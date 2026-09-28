@@ -1,0 +1,8 @@
+$kind: http-request
+url: https://www.haatza.com/_functions/nestBookings?areaName=Neo_Town&page=1&limit=20
+method: GET
+queryParams:
+  areaName: Neo_Town
+  page: "1"
+  limit: "20"
+order: 1790570833962

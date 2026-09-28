@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#FAF9FC] text-[#1F1F1F] font-sans antialiased overflow-x-hidden selection:bg-[#7C3AED] selection:text-white;
+  }
+
+  /* Custom scrollbar matching soft purple & clean light styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F5F3FF;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #DDD6FE;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C4B5FD;
+  }
+
+  /* Hide native browser password reveal / clear icons (e.g. Microsoft Edge ::-ms-reveal) */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.6);
+  }
+}
+
+.radar-pulse {
+  animation: pulseGlow 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
