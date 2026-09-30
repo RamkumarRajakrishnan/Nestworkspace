@@ -237,7 +237,7 @@ export const AssignmentsPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

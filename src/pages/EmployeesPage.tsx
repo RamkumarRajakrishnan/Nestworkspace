@@ -610,32 +610,34 @@ export const EmployeesPage: React.FC = () => {
             <div
               key={e.id}
               onClick={() => setInspectEmployee(e)}
-              className="rounded-2xl border border-[#EEEEF2] bg-white p-4 shadow-soft-sm hover:border-[#5B21B6]/30 transition-all cursor-pointer space-y-3"
+              className="rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-3.5 shadow-soft-sm hover:border-[#5B21B6]/30 transition-all cursor-pointer space-y-2 w-full max-w-full overflow-hidden"
             >
               {/* Card Header: Profile & Status */}
-              <div className="flex items-center justify-between gap-3 border-b border-[#EEEEF2] pb-2.5">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-2.5 border-b border-[#EEEEF2] pb-1.5">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <img
                     src={e.avatar}
                     alt={e.name}
-                    className="h-10 w-10 rounded-full object-cover border border-[#EEEEF2]"
+                    className="h-9 w-9 rounded-full object-cover border border-[#EEEEF2] shrink-0"
                   />
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F1F1F]">{e.name}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="font-mono text-[11px] text-[#6B6B6B]">{e.id}</span>
-                      <span className="inline-flex items-center gap-0.5 font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-1.5 py-0.5 rounded-md">
-                        <MapPin className="h-2.5 w-2.5" />
-                        {e.areaId}
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-[#1F1F1F] truncate">{e.name}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <span className="font-mono text-[11px] text-[#6B6B6B] font-semibold">{e.id}</span>
+                      <span className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-1.5 py-0.5 rounded-md truncate">
+                        <MapPin className="h-2.5 w-2.5 shrink-0" />
+                        <span className="truncate">{e.areaId}</span>
                       </span>
                     </div>
                   </div>
                 </div>
-                <StatusBadge status={e.status} size="sm" pulse={e.status === 'Available'} />
+                <div className="shrink-0">
+                  <StatusBadge status={e.status} size="sm" pulse={e.status === 'Available'} />
+                </div>
               </div>
 
               {/* Skills Tags */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {e.skills.map((skill) => (
                   <span
                     key={skill}
@@ -647,7 +649,7 @@ export const EmployeesPage: React.FC = () => {
               </div>
 
               {/* Footer info & Inspect button */}
-              <div className="flex items-center justify-between border-t border-[#EEEEF2] pt-2 text-xs">
+              <div className="flex items-center justify-between border-t border-[#EEEEF2] pt-1.5 text-xs">
                 <div className="flex items-center gap-1 font-mono text-amber-600 font-semibold">
                   <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
                   <span>{e.rating}</span>
@@ -658,10 +660,11 @@ export const EmployeesPage: React.FC = () => {
                     ev.stopPropagation();
                     setInspectEmployee(e);
                   }}
-                  className="flex items-center gap-1 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-3 py-1.5 text-xs font-semibold shadow-soft-sm transition-all"
+                  title="Inspect Details"
+                  aria-label="Inspect Details"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white shadow-soft-sm transition-all cursor-pointer shrink-0"
                 >
-                  <Eye className="h-3.5 w-3.5" />
-                  Inspect Details
+                  <Eye className="h-4 w-4" />
                 </button>
               </div>
             </div>

@@ -8,14 +8,14 @@ import { BookingDetailDrawer } from '../components/dispatch/BookingDetailDrawer'
 import { AssignWorkerModal } from '../components/assignments/AssignWorkerModal';
 import { getBookings, getActiveAreas, ActiveAreaItem, GetBookingsFilterOptions } from '../services/api';
 import { mapApiBookingToBooking, formatDurationInHours } from '../services/bookingService';
-import { 
-  MapPin, 
-  Eye, 
-  Filter, 
-  X, 
-  ChevronDown, 
-  ChevronUp, 
-  RefreshCw, 
+import {
+  MapPin,
+  Eye,
+  Filter,
+  X,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
   AlertCircle,
   Clock,
   Check,
@@ -84,6 +84,7 @@ export const OrdersPage: React.FC = () => {
 
   // Filter Popover state
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+  const filterContainerRef = useRef<HTMLDivElement>(null);
 
   // Draft states inside the Filter Popover (committed on clicking "Apply")
   const [draftArea, setDraftArea] = useState<string>('');
@@ -92,7 +93,7 @@ export const OrdersPage: React.FC = () => {
   const [draftBookingType, setDraftBookingType] = useState<string>('');
   const [draftDuration, setDraftDuration] = useState<string>('');
 
-  // Accordion sections expansion state - all closed by default
+  // Accordion sections expansion state - all closed by default, mutually exclusive
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     area: false,
     status: false,
@@ -103,10 +104,28 @@ export const OrdersPage: React.FC = () => {
 
   const toggleSection = (sectionKey: string) => {
     setExpandedSections((prev) => ({
-      ...prev,
-      [sectionKey]: !prev[sectionKey],
+      area: sectionKey === 'area' ? !prev.area : false,
+      status: sectionKey === 'status' ? !prev.status : false,
+      bookingType: sectionKey === 'bookingType' ? !prev.bookingType : false,
+      sla: sectionKey === 'sla' ? !prev.sla : false,
+      duration: sectionKey === 'duration' ? !prev.duration : false,
     }));
   };
+
+  // Close filter popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterContainerRef.current && !filterContainerRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    if (isFilterOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isFilterOpen]);
 
   // Inspection Drawer & Assign Modal state
   const [inspectBooking, setInspectBooking] = useState<Booking | null>(null);
@@ -214,7 +233,7 @@ export const OrdersPage: React.FC = () => {
 
   // Requirement: Auto-refresh every 1 minute (60 seconds) without manual refreshment
   // Use a ref to always have access to the latest filter values without resetting the interval
-  const autoRefreshRef = useRef<() => void>(() => {});
+  const autoRefreshRef = useRef<() => void>(() => { });
   useEffect(() => {
     autoRefreshRef.current = () => {
       if (selectedArea && !isLoading && !isRefreshing) {
@@ -311,9 +330,9 @@ export const OrdersPage: React.FC = () => {
       const bId = String(b.bookingId || '').toLowerCase();
       const bAltId = String(b.id || '').toLowerCase();
       const bTableId = String(b.tableId || '').toLowerCase();
-      const matchesId = 
-        bId.includes(qRaw) || 
-        bId.includes(qClean) || 
+      const matchesId =
+        bId.includes(qRaw) ||
+        bId.includes(qClean) ||
         (`#${bId}`).includes(qRaw) ||
         bAltId.includes(qRaw) ||
         bAltId.includes(qClean) ||
@@ -323,17 +342,17 @@ export const OrdersPage: React.FC = () => {
       // 2. Customer Name & Customer Email
       const custName = String(b.customerName || b.customer?.name || '').toLowerCase();
       const custEmail = String(b.customerEmail || b.customer?.email || '').toLowerCase();
-      const matchesCust = 
-        custName.includes(qRaw) || 
-        custName.includes(qClean) || 
+      const matchesCust =
+        custName.includes(qRaw) ||
+        custName.includes(qClean) ||
         custEmail.includes(qRaw);
 
       // 3. Customer Phone (both formatted string and raw numbers)
       const rawPhone = String(b.customerPhone || b.customer?.phone || '').toLowerCase();
       const phoneDigits = rawPhone.replace(/\D/g, '');
-      const matchesPhone = 
-        rawPhone.includes(qRaw) || 
-        rawPhone.includes(qClean) || 
+      const matchesPhone =
+        rawPhone.includes(qRaw) ||
+        rawPhone.includes(qClean) ||
         (qDigits.length >= 3 && phoneDigits.includes(qDigits));
 
       // 4. Vendor / Expert Name & ID
@@ -466,11 +485,10 @@ export const OrdersPage: React.FC = () => {
         return (
           <div className="text-left">
             <span
-              className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold border ${
-                isInstant
+              className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold border ${isInstant
                   ? 'bg-[#EDE9FE] text-[#5B21B6] border-[#DDD6FE]'
                   : 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]'
-              }`}
+                }`}
             >
               {displayType}
             </span>
@@ -569,9 +587,8 @@ export const OrdersPage: React.FC = () => {
         return (
           <div className="text-xs text-left">
             <span
-              className={`font-mono text-xs font-semibold block ${
-                isRisk ? 'text-[#B42318] font-bold animate-pulse' : 'text-[#1F1F1F]'
-              }`}
+              className={`font-mono text-xs font-semibold block ${isRisk ? 'text-[#B42318] font-bold animate-pulse' : 'text-[#1F1F1F]'
+                }`}
             >
               {timer}
             </span>
@@ -622,7 +639,7 @@ export const OrdersPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F1F1F] flex items-center gap-2">
-            Bookings & Order Dispatch
+            Bookings
           </h1>
           <p className="text-xs sm:text-sm text-[#6B6B6B] mt-0.5">
             Monitor incoming customer reservations, assignment coverage, and SLA delivery milestones.
@@ -647,7 +664,7 @@ export const OrdersPage: React.FC = () => {
           </div>
 
           {/* Right: Auto-Refresh info + Refresh button (left beside of filters) + Remove Filters + Filter Button */}
-          <div className="flex items-center gap-2 sm:gap-2.5 self-start lg:self-auto shrink-0 flex-wrap relative">
+          <div ref={filterContainerRef} className="flex items-center gap-2 sm:gap-2.5 self-start lg:self-auto shrink-0 flex-wrap relative">
             {/* Auto-Refresh Status Indicator with Live Countdown Counter */}
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-xs text-[#6B6B6B] shadow-soft-xs">
               {isRefreshing ? (
@@ -706,11 +723,10 @@ export const OrdersPage: React.FC = () => {
                   handleOpenFilter();
                 }
               }}
-              className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
-                isFilterOpen || activeFilterCount > 0
+              className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${isFilterOpen || activeFilterCount > 0
                   ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
                   : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-              }`}
+                }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
@@ -726,7 +742,7 @@ export const OrdersPage: React.FC = () => {
 
             {/* Backing Backdrop for Dismissal */}
             {isFilterOpen && (
-              <div 
+              <div
                 className="fixed inset-0 z-40 bg-black/20 backdrop-blur-xs sm:bg-transparent"
                 onClick={() => setIsFilterOpen(false)}
               />
@@ -792,11 +808,10 @@ export const OrdersPage: React.FC = () => {
                               key={area.areaName}
                               type="button"
                               onClick={() => setDraftArea(area.areaName)}
-                              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                                draftArea === area.areaName
+                              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftArea === area.areaName
                                   ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                              }`}
+                                }`}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>{area.areaName}</span>
@@ -839,17 +854,16 @@ export const OrdersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDraftStatus('ALL')}
-                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                            draftStatus === 'ALL' || draftStatus === ''
+                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftStatus === 'ALL' || draftStatus === ''
                               ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                          }`}
+                            }`}
                         >
                           <span>All Statuses</span>
                           {(draftStatus === 'ALL' || draftStatus === '') && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
                         </button>
                         {STATIC_BOOKING_STATUSES.map((st) => {
-                          const isSelected = 
+                          const isSelected =
                             draftStatus.toLowerCase() === st.id.toLowerCase() ||
                             (st.id === 'Ongoing' && (draftStatus === 'Ongoing' || draftStatus === 'In Progress'));
                           return (
@@ -857,11 +871,10 @@ export const OrdersPage: React.FC = () => {
                               key={st.id}
                               type="button"
                               onClick={() => setDraftStatus(st.id)}
-                              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                                isSelected
+                              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${isSelected
                                   ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                              }`}
+                                }`}
                             >
                               <span>{st.label}</span>
                               {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -899,11 +912,10 @@ export const OrdersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDraftBookingType('ALL')}
-                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                            draftBookingType === 'ALL' || draftBookingType === ''
+                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftBookingType === 'ALL' || draftBookingType === ''
                               ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                          }`}
+                            }`}
                         >
                           <span>All Types</span>
                           {(draftBookingType === 'ALL' || draftBookingType === '') && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -913,11 +925,10 @@ export const OrdersPage: React.FC = () => {
                             key={type.id}
                             type="button"
                             onClick={() => setDraftBookingType(type.id)}
-                            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                              draftBookingType.toLowerCase() === type.id.toLowerCase()
+                            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftBookingType.toLowerCase() === type.id.toLowerCase()
                                 ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                 : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                            }`}
+                              }`}
                           >
                             <span>{type.label}</span>
                             {draftBookingType.toLowerCase() === type.id.toLowerCase() && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -955,11 +966,10 @@ export const OrdersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDraftSlaAlert('ALL')}
-                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                            draftSlaAlert === 'ALL' || draftSlaAlert === ''
+                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftSlaAlert === 'ALL' || draftSlaAlert === ''
                               ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                          }`}
+                            }`}
                         >
                           <span>All Delivery Alerts</span>
                           {(draftSlaAlert === 'ALL' || draftSlaAlert === '') && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -969,11 +979,10 @@ export const OrdersPage: React.FC = () => {
                             key={item.id}
                             type="button"
                             onClick={() => setDraftSlaAlert(item.id)}
-                            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                              draftSlaAlert === item.id
+                            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftSlaAlert === item.id
                                 ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                 : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                            }`}
+                              }`}
                           >
                             <span>{item.label}</span>
                             {draftSlaAlert === item.id && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -1011,11 +1020,10 @@ export const OrdersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDraftDuration('')}
-                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                            !draftDuration
+                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${!draftDuration
                               ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                          }`}
+                            }`}
                         >
                           <span>All Durations</span>
                           {!draftDuration && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -1025,11 +1033,10 @@ export const OrdersPage: React.FC = () => {
                             key={d.val}
                             type="button"
                             onClick={() => setDraftDuration(d.val)}
-                            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                              draftDuration === d.val
+                            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftDuration === d.val
                                 ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                 : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                            }`}
+                              }`}
                           >
                             <span>{d.label}</span>
                             {draftDuration === d.val && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
@@ -1085,12 +1092,12 @@ export const OrdersPage: React.FC = () => {
             {selectedStatus && selectedStatus !== 'ALL' && (
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
                 Status: {selectedStatus === 'In Progress' ? 'Ongoing' : selectedStatus}
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setSelectedStatus('');
                     setDraftStatus('');
-                  }} 
+                  }}
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -1102,12 +1109,12 @@ export const OrdersPage: React.FC = () => {
             {selectedBookingType && selectedBookingType !== 'ALL' && (
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
                 Type: {selectedBookingType === 'scheduled' ? 'Schedule' : selectedBookingType}
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setSelectedBookingType('');
                     setDraftBookingType('');
-                  }} 
+                  }}
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -1119,12 +1126,12 @@ export const OrdersPage: React.FC = () => {
             {selectedSlaAlert && selectedSlaAlert !== 'ALL' && (
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FEF2F2] border border-rose-200 px-2.5 py-0.5 text-[11px] font-semibold text-[#B42318]">
                 SLA: {selectedSlaAlert}
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setSelectedSlaAlert('');
                     setDraftSlaAlert('');
-                  }} 
+                  }}
                   className="hover:text-rose-800 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -1136,12 +1143,12 @@ export const OrdersPage: React.FC = () => {
             {selectedDuration && (
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
                 Duration: {formatDurationInHours(selectedDuration)}
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setSelectedDuration('');
                     setDraftDuration('');
-                  }} 
+                  }}
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -1240,24 +1247,26 @@ export const OrdersPage: React.FC = () => {
               return (
                 <div
                   key={b.bookingId || b.id}
-                  className={`rounded-2xl border p-4 shadow-soft-sm transition-all space-y-3 ${rowStyle.cardClass}`}
+                  className={`rounded-2xl border p-3 sm:p-3.5 shadow-soft-sm transition-all space-y-2 w-full max-w-full overflow-hidden ${rowStyle.cardClass}`}
                 >
                   {/* Card Header: Booking ID + Status */}
-                  <div className="flex items-center justify-between gap-2 border-b border-[#EEEEF2] pb-2.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm font-bold text-[#1F1F1F]">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#EEEEF2] pb-1.5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-mono text-sm font-bold text-[#1F1F1F] shrink-0">
                         #{b.bookingId || b.id}
                       </span>
-                      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-lg">
-                        <MapPin className="h-3 w-3" />
-                        {b.areaName || b.areaId || selectedArea}
+                      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-lg truncate">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{b.areaName || b.areaId || selectedArea}</span>
                       </span>
                     </div>
-                    <StatusBadge status={statusValue} size="sm" pulse={isSlaRisk} />
+                    <div className="shrink-0">
+                      <StatusBadge status={statusValue} size="sm" pulse={isSlaRisk} />
+                    </div>
                   </div>
 
                   {/* Service & Customer Info */}
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="text-sm font-semibold text-[#1F1F1F] flex items-center justify-between">
                       <span className="font-bold text-[#5B21B6]">{displayType}</span>
                       <span className="font-mono text-xs font-bold text-[#5B21B6]">
@@ -1265,48 +1274,49 @@ export const OrdersPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-xs text-[#6B6B6B] flex items-center justify-between">
-                      <span>{custName}</span>
+                      <span className="truncate">{custName}</span>
                       {custPhone && custPhone !== '—' && (
-                        <span className="font-mono text-[11px]">{custPhone}</span>
+                        <span className="font-mono text-[11px] shrink-0 ml-2">{custPhone}</span>
                       )}
                     </div>
                     <p className="text-[11px] text-[#6B6B6B] truncate">{b.address}</p>
                   </div>
 
-                  {/* Key Metrics Row: Slot (no duration, time below date), Duration (in hours), SLA */}
-                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-white/70 p-2.5 text-center text-xs">
+                  {/* Key Metrics Row: Slot, Duration, SLA */}
+                  <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-white/70 p-2 text-center text-xs">
                     <div>
                       <span className="text-[10px] text-[#6B6B6B] block">Slot</span>
-                      <span className="font-mono font-semibold text-[#1F1F1F] text-[11px] block">
+                      <span className="font-mono font-semibold text-[#1F1F1F] text-[11px] block truncate">
                         {dateStr}
                       </span>
-                      <span className="font-mono text-[10px] text-[#6B6B6B] block">
+                      <span className="font-mono text-[10px] text-[#6B6B6B] block truncate">
                         {timeStr}
                       </span>
                     </div>
                     <div>
                       <span className="text-[10px] text-[#6B6B6B] block">Duration</span>
-                      <span className="font-mono font-bold text-[11px] text-[#1F1F1F]">
+                      <span className="font-mono font-bold text-[11px] text-[#1F1F1F] block">
                         {durationHours}
                       </span>
                     </div>
                     <div>
                       <span className="text-[10px] text-[#6B6B6B] block">SLA</span>
-                      <span className={`font-mono text-[11px] font-semibold ${isSlaRisk ? 'text-[#B42318] font-bold animate-pulse' : 'text-[#1F1F1F]'}`}>
+                      <span className={`font-mono text-[11px] font-semibold block ${isSlaRisk ? 'text-[#B42318] font-bold animate-pulse' : 'text-[#1F1F1F]'}`}>
                         {b.slaTimer || '—'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Card Actions */}
+                  {/* Card Actions: Eye icon only (no text) + Assign Expert button */}
                   <div className="flex items-center justify-between pt-1" onClick={(e) => e.stopPropagation()}>
                     <button
                       type="button"
                       onClick={() => setInspectBooking(b)}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+                      title="Inspect Details"
+                      aria-label="Inspect Details"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer shrink-0"
                     >
-                      <Eye className="h-3.5 w-3.5" />
-                      Inspect Details
+                      <Eye className="h-4 w-4" />
                     </button>
 
                     {showAssign && (
@@ -1369,11 +1379,10 @@ export const OrdersPage: React.FC = () => {
                     setPage(p);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`h-8 w-8 rounded-xl font-bold transition-all cursor-pointer ${
-                    safePage === p
+                  className={`h-8 w-8 rounded-xl font-bold transition-all cursor-pointer ${safePage === p
                       ? 'bg-[#5B21B6] text-white shadow-soft-xs'
                       : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
+                    }`}
                 >
                   {p}
                 </button>
@@ -1432,13 +1441,13 @@ export const OrdersPage: React.FC = () => {
             prev.map((b) =>
               b.tableId === updatedBooking.tableId
                 ? {
-                    ...b,
-                    vendorId: updatedBooking.vendorId,
-                    vendorName: updatedBooking.vendorName,
-                    vendorPhoto: updatedBooking.vendorPhoto,
-                    bookingStatus: 'Assigned',
-                    status: 'Assigned',
-                  }
+                  ...b,
+                  vendorId: updatedBooking.vendorId,
+                  vendorName: updatedBooking.vendorName,
+                  vendorPhoto: updatedBooking.vendorPhoto,
+                  bookingStatus: 'Assigned',
+                  status: 'Assigned',
+                }
                 : b
             )
           );

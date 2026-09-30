@@ -11,7 +11,9 @@ interface StatusBadgeProps {
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', pulse = false }) => {
   const getBadgeStyle = () => {
     switch (status) {
-      // Available / Completed / Verified (Soft Green)
+      // Active / Available / Completed / Verified (Soft Green - Active / Enabled State)
+      case 'Active':
+      case 'active':
       case 'Available':
       case 'Completed':
       case 'completed':
@@ -20,6 +22,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', p
       case 'Paid':
       case 'Healthy':
         return 'bg-[#ECFDF3] text-[#027A48] border-[#A6F4C5]';
+
+      // Inactive (Soft Purple / Blue - Brand Theme)
+      case 'Inactive':
+      case 'inactive':
+        return 'bg-[#F5F3FF] text-[#6D28D9] border-[#DDD6FE]';
 
       // Busy / Assigned / Adjusted / Ongoing (Soft Purple - Brand Theme)
       case 'Busy':
@@ -41,12 +48,13 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', p
       case 'Tight':
         return 'bg-[#FFF7ED] text-[#C2410C] border-[#FED7AA]';
 
-      // SLA Risk / Expired / Rejected / Critical (Soft Red)
+      // Suspended / SLA Risk / Expired / Rejected / Critical (Soft Red - Blocked / Suspended State)
+      case 'Suspended':
+      case 'suspended':
       case 'SLA Risk':
       case 'Critical':
       case 'Expired':
       case 'Rejected':
-      case 'Suspended':
         return 'bg-[#FEF2F2] text-[#B42318] border-[#FECDCA]';
 
       // New / Searching / Booked (Soft Cyan / Indigo)

@@ -21,6 +21,7 @@ import { CompliancePage } from './pages/CompliancePage';
 import { PayoutsPage } from './pages/PayoutsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { NestPassPage } from './pages/NestPassPage';
 
 const ProtectedLayout: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -53,6 +54,7 @@ export const App: React.FC = () => {
               <Route path="experts/:id" element={<WorkerDetailPage />} />
               {/* Employees Route */}
               <Route path="employees" element={<EmployeesPage />} />
+              <Route path="nest-pass" element={<NestPassPage />} />
               <Route path="assignments" element={<AssignmentsPage />} />
               <Route path="schedule" element={<SchedulePage />} />
               <Route path="markets" element={<MarketsPage />} />

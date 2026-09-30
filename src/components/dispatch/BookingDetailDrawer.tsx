@@ -115,6 +115,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
         title={`Booking #${bookingIdDisplay}`}
         subtitle={`${booking.service} • Zone: ${areaDisplay}`}
         width="lg"
+        lockBackgroundScroll={true}
         actions={
           <button
             onClick={() => {

@@ -194,7 +194,7 @@ export const PayoutsPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -218,7 +218,7 @@ export const PayoutsPage: React.FC = () => {
       </div>
 
       {/* Financial KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <KpiCard
           title="Total Gross"
           value={`₹${totalGross.toLocaleString()}`}

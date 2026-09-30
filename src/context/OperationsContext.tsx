@@ -62,6 +62,7 @@ interface OperationsContextType {
   approvePayout: (payoutId: string) => Promise<boolean>;
   addPayoutAdjustment: (payoutId: string, item: Omit<LedgerItem, 'id' | 'date'>) => Promise<boolean>;
   markNotificationRead: (notifId: string) => void;
+  refreshMarkets: () => Promise<void>;
 
   // Scenario Triggers for testing/demonstration
   runScenario1CapacityCrunch: () => void;
@@ -120,6 +121,15 @@ export const OperationsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const markNotificationRead = (notifId: string) => {
     setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, read: true } : n));
+  };
+
+  const refreshMarkets = async () => {
+    try {
+      const mList = await marketService.getMarkets();
+      setMarkets(mList);
+    } catch (err) {
+      console.error('Failed to refresh markets:', err);
+    }
   };
 
   const assignWorker = async (bookingId: string, workerId: string): Promise<boolean> => {
@@ -522,6 +532,7 @@ export const OperationsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       approvePayout,
       addPayoutAdjustment,
       markNotificationRead,
+      refreshMarkets,
       runScenario1CapacityCrunch,
     }}>
       {children}

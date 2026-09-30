@@ -132,6 +132,13 @@ export interface Market {
   id: string;
   name: string;
   area: string;
+  tableId?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  pincode?: number;
+  latitude?: number;
+  longitude?: number;
   radius: number;
   maxRadius: number;
   availableWorkers: number;
@@ -147,6 +154,7 @@ export interface Market {
   surgeIncentiveActive: boolean;
   surgeMultiplier: number;
   paused?: boolean;
+  rawArea?: any;
 }
 
 export interface Assignment {

@@ -157,7 +157,7 @@ export const SchedulePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -432,8 +432,8 @@ export const SchedulePage: React.FC = () => {
       </div>
 
       {/* Schedule Matrix Table */}
-      <div className="overflow-hidden rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-sm">
-        <div className="overflow-x-auto">
+      <div className="w-full max-w-full overflow-hidden rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-sm">
+        <div className="w-full overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B] uppercase text-[11px] font-semibold">

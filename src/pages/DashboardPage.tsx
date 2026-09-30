@@ -93,7 +93,7 @@ export const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Top Welcome & Quick Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -162,7 +162,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 8 Top Operational KPI Cards (Section 7: White rounded-2xl cards with circular purple icon containers) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3.5">
         <KpiCard
           title="Active Orders"
           value={activeOrdersCount}

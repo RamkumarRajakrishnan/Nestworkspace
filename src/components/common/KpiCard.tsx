@@ -48,7 +48,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
     <div
       onClick={onClick}
       className={clsx(
-        'group relative rounded-2xl border transition-all duration-200 p-4.5',
+        'group relative rounded-2xl border transition-all duration-200 p-3 sm:p-3.5',
         isPurpleHighlight
           ? 'bg-gradient-to-br from-[#5B21B6] to-[#7C3AED] text-white border-transparent shadow-soft-md'
           : 'bg-white border-[#EEEEF2] text-[#1F1F1F] shadow-soft-sm hover:shadow-soft-md hover:border-[#DDD6FE]',
@@ -56,20 +56,20 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       )}
     >
       <div className="flex items-start justify-between">
-        {/* Soft Circular Icon Container (Worker app style) */}
+        {/* Soft Circular Icon Container */}
         <div
           className={clsx(
-            'flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-105',
+            'flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-105 shrink-0',
             getIconContainerStyle()
           )}
         >
-          <Icon className="h-5 w-5" />
+          <Icon className="h-4.5 w-4.5" />
         </div>
 
         {trend && (
           <span
             className={clsx(
-              'rounded-full px-2 py-0.5 text-[11px] font-semibold font-mono',
+              'rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold font-mono',
               isPurpleHighlight
                 ? 'bg-white/20 text-white'
                 : trend.isNeutral
@@ -84,10 +84,10 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         )}
       </div>
 
-      <div className="mt-3.5 space-y-1">
+      <div className="mt-2.5 space-y-0.5">
         <p
           className={clsx(
-            'text-xs font-semibold uppercase tracking-wider',
+            'text-[11px] font-semibold uppercase tracking-wider',
             isPurpleHighlight ? 'text-purple-200' : 'text-[#6B6B6B]'
           )}
         >
@@ -95,7 +95,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         </p>
         <div
           className={clsx(
-            'text-2xl font-bold font-mono tracking-tight',
+            'text-xl sm:text-2xl font-bold font-mono tracking-tight',
             isPurpleHighlight ? 'text-white' : 'text-[#1F1F1F]'
           )}
         >
@@ -104,7 +104,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         {subtext && (
           <p
             className={clsx(
-              'text-[11px]',
+              'text-[10px] sm:text-[11px]',
               isPurpleHighlight ? 'text-purple-200/90' : 'text-[#6B6B6B]'
             )}
           >

@@ -4,9 +4,9 @@ import {
   LayoutDashboard,
   MapPin,
   ShoppingBag,
-  Users,
+  // Users,
   UserCheck,
-  Briefcase,
+  // Briefcase,
   CalendarDays,
   Store,
   ShieldCheck,
@@ -15,128 +15,107 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
-  X
+  // ChevronDown,
+  Ticket
 } from 'lucide-react';
-import logoImg from '../../assets/Logo.png';
-import { useOperations } from '../../context/OperationsContext';
 
 interface SidebarProps {
   collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-  mobileOpen: boolean;
-  setMobileOpen: (open: boolean) => void;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
-  setCollapsed,
-  mobileOpen,
-  setMobileOpen
+  setCollapsed
 }) => {
-  const { bookings, documents, payouts } = useOperations();
   const location = useLocation();
 
-  const slaRiskCount = bookings.filter((b) => b.status === 'SLA Risk').length;
-  const pendingDocsCount = documents.filter((d) => d.status === 'Pending' || d.status === 'Expiring Soon').length;
-  const pendingPayoutsCount = payouts.filter((p) => p.status === 'Under Review' || p.status === 'Calculated').length;
+  // --- Manage Users dropdown state (disabled for now; kept for future re-enabling) ---
+  // const isManageUsersRoute =
+  //   location.pathname.startsWith('/workers') ||
+  //   location.pathname.startsWith('/experts') ||
+  //   location.pathname.startsWith('/employees');
+  //
+  // const [isManageUsersOpen, setIsManageUsersOpen] = useState(true);
+  //
+  // // Automatically keep expanded when on /experts, /workers, or /employees
+  // useEffect(() => {
+  //   if (isManageUsersRoute) {
+  //     setIsManageUsersOpen(true);
+  //   }
+  // }, [isManageUsersRoute]);
 
-  const isManageUsersRoute =
-    location.pathname.startsWith('/workers') ||
-    location.pathname.startsWith('/experts') ||
-    location.pathname.startsWith('/employees');
+  const [activeTooltip, setActiveTooltip] = useState<{ text: string; top: number } | null>(null);
 
-  const [isManageUsersOpen, setIsManageUsersOpen] = useState(true);
-
-  // Automatically keep expanded when on /experts, /workers, or /employees
+  // Clear tooltip whenever sidebar state changes
   useEffect(() => {
-    if (isManageUsersRoute) {
-      setIsManageUsersOpen(true);
+    setActiveTooltip(null);
+  }, [collapsed]);
+
+  const showTooltip = (text: string, e: React.MouseEvent<HTMLElement>) => {
+    if (collapsed) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setActiveTooltip({
+        text,
+        top: rect.top + rect.height / 2,
+      });
     }
-  }, [isManageUsersRoute]);
+  };
+
+  const hideTooltip = () => {
+    setActiveTooltip(null);
+  };
 
   const navItemsTop = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Live Dispatch', path: '/dispatch', icon: MapPin, badge: slaRiskCount > 0 ? `${slaRiskCount} Risk` : undefined, badgeColor: 'bg-[#B42318]' },
-    { name: 'Orders', path: '/orders', icon: ShoppingBag, badge: bookings.filter((b) => b.status === 'Searching' || b.status === 'New').length || undefined },
+    { name: 'Live Dispatch', path: '/dispatch', icon: MapPin },
+    { name: 'Orders', path: '/orders', icon: ShoppingBag },
   ];
 
   const navItemsBottom = [
     { name: 'Assignments', path: '/assignments', icon: UserCheck },
     { name: 'Schedule', path: '/schedule', icon: CalendarDays },
     { name: 'Markets', path: '/markets', icon: Store },
-    { name: 'Compliance', path: '/compliance', icon: ShieldCheck, badge: pendingDocsCount || undefined, badgeColor: 'bg-[#C2410C]' },
-    { name: 'Payouts', path: '/payouts', icon: CreditCard, badge: pendingPayoutsCount || undefined, badgeColor: 'bg-[#5B21B6]' },
+    { name: 'Compliance', path: '/compliance', icon: ShieldCheck },
+    { name: 'Payouts', path: '/payouts', icon: CreditCard },
     { name: 'Reports', path: '/reports', icon: BarChart3 },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
-  const handleToggleManageUsers = () => {
-    if (collapsed) {
-      setCollapsed(false);
-      setIsManageUsersOpen(true);
-    } else {
-      setIsManageUsersOpen((prev) => !prev);
-    }
-  };
+  // const handleToggleManageUsers = () => {
+  //   if (collapsed) {
+  //     setCollapsed(false);
+  //     setIsManageUsersOpen(true);
+  //   } else {
+  //     setIsManageUsersOpen((prev) => !prev);
+  //   }
+  // };
 
   return (
     <>
-      {/* Mobile Backdrop Overlay */}
-      {mobileOpen && (
-        <div
-          onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs transition-opacity md:hidden"
-          aria-hidden="true"
-        />
-      )}
-
       {/* Sidebar Panel */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-purple-900 bg-purple-800 transition-all duration-300 ${mobileOpen ? 'translate-x-0 w-64 shadow-2xl' : '-translate-x-full md:translate-x-0'
-          } ${collapsed ? 'md:w-18' : 'md:w-60'}`}
+        className={`fixed top-16 bottom-0 left-0 z-40 flex flex-col border-r border-purple-900 bg-purple-800 transition-all duration-300 ${
+          collapsed ? 'w-16' : 'w-48 sm:w-56 lg:w-60'
+        }`}
       >
-        {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between border-b border-purple-200 px-4 bg-purple-100">
-          <div className="flex items-center overflow-hidden">
-            {(!collapsed || mobileOpen) ? (
-              <img
-                src={logoImg}
-                alt="Haatza Nest"
-                className="h-8 w-auto max-w-[150px] object-contain"
-              />
-            ) : (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-purple-200/60 p-1">
-                <img
-                  src={logoImg}
-                  alt="Haatza Nest"
-                  className="h-full w-full object-cover object-left"
-                />
-              </div>
-            )}
-          </div>
+        {/* Compact Semicircular Toggle Attached to Sidebar Border */}
+        <button
+          type="button"
+          onClick={() => setCollapsed((prev) => !prev)}
+          className="absolute left-[calc(100%-1px)] top-3.5 z-40 flex h-7 w-4 items-center justify-center rounded-r-full rounded-l-none border-y border-r border-l-0 border-purple-300 bg-white text-[#5B21B6] shadow-sm hover:bg-[#F5F3FF] hover:text-[#4C1D95] active:scale-95 transition-all cursor-pointer select-none focus:outline-none"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-3.5 w-3.5 stroke-[2.5] -ml-0.5" />
+          ) : (
+            <ChevronLeft className="h-3.5 w-3.5 stroke-[2.5] -ml-0.5" />
+          )}
+        </button>
 
-          {/* Desktop collapse toggle */}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex rounded-lg p-1.5 text-[#5B21B6] hover:bg-purple-200 hover:text-[#5B21B6] transition-colors cursor-pointer"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
-
-          {/* Mobile close button */}
-          <button
-            onClick={() => setMobileOpen(false)}
-            className="flex md:hidden rounded-lg p-1.5 text-white hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors cursor-pointer"
-            title="Close navigation"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Nav Menu */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        {/* Nav Menu Items */}
+        <nav className="flex-1 space-y-1 overflow-y-auto px-2 sm:px-2.5 pt-3 pb-3">
           {/* Top Section Nav Items (Dashboard, Live Dispatch, Orders) */}
           {navItemsTop.map((item) => {
             const Icon = item.icon;
@@ -144,93 +123,132 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <NavLink
                 key={item.path}
                 to={item.path}
-                onClick={() => setMobileOpen(false)}
+                onMouseEnter={(e) => showTooltip(item.name, e)}
+                onMouseLeave={hideTooltip}
                 className={({ isActive }) =>
-                  `group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
-                    ? 'bg-[#EDE9FE] text-[#5B21B6]'
-                    : 'text-white hover:bg-[#FAF9FC] hover:text-[#1F1F1F]'
+                  `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
+                  } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
+                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                    : 'text-white hover:bg-purple-700/60 hover:text-white'
                   }`
                 }
-                title={collapsed && !mobileOpen ? item.name : undefined}
+                title={collapsed ? item.name : undefined}
               >
                 <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {(!collapsed || mobileOpen) && <span className="truncate">{item.name}</span>}
-
-                {/* Badges */}
-                {item.badge && (
-                  <span
-                    className={`ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${item.badgeColor || 'bg-[#5B21B6]'
-                      } ${collapsed && !mobileOpen ? 'absolute top-1 right-1' : ''}`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
+                {!collapsed && <span className="truncate">{item.name}</span>}
               </NavLink>
             );
           })}
 
-          {/* Manage Users Dropdown Section */}
+          {/* Manage Users Dropdown Section (disabled for now; kept for future re-enabling)
+              To re-enable: restore the commented state/handlers/imports above, and
+              remove the  top-level link below.
+
           <div className="space-y-1 pt-0.5">
             <button
               type="button"
               onClick={handleToggleManageUsers}
-              className={`group relative flex items-center justify-between w-full rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer ${isManageUsersRoute
-                ? 'text-[#5B21B6] bg-[#EDE9FE]/40 font-bold'
-                : 'text-white hover:bg-[#FAF9FC] hover:text-[#1F1F1F]'
-                }`}
-              title={collapsed && !mobileOpen ? 'Manage Users' : undefined}
+              onMouseEnter={(e) => showTooltip('Manage Users', e)}
+              onMouseLeave={hideTooltip}
+              className={`group relative flex items-center ${
+                collapsed ? 'justify-center px-2' : 'justify-between px-3.5'
+              } w-full rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                isManageUsersRoute
+                  ? 'text-[#5B21B6] bg-[#EDE9FE] font-bold shadow-soft-xs'
+                  : 'text-white hover:bg-purple-700/60 hover:text-white'
+              }`}
+              title={collapsed ? 'Manage Users' : undefined}
               aria-expanded={isManageUsersOpen}
             >
-              <div className="flex items-center gap-3 min-w-0">
+              <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} min-w-0`}>
                 <Users className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {(!collapsed || mobileOpen) && (
+                {!collapsed && (
                   <span className="truncate">Manage Users</span>
                 )}
               </div>
-              {(!collapsed || mobileOpen) && (
+              {!collapsed && (
                 <ChevronDown
-                  className={`h-3.5 w-3.5 text-white transition-transform duration-200 ${isManageUsersOpen ? 'rotate-180 text-[#5B21B6]' : ''
-                    }`}
+                  className={`h-4 w-4 shrink-0 transition-transform duration-200 stroke-[2.5] ${
+                    isManageUsersRoute ? 'text-[#5B21B6]' : 'text-[#DDD6FE]'
+                  } ${isManageUsersOpen ? 'rotate-180' : ''}`}
                 />
               )}
             </button>
 
-            {/* Collapsible Sub-menu: Experts & Employees */}
-            {isManageUsersOpen && (!collapsed || mobileOpen) && (
-              <div className="ml-4 pl-3 border-l-2 border-[#EEEEF2] space-y-1 my-1 animate-in fade-in slide-in-from-top-1">
-                {/* 1. Experts */}
+            {isManageUsersOpen && (
+              <div
+                className={
+                  collapsed
+                    ? 'space-y-1 my-1 flex flex-col items-center'
+                    : 'ml-4 pl-3 border-l-2 border-purple-700/60 space-y-1 my-1 animate-in fade-in slide-in-from-top-1'
+                }
+              >
                 <NavLink
                   to="/experts"
-                  onClick={() => setMobileOpen(false)}
+                  onMouseEnter={(e) => showTooltip('Experts', e)}
+                  onMouseLeave={hideTooltip}
                   className={({ isActive }) => {
-                    const isExpertActive = isActive || location.pathname.startsWith('/workers') || location.pathname.startsWith('/experts');
-                    return `flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${isExpertActive
-                      ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                      : 'text-white hover:bg-[#FAF9FC] hover:text-[#1F1F1F]'
-                      }`;
+                    const isExpertActive =
+                      isActive ||
+                      location.pathname.startsWith('/workers') ||
+                      location.pathname.startsWith('/experts');
+                    return `flex items-center ${
+                      collapsed ? 'justify-center px-2 w-full' : 'gap-2.5 px-3'
+                    } py-2 rounded-lg text-xs font-semibold transition-all ${
+                      isExpertActive
+                        ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                        : 'text-white hover:bg-purple-700/60 hover:text-white'
+                    }`;
                   }}
+                  title={collapsed ? 'Experts' : undefined}
                 >
-                  <UserCheck className="h-3.5 w-3.5" />
-                  <span>Experts</span>
-                </NavLink>
-
-                {/* 2. Employees */}
-                <NavLink
-                  to="/employees"
-                  onClick={() => setMobileOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${isActive
-                      ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                      : 'text-white hover:bg-[#FAF9FC] hover:text-[#1F1F1F]'
-                    }`
-                  }
-                >
-                  <Briefcase className="h-3.5 w-3.5" />
-                  <span>Employees</span>
+                  <UserCheck className="h-3.5 w-3.5 shrink-0" />
+                  {!collapsed && <span>Experts</span>}
                 </NavLink>
               </div>
             )}
           </div>
+          */}
+
+          {/* Experts Top-level Item */}
+          <NavLink
+            to="/experts"
+            onMouseEnter={(e) => showTooltip('Experts', e)}
+            onMouseLeave={hideTooltip}
+            className={({ isActive }) => {
+              const isExpertActive =
+                isActive ||
+                location.pathname.startsWith('/workers') ||
+                location.pathname.startsWith('/experts');
+              return `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
+                } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isExpertActive
+                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                  : 'text-white hover:bg-purple-700/60 hover:text-white'
+                }`;
+            }}
+            title={collapsed ? 'Experts' : undefined}
+          >
+            <UserCheck className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
+            {!collapsed && <span className="truncate">Manage Experts</span>}
+          </NavLink>
+
+          {/* Nest Pass Top-level Item */}
+          <NavLink
+            to="/nest-pass"
+            onMouseEnter={(e) => showTooltip('Nest Pass', e)}
+            onMouseLeave={hideTooltip}
+            className={({ isActive }) =>
+              `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
+              } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
+                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                : 'text-white hover:bg-purple-700/60 hover:text-white'
+              }`
+            }
+            title={collapsed ? 'Nest Pass' : undefined}
+          >
+            <Ticket className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
+            {!collapsed && <span className="truncate">Nest Pass</span>}
+          </NavLink>
 
           {/* Bottom Section Nav Items (Assignments, Schedule, Markets, Compliance, Payouts, Reports, Settings) */}
           {navItemsBottom.map((item) => {
@@ -239,45 +257,54 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <NavLink
                 key={item.path}
                 to={item.path}
-                onClick={() => setMobileOpen(false)}
+                onMouseEnter={(e) => showTooltip(item.name, e)}
+                onMouseLeave={hideTooltip}
                 className={({ isActive }) =>
-                  `group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
-                    ? 'bg-[#EDE9FE] text-[#5B21B6]'
-                    : 'text-white hover:bg-[#FAF9FC] hover:text-[#1F1F1F]'
+                  `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
+                  } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
+                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                    : 'text-white hover:bg-purple-700/60 hover:text-white'
                   }`
                 }
-                title={collapsed && !mobileOpen ? item.name : undefined}
+                title={collapsed ? item.name : undefined}
               >
                 <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {(!collapsed || mobileOpen) && <span className="truncate">{item.name}</span>}
-
-                {/* Badges */}
-                {item.badge && (
-                  <span
-                    className={`ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${item.badgeColor || 'bg-[#5B21B6]'
-                      } ${collapsed && !mobileOpen ? 'absolute top-1 right-1' : ''}`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
+                {!collapsed && <span className="truncate">{item.name}</span>}
               </NavLink>
             );
           })}
         </nav>
 
-        {/* Operations Telemetry Footer */}
-        {(!collapsed || mobileOpen) && (
-          <div className="border-t border-purple-800 p-3.5 bg-purple-800">
-            <div className="flex items-center gap-2.5 rounded-xl bg-white p-2.5 border border-[#EEEEF2] shadow-soft-sm">
-              <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-[#1F1F1F]">Dispatch Engine Live</span>
-                <span className="text-[10px] text-white font-mono">Cluster: Bengaluru South</span>
+        {/* Operations Telemetry Footer (Visible when expanded) */}
+        {!collapsed && (
+          <div className="border-t border-purple-900/60 p-2.5 sm:p-3 bg-purple-800/80 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl bg-purple-900/50 p-2 sm:p-2.5 border border-purple-700/50 shadow-soft-sm">
+              <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[11px] font-bold text-white truncate">Dispatch Engine Live</span>
+                <span className="text-[10px] text-purple-200 font-mono truncate">Cluster: Bengaluru South</span>
               </div>
             </div>
           </div>
         )}
       </aside>
+
+      {/* Floating Instant Tooltip when Collapsed (renders outside sidebar to prevent clipping) */}
+      {collapsed && activeTooltip && (
+        <div
+          className="fixed z-50 pointer-events-none flex items-center transition-opacity animate-in fade-in zoom-in-95 duration-100"
+          style={{
+            left: '4.75rem',
+            top: `${activeTooltip.top}px`,
+            transform: 'translateY(-50%)',
+          }}
+        >
+          <div className="relative rounded-lg bg-[#5B21B6] px-3 py-1.5 text-xs font-semibold text-white shadow-xl shadow-purple-950/40 border border-purple-400/30 whitespace-nowrap flex items-center">
+            <span className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#5B21B6]" />
+            {activeTooltip.text}
+          </div>
+        </div>
+      )}
     </>
   );
 };

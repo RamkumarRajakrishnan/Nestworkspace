@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { EmptyState } from './EmptyState';
 
 export interface Column<T> {
-  header: string;
+  header: React.ReactNode;
   accessor?: keyof T;
   render?: (row: T, index: number) => React.ReactNode;
   className?: string;
@@ -19,6 +19,7 @@ interface DataTableProps<T> {
   emptyTitle?: string;
   emptyDescription?: string;
   rowClassName?: (row: T, index: number) => string;
+  compact?: boolean;
 }
 
 export function DataTable<T>({
@@ -30,6 +31,7 @@ export function DataTable<T>({
   emptyTitle = 'No data available',
   emptyDescription = 'No records match the selected criteria',
   rowClassName,
+  compact = false,
 }: DataTableProps<T>) {
   if (isLoading) {
     return (
@@ -50,16 +52,26 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs text-[#1F1F1F]">
+    <div className="w-full max-w-full overflow-hidden rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-sm">
+      <div className="w-full overflow-x-auto">
+        <table className="w-full min-w-full text-left text-xs text-[#1F1F1F]">
           <thead className="border-b border-[#EEEEF2] bg-[#FAF9FC] text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
                   className={clsx(
-                    'px-4 py-3.5',
+                    'whitespace-nowrap',
+                    compact
+                      ? clsx(
+                          'py-3 align-middle text-[10px] sm:text-[11px] leading-tight',
+                          idx === 0
+                            ? 'pl-4 pr-2.5 sm:pl-5 sm:pr-3'
+                            : idx === columns.length - 1
+                            ? 'pl-2.5 pr-4 sm:pl-3 sm:pr-5'
+                            : 'px-2.5 sm:px-3'
+                        )
+                      : 'px-4 py-3.5 align-middle',
                     col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left',
                     col.className
                   )}
@@ -87,7 +99,16 @@ export function DataTable<T>({
                     <td
                       key={colIdx}
                       className={clsx(
-                        'px-4 py-3.5 whitespace-nowrap align-middle',
+                        compact
+                          ? clsx(
+                              'py-2.5 whitespace-nowrap align-middle',
+                              colIdx === 0
+                                ? 'pl-4 pr-2.5 sm:pl-5 sm:pr-3'
+                                : colIdx === columns.length - 1
+                                ? 'pl-2.5 pr-4 sm:pl-3 sm:pr-5'
+                                : 'px-2.5 sm:px-3'
+                            )
+                          : 'px-4 py-3.5 whitespace-nowrap align-middle',
                         col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left',
                         col.className
                       )}
@@ -105,7 +126,7 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between border-t border-[#EEEEF2] bg-[#FAF9FC] px-4 py-3 text-xs text-[#6B6B6B]">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#EEEEF2] bg-[#FAF9FC] px-4 py-3 text-xs text-[#6B6B6B]">
         <span>Showing <strong className="text-[#1F1F1F] font-semibold">{data.length}</strong> records</span>
         <span className="font-mono text-[11px] text-[#5B21B6] font-semibold">Live Realtime Sync</span>
       </div>

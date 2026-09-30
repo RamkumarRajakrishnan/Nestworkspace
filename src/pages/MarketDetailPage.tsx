@@ -1,65 +1,91 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useOperations } from '../context/OperationsContext';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { CapacityCrunchPanel } from '../components/markets/CapacityCrunchPanel';
 import { 
   ArrowLeft, 
   MapPin, 
-  Users, 
-  ShoppingBag, 
-  Compass, 
-  Zap, 
-  PauseCircle, 
-  PlayCircle,
-  Network, 
-  Sliders,
-  ChevronRight,
-  Clock,
-  TrendingUp,
-  AlertTriangle
+  Radio, 
+  Clock, 
+  RotateCw, 
+  AlertCircle, 
+  Loader2, 
+  Sparkles 
 } from 'lucide-react';
+import { getNestAreaById, RawNestAreaDetail, RawNestAreaDurationItem } from '../services/api';
 
 export const MarketDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { 
-    markets, 
-    workers, 
-    bookings, 
-    expandMarketRadius, 
-    toggleMarketSurge, 
-    toggleMarketPause 
-  } = useOperations();
+  const location = useLocation();
+  const routeState = location.state as { marketName?: string; areaDetail?: RawNestAreaDetail } | null;
 
-  const [radiusInput, setRadiusInput] = useState<number>(500);
+  // Real API details state via getNestAreaById?tableId={tableId}
+  const [areaDetail, setAreaDetail] = useState<RawNestAreaDetail | null>(() => routeState?.areaDetail || null);
+  const [durations, setDurations] = useState<RawNestAreaDurationItem[]>([]);
+  const [isLoadingApi, setIsLoadingApi] = useState<boolean>(!routeState?.areaDetail);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  const market = markets.find((m) => m.id === id);
+  // Fetch complete details by tableId using GET https://www.haatza.com/_functions/getNestAreaById?tableId={tableId}
+  useEffect(() => {
+    if (!id) return;
 
-  if (!market) {
-    return (
-      <div className="py-16 text-center space-y-3">
-        <h2 className="text-base font-bold text-white">Nano-Market #{id} Not Found</h2>
-        <button
-          onClick={() => navigate('/markets')}
-          className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-emerald-500"
-        >
-          Return to Markets
-        </button>
-      </div>
-    );
-  }
+    let isMounted = true;
+    if (!areaDetail) {
+      setIsLoadingApi(true);
+    }
+    setApiError(null);
 
-  const marketWorkers = workers.filter((w) => w.areaId === market.id);
-  const marketBookings = bookings.filter((b) => b.areaId === market.id);
+    getNestAreaById(id)
+      .then((res) => {
+        if (!isMounted) return;
+        if (res.success && res.data) {
+          setAreaDetail(res.data.area || null);
+          setDurations(Array.isArray(res.data.durations) ? res.data.durations : []);
+        } else {
+          setApiError(res.error || 'Unable to load market details. Please try again.');
+        }
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        setApiError(err?.message || 'Unable to load market details. Please try again.');
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingApi(false);
+      });
 
-  const availableWorkersCount = marketWorkers.filter((w) => w.status === 'Available').length;
-  const busyWorkersCount = marketWorkers.filter((w) => w.status === 'Busy' || w.status === 'Assigned' || w.status === 'Traveling').length;
-  const offlineWorkersCount = marketWorkers.filter((w) => w.status === 'Offline' || w.status === 'Unavailable').length;
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
-  const handleApplyRadius = async () => {
-    await expandMarketRadius(market.id, radiusInput);
+  const handleRetryApi = () => {
+    if (!id) return;
+    setIsLoadingApi(true);
+    setApiError(null);
+    getNestAreaById(id)
+      .then((res) => {
+        setIsLoadingApi(false);
+        if (res.success && res.data) {
+          setAreaDetail(res.data.area || null);
+          setDurations(Array.isArray(res.data.durations) ? res.data.durations : []);
+        } else {
+          setApiError(res.error || 'Unable to load market details. Please try again.');
+        }
+      })
+      .catch((err) => {
+        setIsLoadingApi(false);
+        setApiError(err?.message || 'Unable to load market details. Please try again.');
+      });
   };
+
+  const passedMarketName = routeState?.marketName || routeState?.areaDetail?.areaName;
+  const displayName = areaDetail?.areaName 
+    ? areaDetail.areaName.replace(/_/g, ' ') 
+    : (passedMarketName ? passedMarketName.replace(/_/g, ' ') : 'Market Details');
+  const locationText = [areaDetail?.city, areaDetail?.state, areaDetail?.country].filter(Boolean).join(', ') || '—';
+  const isPriority = Boolean(areaDetail?.priorityArea);
+  const isOperational = areaDetail?.serviceStatus !== false;
+  const isActive = areaDetail?.isActive !== false;
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -68,199 +94,250 @@ export const MarketDetailPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/markets')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors"
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-[#1F1F1F]">{market.name}</h1>
-              <span className="font-mono text-xs font-semibold text-[#6B6B6B]">({market.id})</span>
-              <StatusBadge status={market.status} size="md" pulse={market.capacity >= 90} />
+              <h1 className="text-xl font-bold text-[#1F1F1F]">{displayName}</h1>
+              {isPriority ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-300 text-amber-800 shadow-soft-xs">
+                  <Sparkles className="h-3 w-3 text-amber-500 fill-amber-400 animate-pulse" />
+                  <span>Priority Area</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                  <span>Standard Area</span>
+                </span>
+              )}
+              <StatusBadge status={isActive ? 'Healthy' : 'Critical'} size="md" />
             </div>
             <p className="text-xs text-[#6B6B6B] mt-0.5">
-              {market.area} • Primary dispatch perimeter: {market.radius}m
+              {locationText} • Primary dispatch perimeter: {areaDetail?.coverageRadius ?? 0}m
             </p>
           </div>
         </div>
 
-        {/* Global Controls */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => toggleMarketSurge(market.id)}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold border transition-all shadow-soft-sm ${
-              market.surgeIncentiveActive
-                ? 'bg-[#FFF7ED] border-amber-300 text-[#C2410C]'
-                : 'border-[#EEEEF2] bg-white text-[#1F1F1F] hover:bg-[#FAF9FC]'
-            }`}
+            onClick={handleRetryApi}
+            className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-all shadow-soft-sm cursor-pointer"
           >
-            <Zap className="h-3.5 w-3.5" />
-            {market.surgeIncentiveActive ? `Surge Active (${market.surgeMultiplier}x)` : 'Enable Surge Incentive'}
-          </button>
-
-          <button
-            onClick={() => toggleMarketPause(market.id)}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold border transition-all shadow-soft-sm ${
-              market.paused
-                ? 'bg-[#FEF2F2] border-rose-300 text-[#B42318]'
-                : 'border-[#EEEEF2] bg-white text-[#1F1F1F] hover:bg-[#FAF9FC]'
-            }`}
-          >
-            {market.paused ? <PlayCircle className="h-3.5 w-3.5" /> : <PauseCircle className="h-3.5 w-3.5" />}
-            {market.paused ? 'Resume Market' : 'Pause Intake'}
+            <RotateCw className="h-3.5 w-3.5 text-[#6B6B6B]" />
+            <span>Refresh Data</span>
           </button>
         </div>
       </div>
 
-      {/* Capacity Crunch Escalation Panel (Section 17 & Scenario 1 Demonstration) */}
-      <CapacityCrunchPanel market={market} />
-
-      {/* Grid: Supply Breakdown, Demand Breakdown, Dispatch Config */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Current Supply Breakdown */}
-        <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
-            <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#5B21B6]" />
-              Current Expert Supply Pool
-            </h3>
-            <span className="font-mono text-xs text-[#5B21B6] font-bold bg-[#EDE9FE] px-2 py-0.5 rounded-lg">
-              Experts: {marketWorkers.length}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
-              <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Available</span>
-              <div className="text-xl font-bold font-mono text-emerald-700 mt-1">{availableWorkersCount}</div>
-            </div>
-            <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
-              <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Busy</span>
-              <div className="text-xl font-bold font-mono text-[#7C3AED] mt-1">{busyWorkersCount}</div>
-            </div>
-            <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
-              <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Offline</span>
-              <div className="text-xl font-bold font-mono text-[#6B6B6B] mt-1">{offlineWorkersCount}</div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#EEEEF2] pt-3">
-            <button
-              onClick={() => navigate('/workers')}
-              className="text-xs font-semibold text-[#5B21B6] hover:text-[#4C1D95] flex items-center gap-1"
-            >
-              View All Experts in this Market →
-            </button>
-          </div>
+      {/* Loading State */}
+      {isLoadingApi && (
+        <div className="py-20 text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin text-[#5B21B6] mx-auto" />
+          <div className="text-sm font-semibold text-[#1F1F1F]">Loading Market Telemetry...</div>
+          <p className="text-xs text-[#6B6B6B]">
+            Fetching market parameters and complete pricing tiers from API.
+          </p>
         </div>
+      )}
 
-        {/* Current Demand Breakdown */}
-        <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
-            <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4 text-[#5B21B6]" />
-              Current Demand Load
-            </h3>
-            <span className="font-mono text-xs text-[#5B21B6] font-semibold">{market.activeOrders} Active</span>
+      {/* API Error Banner */}
+      {!isLoadingApi && apiError && (
+        <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-xs text-rose-800">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
+            <span className="font-semibold">{apiError}</span>
           </div>
-
-          <div className="grid grid-cols-2 gap-2 text-center">
-            <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
-              <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Queued / Waiting</span>
-              <div className="text-xl font-bold font-mono text-amber-700 mt-1">{market.queuedOrders}</div>
-            </div>
-            <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
-              <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Expected (Next 2h)</span>
-              <div className="text-xl font-bold font-mono text-[#1F1F1F] mt-1">~14 orders</div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#EEEEF2] pt-3">
-            <button
-              onClick={() => navigate('/orders')}
-              className="text-xs font-semibold text-[#5B21B6] hover:text-[#4C1D95] flex items-center gap-1"
-            >
-              View Active Bookings in this Market →
-            </button>
-          </div>
+          <button
+            onClick={handleRetryApi}
+            className="flex items-center gap-1 rounded-lg bg-rose-600 text-white px-3 py-1 font-semibold hover:bg-rose-700 transition-colors cursor-pointer"
+          >
+            <RotateCw className="h-3 w-3" />
+            <span>Retry</span>
+          </button>
         </div>
+      )}
 
-        {/* Dispatch Rules & Configuration */}
-        <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
-          <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider border-b border-[#EEEEF2] pb-3 flex items-center gap-2">
-            <Sliders className="h-4 w-4 text-[#5B21B6]" />
-            Dispatch Parameters
-          </h3>
-
-          <div className="space-y-3 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[#6B6B6B]">Search Radius Limit:</span>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  step="100"
-                  min="200"
-                  max="2500"
-                  value={radiusInput}
-                  onChange={(e) => setRadiusInput(Number(e.target.value))}
-                  className="w-20 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] py-1 px-2 font-mono text-[#1F1F1F] text-right focus:outline-none focus:border-[#5B21B6]"
-                />
-                <span className="font-mono text-[#6B6B6B]">m</span>
-                <button
-                  onClick={handleApplyRadius}
-                  className="rounded-xl bg-[#5B21B6] px-2.5 py-1 text-white hover:bg-[#4C1D95] font-semibold shadow-soft-sm active:scale-95"
-                >
-                  Set
-                </button>
-              </div>
+      {/* Real API Operational Telemetry Cards */}
+      {!isLoadingApi && !apiError && areaDetail && (
+        <div className="space-y-6">
+          {/* Section 1: Geographic & Operational Spec */}
+          <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
+              <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-[#5B21B6]" />
+                Geographic Boundary & Dispatch Spec
+              </h3>
+              <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-1 rounded-lg">
+                Pincode: {areaDetail.pincode ?? '—'}
+              </span>
             </div>
 
-            <div className="flex items-center justify-between border-t border-[#EEEEF2] pt-2">
-              <span className="text-[#6B6B6B]">Instant Booking Dispatch:</span>
-              <span className="font-semibold text-emerald-700">Enabled (Auto-match)</span>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-[#EEEEF2] pt-2">
-              <span className="text-[#6B6B6B]">Max Expansion Threshold:</span>
-              <span className="font-mono font-medium text-[#1F1F1F]">{market.maxRadius}m</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Neighboring Markets Relationships */}
-      <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
-        <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-          <Network className="h-4 w-4 text-[#5B21B6]" />
-          Neighboring Markets & Supply Sharing Interlinks
-        </h3>
-        <p className="text-xs text-[#6B6B6B]">
-          When {market.id} reaches capacity saturation, the dispatch engine escalates candidate searches to these interconnected clusters:
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {market.neighboringMarkets.map((nId) => {
-            const neighbor = markets.find((m) => m.id === nId);
-            return (
-              <div
-                key={nId}
-                onClick={() => navigate(`/markets/${nId}`)}
-                className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3.5 hover:border-[#5B21B6]/50 hover:bg-[#F5F3FF] cursor-pointer transition-all shadow-soft-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#5B21B6]">{nId}</span>
-                  <StatusBadge status={neighbor?.status || 'Healthy'} size="sm" />
-                </div>
-                <div className="text-xs font-semibold text-[#1F1F1F] mt-1">{neighbor?.name || nId}</div>
-                <div className="mt-2 flex items-center justify-between text-[11px] text-[#6B6B6B] font-mono">
-                  <span>Available: {neighbor?.availableWorkers || 0}</span>
-                  <span>Cap: {neighbor?.capacity || 0}%</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Working Hours</span>
+                <div className="font-semibold text-[#1F1F1F] mt-1 flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                  <span className="truncate">{areaDetail.workingHours || '—'}</span>
                 </div>
               </div>
-            );
-          })}
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Surge Pricing</span>
+                <div className="font-semibold text-amber-700 font-mono mt-1">
+                  {areaDetail.surgePricing != null ? `${areaDetail.surgePricing}%` : '—'}
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Coverage Radius</span>
+                <div className="font-semibold text-[#1F1F1F] font-mono mt-1 flex items-center gap-1">
+                  <Radio className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                  <span>{areaDetail.coverageRadius != null ? `${areaDetail.coverageRadius}m` : '—'}</span>
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Service Status</span>
+                <div className="mt-1">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                    isOperational
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-rose-50 text-rose-700 border border-rose-200'
+                  }`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${isOperational ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                    {isOperational ? 'Operational' : 'Suspended'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Latitude</span>
+                <div className="font-mono font-semibold text-[#1F1F1F] mt-1">{areaDetail.latitude ?? '—'}</div>
+              </div>
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Longitude</span>
+                <div className="font-mono font-semibold text-[#1F1F1F] mt-1">{areaDetail.longitude ?? '—'}</div>
+              </div>
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Location</span>
+                <div className="font-semibold text-[#1F1F1F] mt-1 truncate">
+                  {[areaDetail.city, areaDetail.state].filter(Boolean).join(', ') || '—'}
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
+                <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Country Code</span>
+                <div className="font-semibold font-mono text-[#1F1F1F] mt-1">{areaDetail.country || 'IN'}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: COMPLETE Duration Tiers & Pricing Table */}
+          <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
+              <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
+                <span className="font-bold text-sm text-[#5B21B6] font-mono">₹</span>
+                <span>Complete Duration Tiers & Pricing Console ({durations.length})</span>
+              </h3>
+              <span className="text-xs text-[#6B6B6B] font-mono">
+                Dispatch Radius: {areaDetail.coverageRadius ?? 0}m
+              </span>
+            </div>
+
+            {durations.length === 0 ? (
+              <div className="py-8 text-center text-xs text-[#6B6B6B]">
+                No duration pricing records configured for this market.
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-[#EEEEF2] overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[850px]">
+                    <thead className="border-b border-[#EEEEF2] bg-[#FAF9FC] text-[11px] font-bold text-[#6B6B6B] uppercase font-mono">
+                      <tr>
+                        <th className="px-3.5 py-3">Duration</th>
+                        <th className="px-3.5 py-3">Standard</th>
+                        <th className="px-3.5 py-3">Original</th>
+                        <th className="px-3.5 py-3">1st Time</th>
+                        <th className="px-3.5 py-3">2nd Time</th>
+                        <th className="px-3.5 py-3">Regular</th>
+                        <th className="px-3.5 py-3 text-center">Timing</th>
+                        <th className="px-3.5 py-3 text-center">Badge</th>
+                        <th className="px-3.5 py-3 text-center">Workers</th>
+                        <th className="px-3.5 py-3 text-center">ETA</th>
+                        <th className="px-3.5 py-3 text-center">Nearest</th>
+                        <th className="px-3.5 py-3 text-center">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#EEEEF2]">
+                      {durations.map((d, idx) => (
+                        <tr key={d.tableId || idx} className="hover:bg-[#F5F3FF]/40 transition-colors">
+                          <td className="px-3.5 py-3 font-semibold text-[#1F1F1F]">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono text-[10px] text-[#6B6B6B]">#{d.sequence ?? idx + 1}</span>
+                              <span className="font-mono font-bold">{d.displayTime || (d.duration ? `${d.duration} Mins` : '—')}</span>
+                            </div>
+                          </td>
+                          <td className="px-3.5 py-3 font-mono font-bold text-[#1F1F1F]">
+                            ₹{d.price}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[#6B6B6B] line-through">
+                            ₹{d.originalPrice}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-emerald-700 font-semibold">
+                            {d.firstTimeUser != null ? `₹${d.firstTimeUser}` : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[#7C3AED] font-semibold">
+                            {d.secoundtimeuser != null ? `₹${d.secoundtimeuser}` : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[#1F1F1F]">
+                            {d.regularUser != null ? `₹${d.regularUser}` : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[10px] text-[#6B6B6B] text-center">
+                            {d.startTime || d.endTime ? `${d.startTime || '00:00'} - ${d.endTime || '00:00'}` : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 text-center">
+                            {d.badge ? (
+                              <span className="inline-block rounded-md bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-bold text-[#5B21B6]">
+                                {d.badge}
+                              </span>
+                            ) : (
+                              <span className="text-[#9E9E9E]">—</span>
+                            )}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[11px] text-[#1F1F1F] text-center">
+                            {d.workersAvailable !== undefined && d.workersAvailable !== '' ? d.workersAvailable : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[11px] text-[#1F1F1F] text-center">
+                            {d.estimatedTimeInMinutes !== undefined && d.estimatedTimeInMinutes !== '' ? `${d.estimatedTimeInMinutes}m` : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 font-mono text-[11px] text-[#1F1F1F] text-center">
+                            {d.nearestWorkerDistanceMeters !== undefined && d.nearestWorkerDistanceMeters !== '' ? `${d.nearestWorkerDistanceMeters}m` : '—'}
+                          </td>
+                          <td className="px-3.5 py-3 text-center">
+                            <span
+                              className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                                d.isActive !== false
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-zinc-100 text-zinc-600'
+                              }`}
+                            >
+                              {d.isActive !== false ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
