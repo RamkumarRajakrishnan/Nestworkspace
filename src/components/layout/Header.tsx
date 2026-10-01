@@ -8,7 +8,8 @@ import {
   LogOut,
   User,
   MoreVertical,
-  Check
+  Check,
+  Menu
 } from 'lucide-react';
 import logoImg from '../../assets/Logo.png';
 import { useOperations } from '../../context/OperationsContext';
@@ -173,7 +174,11 @@ const MarketSelectorDropdown: React.FC<MarketSelectorDropdownProps> = ({
   );
 };
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onOpenMobileSidebar?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
   const {
     markets,
     selectedMarketId,
@@ -226,11 +231,11 @@ export const Header: React.FC = () => {
     setSearchQuery(val);
     if (!val.trim()) return;
     if (val.toUpperCase().startsWith('BK-') || val.startsWith('10')) {
-      navigate('/orders');
+      navigate('/bookings');
     } else if (val.toUpperCase().startsWith('WRK-')) {
-      navigate('/workers');
+      navigate('/experts');
     } else {
-      navigate('/dispatch');
+      navigate('/live-operations');
     }
   };
 
@@ -262,27 +267,35 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="flex h-16 w-full items-center justify-between border-b border-purple-200 bg-purple-100 px-3 sm:px-4 md:px-6 shadow-soft-sm gap-2 sm:gap-3">
-        {/* Left: Navbar Logo (slightly reduced for better responsive fitting across desktop, tablet, mobile) */}
-        <div className="flex items-center shrink-0">
+      <header className="flex h-16 w-full items-center justify-between border-b border-purple-200 bg-purple-100 px-2 sm:px-4 md:px-6 shadow-soft-sm gap-1 sm:gap-3">
+        {/* Left: Mobile Hamburger (< md) & Navbar Logo */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            aria-label="Open navigation menu"
+            className="inline-flex md:hidden items-center justify-center p-1.5 sm:p-2 rounded-xl text-[#5B21B6] hover:bg-purple-200/70 active:scale-95 transition-all cursor-pointer focus:outline-none"
+          >
+            <Menu className="h-5 w-5 stroke-[2.2]" />
+          </button>
           <img
             src="/logo.png"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = logoImg;
             }}
             alt="Haatza Nest"
-            className="h-7 sm:h-8 w-auto max-w-[110px] sm:max-w-[135px] object-contain shrink-0"
+            className="h-7 sm:h-8 w-auto max-w-[80px] xs:max-w-[100px] sm:max-w-[135px] object-contain shrink-0"
           />
         </div>
 
         {/* Right Section containing all header elements */}
-        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 shrink-0 ml-auto">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-2.5 shrink-0 ml-auto">
           {/* 1. Search Input - Responsive sizing */}
           <SearchInput
             value={searchQuery}
             onChange={handleSearchSubmit}
-            placeholder="Search booking, expert..."
-            className="w-24 sm:w-36 md:w-52 lg:w-60 shrink-0"
+            placeholder="Search..."
+            className="w-20 min-[380px]:w-28 sm:w-36 md:w-52 lg:w-60 min-w-0"
           />
 
           {/* 2. Desktop Secondary Elements: Market Selector, Scenario 1, Clock (Visible on desktop xl:) */}

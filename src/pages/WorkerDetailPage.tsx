@@ -182,7 +182,7 @@ export const WorkerDetailPage: React.FC = () => {
       <div className="space-y-6 max-w-6xl mx-auto py-8">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/workers')}
+            onClick={() => navigate('/experts')}
             className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -203,7 +203,7 @@ export const WorkerDetailPage: React.FC = () => {
       <div className="space-y-6 max-w-6xl mx-auto py-8">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/workers')}
+            onClick={() => navigate('/experts')}
             className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -224,7 +224,7 @@ export const WorkerDetailPage: React.FC = () => {
               Retry
             </button>
             <button
-              onClick={() => navigate('/workers')}
+              onClick={() => navigate('/experts')}
               className="rounded-xl border border-[#EEEEF2] bg-white px-4 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
             >
               Return to Experts Directory
@@ -248,7 +248,7 @@ export const WorkerDetailPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/workers')}
+            onClick={() => navigate('/experts')}
             className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
             title="Return to Experts Directory"
           >

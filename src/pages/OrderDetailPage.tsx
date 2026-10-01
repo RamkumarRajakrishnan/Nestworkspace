@@ -86,10 +86,10 @@ export const OrderDetailPage: React.FC = () => {
         <h2 className="text-base font-bold text-[#1F1F1F]">Booking #{id} Not Found</h2>
         <p className="text-xs text-[#6B6B6B]">The requested order could not be located in the dispatch records.</p>
         <button
-          onClick={() => navigate('/orders')}
-          className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D95] transition-all shadow-soft-sm"
+          onClick={() => navigate('/bookings')}
+          className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D95] transition-all shadow-soft-sm cursor-pointer"
         >
-          Return to Orders
+          Return to Bookings
         </button>
       </div>
     );
@@ -167,8 +167,8 @@ export const OrderDetailPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/orders')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors"
+            onClick={() => navigate('/bookings')}
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>

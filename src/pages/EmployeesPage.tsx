@@ -351,8 +351,7 @@ export const EmployeesPage: React.FC = () => {
             {/* Filter Popover Panel */}
             {isFilterOpen && (
               <div 
-                className="absolute right-0 top-full mt-2 z-50 w-80 sm:w-96 rounded-2xl border border-[#EEEEF2] bg-white p-4 shadow-soft-xl animate-in fade-in zoom-in-95"
-                style={{ maxHeight: 'calc(100vh - 240px)', overflowY: 'auto' }}
+                className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-80 md:w-96 rounded-2xl border border-[#EEEEF2] bg-white p-4 shadow-2xl shadow-purple-950/15 animate-in fade-in zoom-in-95 max-h-[85vh] overflow-y-auto"
               >
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
                   <div className="flex items-center gap-2">

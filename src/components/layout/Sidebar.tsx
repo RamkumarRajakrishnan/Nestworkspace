@@ -2,52 +2,484 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
-  MapPin,
+  ClipboardList,
   ShoppingBag,
-  // Users,
+  Radio,
+  Users,
   UserCheck,
-  // Briefcase,
   CalendarDays,
+  CalendarOff,
   Store,
-  ShieldCheck,
+  MapPin,
+  Clock,
+  Sparkles,
+  Ticket,
+  History,
+  User,
   CreditCard,
+  TrendingUp,
+  Receipt,
+  RotateCcw,
+  Wallet,
+  Banknote,
+  Megaphone,
+  Tag,
+  Gift,
+  Flame,
+  Bell,
+  Star,
+  AlertTriangle,
+  FileCheck,
   BarChart3,
+  LineChart,
+  Sliders,
+  DollarSign,
+  CalendarClock,
+  Shield,
+  Key,
+  CheckSquare,
   Settings,
   ChevronLeft,
   ChevronRight,
-  // ChevronDown,
-  Ticket
+  ChevronDown,
+  X,
+  LucideIcon
 } from 'lucide-react';
 
 interface SidebarProps {
   collapsed: boolean;
   setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  mobileOpen?: boolean;
+  setMobileOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+interface NavChildItem {
+  name: string;
+  path: string;
+  icon: LucideIcon;
+  alias?: string[];
+}
+
+interface NavDirectItem {
+  type: 'direct';
+  id: string;
+  name: string;
+  path: string;
+  icon: LucideIcon;
+  alias?: string[];
+}
+
+interface NavGroupItem {
+  type: 'group';
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  children: NavChildItem[];
+}
+
+type NavMenuItem = NavDirectItem | NavGroupItem;
 
 export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
-  setCollapsed
+  setCollapsed,
+  mobileOpen = false,
+  setMobileOpen,
 }) => {
   const location = useLocation();
 
-  // --- Manage Users dropdown state (disabled for now; kept for future re-enabling) ---
-  // const isManageUsersRoute =
-  //   location.pathname.startsWith('/workers') ||
-  //   location.pathname.startsWith('/experts') ||
-  //   location.pathname.startsWith('/employees');
-  //
-  // const [isManageUsersOpen, setIsManageUsersOpen] = useState(true);
-  //
-  // // Automatically keep expanded when on /experts, /workers, or /employees
-  // useEffect(() => {
-  //   if (isManageUsersRoute) {
-  //     setIsManageUsersOpen(true);
-  //   }
-  // }, [isManageUsersRoute]);
+  // Navigation Menu Structure per Haatza Nest Specification
+  const menuItems: NavMenuItem[] = [
+    // 1. Dashboard (Direct)
+    {
+      type: 'direct',
+      id: 'dashboard',
+      name: 'Dashboard',
+      path: '/dashboard',
+      icon: LayoutDashboard,
+    },
+
+    // 2. Operations (Collapsible)
+    {
+      type: 'group',
+      id: 'operations',
+      name: 'Operations',
+      icon: ClipboardList,
+      children: [
+        {
+          name: 'Bookings',
+          path: '/bookings',
+          icon: ShoppingBag,
+          alias: ['/orders'],
+        },
+        {
+          name: 'Live Operations',
+          path: '/live-operations',
+          icon: Radio,
+          alias: ['/dispatch'],
+        },
+      ],
+    },
+
+    // 3. Workforce (Collapsible)
+    {
+      type: 'group',
+      id: 'workforce',
+      name: 'Workforce',
+      icon: Users,
+      children: [
+        {
+          name: 'Experts',
+          path: '/experts',
+          icon: UserCheck,
+          alias: ['/workers'],
+        },
+        {
+          name: 'Attendance',
+          path: '/attendance',
+          icon: CalendarDays,
+          alias: ['/schedule', '/workforce/attendance'],
+        },
+        {
+          name: 'Leave',
+          path: '/workforce/leave',
+          icon: CalendarOff,
+        },
+      ],
+    },
+
+    // 4. Market (Collapsible)
+    {
+      type: 'group',
+      id: 'market',
+      name: 'Market',
+      icon: Store,
+      children: [
+        {
+          name: 'Area',
+          path: '/area',
+          icon: MapPin,
+          alias: ['/markets', '/market/area'],
+        },
+        {
+          name: 'Durations & Pricing',
+          path: '/market/durations-pricing',
+          icon: Clock,
+        },
+      ],
+    },
+
+    // 5. Services (Direct)
+    {
+      type: 'direct',
+      id: 'services',
+      name: 'Services',
+      path: '/services',
+      icon: Sparkles,
+    },
+
+    // 6. Pass Management (Collapsible)
+    {
+      type: 'group',
+      id: 'pass-management',
+      name: 'Pass Management',
+      icon: Ticket,
+      children: [
+        {
+          name: 'All Passes',
+          path: '/all-passes',
+          icon: Ticket,
+          alias: ['/nest-pass', '/pass-management/all-passes'],
+        },
+        {
+          name: 'Usage History',
+          path: '/pass-management/usage-history',
+          icon: History,
+        },
+      ],
+    },
+
+    // 7. Customers (Collapsible)
+    {
+      type: 'group',
+      id: 'customers',
+      name: 'Customers',
+      icon: User,
+      children: [
+        {
+          name: 'Customers',
+          path: '/customers',
+          icon: User,
+        },
+      ],
+    },
+
+    // 8. Finance (Collapsible)
+    {
+      type: 'group',
+      id: 'finance',
+      name: 'Finance',
+      icon: CreditCard,
+      children: [
+        {
+          name: 'Revenue',
+          path: '/finance/revenue',
+          icon: TrendingUp,
+        },
+        {
+          name: 'Payments',
+          path: '/finance/payments',
+          icon: Receipt,
+        },
+        {
+          name: 'Refunds',
+          path: '/finance/refunds',
+          icon: RotateCcw,
+        },
+        {
+          name: 'Wallet',
+          path: '/finance/wallet',
+          icon: Wallet,
+        },
+        {
+          name: 'Payroll',
+          path: '/payroll',
+          icon: Banknote,
+          alias: ['/payouts', '/finance/payroll'],
+        },
+      ],
+    },
+
+    // 9. Marketing (Collapsible)
+    {
+      type: 'group',
+      id: 'marketing',
+      name: 'Marketing',
+      icon: Megaphone,
+      children: [
+        {
+          name: 'Offers',
+          path: '/marketing/offers',
+          icon: Tag,
+        },
+        {
+          name: 'Coupons',
+          path: '/marketing/coupons',
+          icon: Gift,
+        },
+        {
+          name: 'Campaigns',
+          path: '/marketing/campaigns',
+          icon: Flame,
+        },
+        {
+          name: 'Notifications',
+          path: '/marketing/notifications',
+          icon: Bell,
+        },
+      ],
+    },
+
+    // 10. Quality (Collapsible)
+    {
+      type: 'group',
+      id: 'quality',
+      name: 'Quality',
+      icon: Star,
+      children: [
+        {
+          name: 'Reviews & Ratings',
+          path: '/quality/reviews',
+          icon: Star,
+        },
+        {
+          name: 'Complaints',
+          path: '/quality/complaints',
+          icon: AlertTriangle,
+        },
+        {
+          name: 'Quality Reports',
+          path: '/quality/reports',
+          icon: FileCheck,
+        },
+      ],
+    },
+
+    // 11. Reports (Collapsible)
+    {
+      type: 'group',
+      id: 'reports',
+      name: 'Reports',
+      icon: BarChart3,
+      children: [
+        {
+          name: 'Operations',
+          path: '/reports/operations',
+          icon: ClipboardList,
+        },
+        {
+          name: 'Workforce',
+          path: '/reports/workforce',
+          icon: Users,
+        },
+        {
+          name: 'Market',
+          path: '/reports/market',
+          icon: Store,
+        },
+        {
+          name: 'Finance',
+          path: '/reports/finance',
+          icon: CreditCard,
+        },
+        {
+          name: 'Customers',
+          path: '/reports/customers',
+          icon: User,
+        },
+        {
+          name: 'Analytics',
+          path: '/analytics',
+          icon: LineChart,
+          alias: ['/reports', '/reports/analytics'],
+        },
+      ],
+    },
+
+    // 12. Masters (Collapsible)
+    {
+      type: 'group',
+      id: 'masters',
+      name: 'Masters',
+      icon: Sliders,
+      children: [
+        {
+          name: 'Services',
+          path: '/masters/services',
+          icon: Sparkles,
+        },
+        {
+          name: 'Areas',
+          path: '/masters/areas',
+          icon: MapPin,
+        },
+        {
+          name: 'Durations',
+          path: '/masters/durations',
+          icon: Clock,
+        },
+        {
+          name: 'Pricing',
+          path: '/masters/pricing',
+          icon: DollarSign,
+        },
+        {
+          name: 'Shifts',
+          path: '/masters/shifts',
+          icon: CalendarClock,
+        },
+      ],
+    },
+
+    // 13. Administration (Collapsible)
+    {
+      type: 'group',
+      id: 'administration',
+      name: 'Administration',
+      icon: Shield,
+      children: [
+        {
+          name: 'Users',
+          path: '/users',
+          icon: UserCheck,
+          alias: ['/employees', '/administration/users'],
+        },
+        {
+          name: 'Roles',
+          path: '/administration/roles',
+          icon: Key,
+        },
+        {
+          name: 'Permissions',
+          path: '/administration/permissions',
+          icon: CheckSquare,
+        },
+        {
+          name: 'System Settings',
+          path: '/settings',
+          icon: Settings,
+          alias: ['/administration/settings'],
+        },
+      ],
+    },
+  ];
+
+  // Helper to determine if a route is currently active
+  const isChildActive = (item: NavChildItem, currentPath: string): boolean => {
+    if (currentPath === item.path || currentPath.startsWith(`${item.path}/`)) {
+      return true;
+    }
+    if (item.alias) {
+      return item.alias.some(
+        (alias) => currentPath === alias || currentPath.startsWith(`${alias}/`)
+      );
+    }
+    return false;
+  };
+
+  const isDirectActive = (item: NavDirectItem, currentPath: string): boolean => {
+    if (currentPath === item.path || currentPath.startsWith(`${item.path}/`)) {
+      return true;
+    }
+    if (item.alias) {
+      return item.alias.some(
+        (alias) => currentPath === alias || currentPath.startsWith(`${alias}/`)
+      );
+    }
+    return false;
+  };
+
+  // State to track expanded status for each collapsible group
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    menuItems.forEach((item) => {
+      if (item.type === 'group') {
+        const hasActiveChild = item.children.some((c) => isChildActive(c, location.pathname));
+        if (hasActiveChild) {
+          initial[item.id] = true;
+        }
+      }
+    });
+    return initial;
+  });
+
+  // Automatically keep parent section expanded whenever route changes
+  useEffect(() => {
+    menuItems.forEach((item) => {
+      if (item.type === 'group') {
+        const hasActive = item.children.some((c) => isChildActive(c, location.pathname));
+        if (hasActive) {
+          setOpenSections((prev) => ({ ...prev, [item.id]: true }));
+        }
+      }
+    });
+  }, [location.pathname]);
+
+  const toggleSection = (sectionId: string) => {
+    if (collapsed) {
+      // If collapsed on desktop, clicking a section expands sidebar and opens that section
+      setCollapsed(false);
+      setOpenSections((prev) => ({ ...prev, [sectionId]: true }));
+    } else {
+      setOpenSections((prev) => ({
+        ...prev,
+        [sectionId]: !prev[sectionId],
+      }));
+    }
+  };
 
   const [activeTooltip, setActiveTooltip] = useState<{ text: string; top: number } | null>(null);
 
-  // Clear tooltip whenever sidebar state changes
+  // Clear tooltip whenever sidebar collapsed state changes
   useEffect(() => {
     setActiveTooltip(null);
   }, [collapsed]);
@@ -66,44 +498,96 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setActiveTooltip(null);
   };
 
-  const navItemsTop = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Live Dispatch', path: '/dispatch', icon: MapPin },
-    { name: 'Orders', path: '/orders', icon: ShoppingBag },
-  ];
+  // Automatically close mobile sidebar on route change
+  useEffect(() => {
+    if (mobileOpen && setMobileOpen) {
+      setMobileOpen(false);
+    }
+  }, [location.pathname]);
 
-  const navItemsBottom = [
-    { name: 'Assignments', path: '/assignments', icon: UserCheck },
-    { name: 'Schedule', path: '/schedule', icon: CalendarDays },
-    { name: 'Markets', path: '/markets', icon: Store },
-    { name: 'Compliance', path: '/compliance', icon: ShieldCheck },
-    { name: 'Payouts', path: '/payouts', icon: CreditCard },
-    { name: 'Reports', path: '/reports', icon: BarChart3 },
-    { name: 'Settings', path: '/settings', icon: Settings },
-  ];
+  // Close mobile sidebar on Escape key press
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen?.(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen, setMobileOpen]);
 
-  // const handleToggleManageUsers = () => {
-  //   if (collapsed) {
-  //     setCollapsed(false);
-  //     setIsManageUsersOpen(true);
-  //   } else {
-  //     setIsManageUsersOpen((prev) => !prev);
-  //   }
-  // };
+  // Close mobile sidebar if window resizes to >= 768px (tablet/desktop)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && mobileOpen) {
+        setMobileOpen?.(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [mobileOpen, setMobileOpen]);
+
+  // Lock background page scrolling when mobile sidebar is open
+  useEffect(() => {
+    if (!mobileOpen) return;
+    if (window.innerWidth >= 768) return;
+
+    const originalOverflow = document.body.style.overflow;
+    const originalTouchAction = document.body.style.touchAction;
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+    };
+  }, [mobileOpen]);
 
   return (
     <>
+      {/* Mobile Dark Backdrop: strictly below md (< 768px), visible when mobileOpen is true */}
+      {mobileOpen && (
+        <div
+          role="presentation"
+          onClick={() => setMobileOpen?.(false)}
+          onTouchMove={(e) => e.preventDefault()}
+          className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-xs md:hidden animate-in fade-in duration-200 transition-opacity"
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar Panel */}
       <aside
-        className={`fixed top-16 bottom-0 left-0 z-40 flex flex-col border-r border-purple-900 bg-purple-800 transition-all duration-300 ${
-          collapsed ? 'w-16' : 'w-48 sm:w-56 lg:w-60'
+        className={`fixed z-[60] md:z-40 flex flex-col border-r border-purple-900 bg-purple-800 transition-transform duration-300 ease-in-out md:transition-all ${
+          /* Mobile Drawer: fixed off-canvas from left */
+          mobileOpen
+            ? 'top-0 bottom-0 left-0 translate-x-0 w-64 max-w-[80vw] shadow-2xl'
+            : 'top-0 bottom-0 left-0 -translate-x-full w-64 max-w-[80vw]'
+        } md:top-16 md:bottom-0 md:translate-x-0 md:shadow-none ${
+          /* Tablet/Desktop width according to collapsed state */
+          collapsed ? 'md:w-16' : 'md:w-56 lg:w-60'
         }`}
       >
-        {/* Compact Semicircular Toggle Attached to Sidebar Border */}
+        {/* Mobile Drawer Top Header: strictly visible below md (< 768px) */}
+        <div className="flex md:hidden items-center justify-end px-3.5 py-3 border-b border-purple-900 bg-purple-900/60 shrink-0">
+          <button
+            type="button"
+            onClick={() => setMobileOpen?.(false)}
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-950/40 hover:bg-purple-700/60 text-white transition-colors cursor-pointer focus:outline-none"
+            title="Close navigation menu"
+            aria-label="Close navigation menu"
+          >
+            <X className="h-4 w-4 stroke-[2.5]" />
+          </button>
+        </div>
+
+        {/* Compact Semicircular Toggle Attached to Sidebar Border (Desktop & Tablet only) */}
         <button
           type="button"
           onClick={() => setCollapsed((prev) => !prev)}
-          className="absolute left-[calc(100%-1px)] top-3.5 z-40 flex h-7 w-4 items-center justify-center rounded-r-full rounded-l-none border-y border-r border-l-0 border-purple-300 bg-white text-[#5B21B6] shadow-sm hover:bg-[#F5F3FF] hover:text-[#4C1D95] active:scale-95 transition-all cursor-pointer select-none focus:outline-none"
+          className="hidden md:flex absolute left-[calc(100%-1px)] top-3.5 z-40 h-7 w-4 items-center justify-center rounded-r-full rounded-l-none border-y border-r border-l-0 border-purple-300 bg-white text-[#5B21B6] shadow-sm hover:bg-[#F5F3FF] hover:text-[#4C1D95] active:scale-95 transition-all cursor-pointer select-none focus:outline-none"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -115,184 +599,131 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         {/* Nav Menu Items */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-2 sm:px-2.5 pt-3 pb-3">
-          {/* Top Section Nav Items (Dashboard, Live Dispatch, Orders) */}
-          {navItemsTop.map((item) => {
-            const Icon = item.icon;
+        <nav className="flex-1 space-y-1 overflow-y-auto overscroll-contain px-2 sm:px-2.5 pt-3 pb-3">
+          {menuItems.map((item) => {
+            if (item.type === 'direct') {
+              const Icon = item.icon;
+              const isActive = isDirectActive(item, location.pathname);
+
+              return (
+                <NavLink
+                  key={item.id}
+                  to={item.path}
+                  onClick={() => setMobileOpen?.(false)}
+                  onMouseEnter={(e) => showTooltip(item.name, e)}
+                  onMouseLeave={hideTooltip}
+                  className={`group relative flex items-center ${
+                    collapsed
+                      ? 'justify-start gap-3 px-3.5 md:justify-center md:px-2 md:gap-0'
+                      : 'gap-3 px-3.5'
+                  } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${
+                    isActive
+                      ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                      : 'text-white hover:bg-purple-700/60 hover:text-white'
+                  }`}
+                  title={collapsed ? item.name : undefined}
+                >
+                  <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
+                  <span className={`truncate ${collapsed ? 'block md:hidden' : 'block'}`}>
+                    {item.name}
+                  </span>
+                </NavLink>
+              );
+            }
+
+            // Collapsible Parent Group
+            const GroupIcon = item.icon;
+            const isExpanded = Boolean(openSections[item.id]);
+            const isGroupActive = item.children.some((c) => isChildActive(c, location.pathname));
+
             return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onMouseEnter={(e) => showTooltip(item.name, e)}
-                onMouseLeave={hideTooltip}
-                className={({ isActive }) =>
-                  `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
-                  } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
-                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                    : 'text-white hover:bg-purple-700/60 hover:text-white'
-                  }`
-                }
-                title={collapsed ? item.name : undefined}
-              >
-                <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {!collapsed && <span className="truncate">{item.name}</span>}
-              </NavLink>
-            );
-          })}
+              <div key={item.id} className="space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(item.id)}
+                  onMouseEnter={(e) => showTooltip(item.name, e)}
+                  onMouseLeave={hideTooltip}
+                  className={`group relative flex w-full items-center ${
+                    collapsed
+                      ? 'justify-start gap-3 px-3.5 md:justify-center md:px-2 md:gap-0'
+                      : 'justify-between px-3.5'
+                  } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer select-none ${
+                    isGroupActive && !isExpanded
+                      ? 'bg-purple-700/80 text-white font-bold'
+                      : 'text-white hover:bg-purple-700/60 hover:text-white'
+                  }`}
+                  title={collapsed ? item.name : undefined}
+                  aria-expanded={isExpanded}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <GroupIcon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
+                    <span className={`truncate ${collapsed ? 'block md:hidden' : 'block'}`}>
+                      {item.name}
+                    </span>
+                  </div>
 
-          {/* Manage Users Dropdown Section (disabled for now; kept for future re-enabling)
-              To re-enable: restore the commented state/handlers/imports above, and
-              remove the  top-level link below.
+                  {/* Dropdown Chevron */}
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 text-purple-200 ${
+                      isExpanded ? 'rotate-180 text-white' : ''
+                    } ${collapsed ? 'block md:hidden' : 'block'}`}
+                  />
+                </button>
 
-          <div className="space-y-1 pt-0.5">
-            <button
-              type="button"
-              onClick={handleToggleManageUsers}
-              onMouseEnter={(e) => showTooltip('Manage Users', e)}
-              onMouseLeave={hideTooltip}
-              className={`group relative flex items-center ${
-                collapsed ? 'justify-center px-2' : 'justify-between px-3.5'
-              } w-full rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer ${
-                isManageUsersRoute
-                  ? 'text-[#5B21B6] bg-[#EDE9FE] font-bold shadow-soft-xs'
-                  : 'text-white hover:bg-purple-700/60 hover:text-white'
-              }`}
-              title={collapsed ? 'Manage Users' : undefined}
-              aria-expanded={isManageUsersOpen}
-            >
-              <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} min-w-0`}>
-                <Users className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {!collapsed && (
-                  <span className="truncate">Manage Users</span>
+                {/* Sub-menu Child Items */}
+                {isExpanded && (
+                  <div
+                    className={`mt-1 space-y-0.5 pl-4 pr-1 animate-in fade-in slide-in-from-top-1 duration-150 border-l border-purple-700/60 ml-4 ${
+                      collapsed ? 'block md:hidden' : 'block'
+                    }`}
+                  >
+                    {item.children.map((child) => {
+                      const ChildIcon = child.icon;
+                      const active = isChildActive(child, location.pathname);
+
+                      return (
+                        <NavLink
+                          key={child.path}
+                          to={child.path}
+                          onClick={() => setMobileOpen?.(false)}
+                          className={`group relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 ${
+                            active
+                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                              : 'text-purple-100 hover:bg-purple-700/60 hover:text-white'
+                          }`}
+                        >
+                          <ChildIcon className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
+                          <span className="truncate">{child.name}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-              {!collapsed && (
-                <ChevronDown
-                  className={`h-4 w-4 shrink-0 transition-transform duration-200 stroke-[2.5] ${
-                    isManageUsersRoute ? 'text-[#5B21B6]' : 'text-[#DDD6FE]'
-                  } ${isManageUsersOpen ? 'rotate-180' : ''}`}
-                />
-              )}
-            </button>
-
-            {isManageUsersOpen && (
-              <div
-                className={
-                  collapsed
-                    ? 'space-y-1 my-1 flex flex-col items-center'
-                    : 'ml-4 pl-3 border-l-2 border-purple-700/60 space-y-1 my-1 animate-in fade-in slide-in-from-top-1'
-                }
-              >
-                <NavLink
-                  to="/experts"
-                  onMouseEnter={(e) => showTooltip('Experts', e)}
-                  onMouseLeave={hideTooltip}
-                  className={({ isActive }) => {
-                    const isExpertActive =
-                      isActive ||
-                      location.pathname.startsWith('/workers') ||
-                      location.pathname.startsWith('/experts');
-                    return `flex items-center ${
-                      collapsed ? 'justify-center px-2 w-full' : 'gap-2.5 px-3'
-                    } py-2 rounded-lg text-xs font-semibold transition-all ${
-                      isExpertActive
-                        ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                        : 'text-white hover:bg-purple-700/60 hover:text-white'
-                    }`;
-                  }}
-                  title={collapsed ? 'Experts' : undefined}
-                >
-                  <UserCheck className="h-3.5 w-3.5 shrink-0" />
-                  {!collapsed && <span>Experts</span>}
-                </NavLink>
-              </div>
-            )}
-          </div>
-          */}
-
-          {/* Experts Top-level Item */}
-          <NavLink
-            to="/experts"
-            onMouseEnter={(e) => showTooltip('Experts', e)}
-            onMouseLeave={hideTooltip}
-            className={({ isActive }) => {
-              const isExpertActive =
-                isActive ||
-                location.pathname.startsWith('/workers') ||
-                location.pathname.startsWith('/experts');
-              return `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
-                } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isExpertActive
-                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                  : 'text-white hover:bg-purple-700/60 hover:text-white'
-                }`;
-            }}
-            title={collapsed ? 'Experts' : undefined}
-          >
-            <UserCheck className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-            {!collapsed && <span className="truncate">Manage Experts</span>}
-          </NavLink>
-
-          {/* Nest Pass Top-level Item */}
-          <NavLink
-            to="/nest-pass"
-            onMouseEnter={(e) => showTooltip('Nest Pass', e)}
-            onMouseLeave={hideTooltip}
-            className={({ isActive }) =>
-              `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
-              } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
-                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                : 'text-white hover:bg-purple-700/60 hover:text-white'
-              }`
-            }
-            title={collapsed ? 'Nest Pass' : undefined}
-          >
-            <Ticket className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-            {!collapsed && <span className="truncate">Nest Pass</span>}
-          </NavLink>
-
-          {/* Bottom Section Nav Items (Assignments, Schedule, Markets, Compliance, Payouts, Reports, Settings) */}
-          {navItemsBottom.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onMouseEnter={(e) => showTooltip(item.name, e)}
-                onMouseLeave={hideTooltip}
-                className={({ isActive }) =>
-                  `group relative flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3.5'
-                  } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
-                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                    : 'text-white hover:bg-purple-700/60 hover:text-white'
-                  }`
-                }
-                title={collapsed ? item.name : undefined}
-              >
-                <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {!collapsed && <span className="truncate">{item.name}</span>}
-              </NavLink>
             );
           })}
         </nav>
 
-        {/* Operations Telemetry Footer (Visible when expanded) */}
-        {!collapsed && (
-          <div className="border-t border-purple-900/60 p-2.5 sm:p-3 bg-purple-800/80 shrink-0">
-            <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl bg-purple-900/50 p-2 sm:p-2.5 border border-purple-700/50 shadow-soft-sm">
-              <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
-              <div className="flex flex-col min-w-0">
-                <span className="text-[11px] font-bold text-white truncate">Dispatch Engine Live</span>
-                <span className="text-[10px] text-purple-200 font-mono truncate">Cluster: Bengaluru South</span>
-              </div>
+        {/* Operations Telemetry Footer */}
+        <div
+          className={`border-t border-purple-900/60 p-2.5 sm:p-3 bg-purple-800/80 shrink-0 ${
+            collapsed ? 'block md:hidden' : 'block'
+          }`}
+        >
+          <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl bg-purple-900/50 p-2 sm:p-2.5 border border-purple-700/50 shadow-soft-sm">
+            <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+            <div className="flex flex-col min-w-0">
+              <span className="text-[11px] font-bold text-white truncate">Dispatch Engine Live</span>
+              <span className="text-[10px] text-purple-200 font-mono truncate">Cluster: Bengaluru South</span>
             </div>
           </div>
-        )}
+        </div>
       </aside>
 
-      {/* Floating Instant Tooltip when Collapsed (renders outside sidebar to prevent clipping) */}
+      {/* Floating Instant Tooltip when Collapsed (Desktop & Tablet only) */}
       {collapsed && activeTooltip && (
         <div
-          className="fixed z-50 pointer-events-none flex items-center transition-opacity animate-in fade-in zoom-in-95 duration-100"
+          className="hidden md:flex fixed z-50 pointer-events-none items-center transition-opacity animate-in fade-in zoom-in-95 duration-100"
           style={{
             left: '4.75rem',
             top: `${activeTooltip.top}px`,

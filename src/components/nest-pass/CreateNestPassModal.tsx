@@ -139,11 +139,30 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
       setPopupBannerPreview(null);
       if (dashboardBannerInputRef.current) dashboardBannerInputRef.current.value = '';
       if (popupBannerInputRef.current) popupBannerInputRef.current.value = '';
-      setUploadStepText(null);
       setApiError(null);
       setValidationErrors({});
     }
   }, [isOpen]);
+
+  // Lock background scroll when open
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isSubmitting) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    const origBodyOverflow = document.body.style.overflow;
+    const origHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = origBodyOverflow;
+      document.documentElement.style.overflow = origHtmlOverflow;
+    };
+  }, [isOpen, isSubmitting, onClose]);
 
   if (!isOpen) return null;
 

@@ -70,7 +70,7 @@ export const DashboardPage: React.FC = () => {
       description: '100% capacity reached. 0 local experts available for incoming orders.',
       time: '4m ago',
       actionLabel: 'Open Crunch Console',
-      onAction: () => navigate('/markets/KOR-03'),
+      onAction: () => navigate('/area/KOR-03'),
     },
     {
       id: 'exc-3',
@@ -79,7 +79,7 @@ export const DashboardPage: React.FC = () => {
       description: 'No GPS telemetry transmitted for 18 minutes. Potential dead zone.',
       time: '18m ago',
       actionLabel: 'Inspect Expert',
-      onAction: () => navigate('/workers/WRK-1009'),
+      onAction: () => navigate('/experts/WRK-1009'),
     },
     {
       id: 'exc-4',
@@ -110,7 +110,7 @@ export const DashboardPage: React.FC = () => {
           <button
             onClick={() => {
               runScenario1CapacityCrunch();
-              navigate('/markets/KOR-03');
+              navigate('/area/KOR-03');
             }}
             className="flex items-center gap-2 rounded-xl border border-[#FECDCA] bg-[#FEF2F2] px-3.5 py-2 text-xs font-bold text-[#B42318] hover:bg-[#FEE2E2] transition-all shadow-soft-sm active:scale-95"
           >
@@ -119,7 +119,7 @@ export const DashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => navigate('/dispatch')}
+            onClick={() => navigate('/live-operations')}
             className="flex items-center gap-2 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
           >
             <MapPin className="h-4 w-4" />
@@ -162,14 +162,14 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 8 Top Operational KPI Cards (Section 7: White rounded-2xl cards with circular purple icon containers) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-8 gap-3 sm:gap-3.5">
         <KpiCard
           title="Active Orders"
           value={activeOrdersCount}
           subtext="In execution"
           icon={ShoppingBag}
           trend={{ value: '+14%', isPositive: true }}
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate('/bookings')}
         />
         <KpiCard
           title="Unassigned"
@@ -177,21 +177,21 @@ export const DashboardPage: React.FC = () => {
           subtext="Searching supply"
           icon={AlertCircle}
           variant={unassignedOrdersCount > 0 ? 'warning' : 'default'}
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate('/bookings')}
         />
         <KpiCard
           title="Experts Online"
           value={workersOnlineCount}
           subtext="Logged in"
           icon={Users}
-          onClick={() => navigate('/workers')}
+          onClick={() => navigate('/experts')}
         />
         <KpiCard
           title="Experts Busy"
           value={workersBusyCount}
           subtext="Committed"
           icon={Briefcase}
-          onClick={() => navigate('/workers')}
+          onClick={() => navigate('/experts')}
         />
         <KpiCard
           title="Available Experts"
@@ -199,14 +199,14 @@ export const DashboardPage: React.FC = () => {
           subtext="Ready to dispatch"
           icon={CheckCircle}
           variant="success"
-          onClick={() => navigate('/workers')}
+          onClick={() => navigate('/experts')}
         />
         <KpiCard
           title="In Progress"
           value={jobsInProgressCount}
           subtext="On-site active"
           icon={Clock}
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate('/bookings')}
         />
         <KpiCard
           title="SLA Risk"
@@ -214,7 +214,7 @@ export const DashboardPage: React.FC = () => {
           subtext="Critical urgency"
           icon={Flame}
           variant={slaRiskCount > 0 ? 'critical' : 'default'}
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate('/bookings')}
         />
         <KpiCard
           title="Avg Dispatch"
@@ -239,7 +239,7 @@ export const DashboardPage: React.FC = () => {
               </p>
             </div>
             <button
-              onClick={() => navigate('/markets')}
+              onClick={() => navigate('/area')}
               className="text-xs text-[#5B21B6] hover:text-[#4C1D95] font-bold flex items-center gap-1"
             >
               All Markets <ChevronRight className="h-3.5 w-3.5" />
@@ -262,7 +262,7 @@ export const DashboardPage: React.FC = () => {
                 {markets.map((m) => (
                   <tr
                     key={m.id}
-                    onClick={() => navigate(`/markets/${m.id}`)}
+                    onClick={() => navigate(`/area/${m.id}`)}
                     className="hover:bg-[#F9F8FD] cursor-pointer transition-colors"
                   >
                     <td className="py-3.5 px-3.5">
@@ -432,7 +432,7 @@ export const DashboardPage: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => navigate('/orders')}
+            onClick={() => navigate('/bookings')}
             className="text-xs text-[#5B21B6] hover:text-[#4C1D95] font-bold flex items-center gap-1"
           >
             View All Bookings <ChevronRight className="h-3.5 w-3.5" />
@@ -456,7 +456,7 @@ export const DashboardPage: React.FC = () => {
               {bookings.slice(0, 6).map((b) => (
                 <tr
                   key={b.id}
-                  onClick={() => navigate(`/orders/${b.id}`)}
+                  onClick={() => navigate(`/bookings/${b.id}`)}
                   className="hover:bg-[#F9F8FD] cursor-pointer transition-colors"
                 >
                   <td className="py-3.5 px-3.5 font-mono font-bold text-[#5B21B6]">#{b.id}</td>

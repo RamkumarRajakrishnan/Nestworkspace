@@ -97,8 +97,8 @@ export const LoginPage: React.FC = () => {
 
 
       {/* Main Login Card Section */}
-      <div className="relative z-20 w-full max-w-[500px] px-4 py-8 sm:px-6 lg:px-0 lg:mr-16 xl:mr-24 2xl:mr-36">
-        <div className="rounded-[32px] bg-white px-10 py-14 shadow-[0_24px_70px_-10px_rgba(0,0,0,0.15)] border border-[#EEEEF2]/80">
+      <div className="relative z-20 w-full max-w-[500px] px-4 py-6 sm:px-6 lg:px-0 lg:mr-16 xl:mr-24 2xl:mr-36">
+        <div className="rounded-[32px] bg-white px-5 sm:px-10 py-10 sm:py-14 shadow-[0_24px_70px_-10px_rgba(0,0,0,0.15)] border border-[#EEEEF2]/80">
 
           {/* Brand Header: Logo.png image (the Haatza Nest wordmark) */}
           <div className="flex flex-col items-center text-center">
@@ -112,7 +112,7 @@ export const LoginPage: React.FC = () => {
 
             {/* Tagline — centered */}
             <div className="mt-5 text-center w-full">
-              <h2 className="text-xl font-black text-[#3B1E7A] leading-snug tracking-tight whitespace-nowrap">
+              <h2 className="text-base sm:text-xl font-black text-[#3B1E7A] leading-snug tracking-tight">
                 Manage Your Operations, Effortlessly
               </h2>
             </div>

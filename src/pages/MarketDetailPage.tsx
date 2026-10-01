@@ -91,15 +91,15 @@ export const MarketDetailPage: React.FC = () => {
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
           <button
-            onClick={() => navigate('/markets')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
+            onClick={() => navigate('/area')}
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer shrink-0 mt-0.5 sm:mt-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div>
-            <div className="flex items-center gap-2.5">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
               <h1 className="text-xl font-bold text-[#1F1F1F]">{displayName}</h1>
               {isPriority ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-300 text-amber-800 shadow-soft-xs">

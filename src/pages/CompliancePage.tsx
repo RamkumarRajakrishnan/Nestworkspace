@@ -308,7 +308,7 @@ export const CompliancePage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-[480px] max-h-[82vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
@@ -324,7 +324,7 @@ export const CompliancePage: React.FC = () => {
                 </div>
 
                 {/* Popover Body: Accordions */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAF9FC]/50">
+                <div className="max-h-[55vh] overflow-y-auto p-4 space-y-3 bg-[#FAF9FC]/50">
                   {/* 1. Status Accordion */}
                   <div className="rounded-xl border border-[#EEEEF2] bg-white overflow-hidden shadow-soft-xs">
                     <button

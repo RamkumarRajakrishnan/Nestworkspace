@@ -256,7 +256,7 @@ export const SchedulePage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-[480px] max-h-[82vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
@@ -272,7 +272,7 @@ export const SchedulePage: React.FC = () => {
                 </div>
 
                 {/* Popover Body: Accordions */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAF9FC]/50">
+                <div className="max-h-[55vh] overflow-y-auto p-4 space-y-3 bg-[#FAF9FC]/50">
                   {/* 1. Market Accordion */}
                   <div className="rounded-xl border border-[#EEEEF2] bg-white overflow-hidden shadow-soft-xs">
                     <button
@@ -437,7 +437,7 @@ export const SchedulePage: React.FC = () => {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B] uppercase text-[11px] font-semibold">
-                <th className="py-3 px-4 w-56 sticky left-0 bg-[#FAF9FC] z-10 border-r border-[#EEEEF2]">
+                <th className="py-3 px-2.5 sm:px-4 w-36 sm:w-56 min-w-[130px] sm:min-w-[224px] sticky left-0 bg-[#FAF9FC] z-10 border-r border-[#EEEEF2]">
                   Expert Name & ID
                 </th>
                 {viewMode === 'day'
@@ -458,16 +458,16 @@ export const SchedulePage: React.FC = () => {
               {filteredWorkers.map((w) => (
                 <tr key={w.id} className="hover:bg-[#F9F8FD] transition-colors">
                   {/* Worker Row Header */}
-                  <td className="py-3 px-4 sticky left-0 bg-white z-10 border-r border-[#EEEEF2]">
-                    <div className="flex items-center gap-2.5">
+                  <td className="py-3 px-2.5 sm:px-4 w-36 sm:w-56 min-w-[130px] sm:min-w-[224px] sticky left-0 bg-white z-10 border-r border-[#EEEEF2]">
+                    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                       <img
                         src={w.avatar}
                         alt={w.name}
-                        className="h-7 w-7 rounded-full object-cover border border-[#EEEEF2]"
+                        className="h-7 w-7 rounded-full object-cover border border-[#EEEEF2] shrink-0"
                       />
-                      <div>
-                        <div className="font-bold text-[#1F1F1F] text-xs">{w.name.split(' ')[0]}</div>
-                        <div className="font-mono text-[10px] text-[#6B6B6B]">{w.id} • {w.areaId}</div>
+                      <div className="min-w-0 truncate">
+                        <div className="font-bold text-[#1F1F1F] text-xs truncate">{w.name.split(' ')[0]}</div>
+                        <div className="font-mono text-[10px] text-[#6B6B6B] truncate">{w.id} • {w.areaId}</div>
                       </div>
                     </div>
                   </td>

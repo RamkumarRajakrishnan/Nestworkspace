@@ -131,7 +131,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   return (
     <div className="relative h-[calc(100vh-10rem)] w-full overflow-hidden rounded-3xl border border-[#EEEEF2] bg-[#F8F7FC] shadow-soft-md select-none">
       {/* Top Floating Control Bar */}
-      <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2 rounded-2xl border border-[#EEEEF2] bg-white/95 p-2.5 shadow-soft-md backdrop-blur-md">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-2rem)] z-10 flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-2xl border border-[#EEEEF2] bg-white/95 p-2 sm:p-2.5 shadow-soft-md backdrop-blur-md">
         {/* Area Filter */}
         <select
           value={selectedAreaFilter}

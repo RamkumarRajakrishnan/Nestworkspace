@@ -474,7 +474,7 @@ export const WorkersPage: React.FC = () => {
           <button
             onClick={() => {
               const routeId = w.tableId || w.workerId;
-              navigate(`/workers/${routeId}?edit=true`, {
+              navigate(`/experts/${routeId}?edit=true`, {
                 state: { tableId: w.tableId, edit: true },
               });
             }}
@@ -916,7 +916,7 @@ export const WorkersPage: React.FC = () => {
                   <button
                     onClick={() => {
                       const routeId = w.tableId || w.workerId;
-                      navigate(`/workers/${routeId}?edit=true`, {
+                      navigate(`/experts/${routeId}?edit=true`, {
                         state: { tableId: w.tableId, edit: true },
                       });
                     }}
