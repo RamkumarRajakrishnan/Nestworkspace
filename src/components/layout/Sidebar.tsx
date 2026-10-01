@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -79,6 +80,288 @@ interface NavGroupItem {
 
 type NavMenuItem = NavDirectItem | NavGroupItem;
 
+const MENU_ICONS: Record<string, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  operations: ClipboardList,
+  workforce: Users,
+  market: Store,
+  services: Sparkles,
+  'pass management': Ticket,
+  customers: User,
+  finance: CreditCard,
+  marketing: Megaphone,
+  quality: Star,
+  reports: BarChart3,
+  masters: Sliders,
+  administration: Shield,
+};
+
+const MODULE_REGISTRY: Record<
+  string,
+  { name: string; path: string; icon: LucideIcon; alias?: string[] }
+> = {
+  // Operations
+  'operations:bookings': {
+    name: 'Bookings',
+    path: '/bookings',
+    icon: ShoppingBag,
+    alias: ['/orders'],
+  },
+  'operations:live operations': {
+    name: 'Live Operations',
+    path: '/live-operations',
+    icon: Radio,
+    alias: ['/dispatch'],
+  },
+
+  // Workforce
+  'workforce:experts': {
+    name: 'Experts',
+    path: '/experts',
+    icon: UserCheck,
+    alias: ['/workers'],
+  },
+  'workforce:attendance': {
+    name: 'Attendance',
+    path: '/attendance',
+    icon: CalendarDays,
+    alias: ['/schedule', '/workforce/attendance'],
+  },
+  'workforce:leave': {
+    name: 'Leave',
+    path: '/workforce/leave',
+    icon: CalendarOff,
+  },
+
+  // Market
+  'market:area': {
+    name: 'Area',
+    path: '/area',
+    icon: MapPin,
+    alias: ['/markets', '/market/area'],
+  },
+  'market:durations & pricing': {
+    name: 'Durations & Pricing',
+    path: '/market/durations-pricing',
+    icon: Clock,
+  },
+
+  // Services
+  'services:services': {
+    name: 'Services',
+    path: '/services',
+    icon: Sparkles,
+  },
+
+  // Pass Management
+  'pass management:all passes': {
+    name: 'All Passes',
+    path: '/all-passes',
+    icon: Ticket,
+    alias: ['/nest-pass', '/pass-management/all-passes'],
+  },
+  'pass management:usage history': {
+    name: 'Usage History',
+    path: '/pass-management/usage-history',
+    icon: History,
+  },
+
+  // Customers
+  'customers:customers': {
+    name: 'Customers',
+    path: '/customers',
+    icon: User,
+  },
+
+  // Finance
+  'finance:revenue': {
+    name: 'Revenue',
+    path: '/finance/revenue',
+    icon: TrendingUp,
+  },
+  'finance:payments': {
+    name: 'Payments',
+    path: '/finance/payments',
+    icon: Receipt,
+  },
+  'finance:refunds': {
+    name: 'Refunds',
+    path: '/finance/refunds',
+    icon: RotateCcw,
+  },
+  'finance:wallet': {
+    name: 'Wallet',
+    path: '/finance/wallet',
+    icon: Wallet,
+  },
+  'finance:payroll': {
+    name: 'Payroll',
+    path: '/payroll',
+    icon: Banknote,
+    alias: ['/payouts', '/finance/payroll'],
+  },
+
+  // Marketing
+  'marketing:offers': {
+    name: 'Offers',
+    path: '/marketing/offers',
+    icon: Tag,
+  },
+  'marketing:coupons': {
+    name: 'Coupons',
+    path: '/marketing/coupons',
+    icon: Gift,
+  },
+  'marketing:campaigns': {
+    name: 'Campaigns',
+    path: '/marketing/campaigns',
+    icon: Flame,
+  },
+  'marketing:notifications': {
+    name: 'Notifications',
+    path: '/marketing/notifications',
+    icon: Bell,
+  },
+
+  // Quality
+  'quality:reviews & ratings': {
+    name: 'Reviews & Ratings',
+    path: '/quality/reviews',
+    icon: Star,
+  },
+  'quality:complaints': {
+    name: 'Complaints',
+    path: '/quality/complaints',
+    icon: AlertTriangle,
+  },
+  'quality:quality reports': {
+    name: 'Quality Reports',
+    path: '/quality/reports',
+    icon: FileCheck,
+  },
+
+  // Reports
+  'reports:operations': {
+    name: 'Operations',
+    path: '/reports/operations',
+    icon: ClipboardList,
+  },
+  'reports:workforce': {
+    name: 'Workforce',
+    path: '/reports/workforce',
+    icon: Users,
+  },
+  'reports:market': {
+    name: 'Market',
+    path: '/reports/market',
+    icon: Store,
+  },
+  'reports:finance': {
+    name: 'Finance',
+    path: '/reports/finance',
+    icon: CreditCard,
+  },
+  'reports:customers': {
+    name: 'Customers',
+    path: '/reports/customers',
+    icon: User,
+  },
+  'reports:analytics': {
+    name: 'Analytics',
+    path: '/analytics',
+    icon: LineChart,
+    alias: ['/reports', '/reports/analytics'],
+  },
+
+  // Masters
+  'masters:services': {
+    name: 'Services',
+    path: '/masters/services',
+    icon: Sparkles,
+  },
+  'masters:master services': {
+    name: 'Services',
+    path: '/masters/services',
+    icon: Sparkles,
+  },
+  'masters:pricing': {
+    name: 'Pricing',
+    path: '/masters/pricing',
+    icon: DollarSign,
+  },
+  'masters:areas': {
+    name: 'Areas',
+    path: '/masters/areas',
+    icon: MapPin,
+  },
+  'masters:durations': {
+    name: 'Durations',
+    path: '/masters/durations',
+    icon: Clock,
+  },
+  'masters:shifts': {
+    name: 'Shifts',
+    path: '/masters/shifts',
+    icon: CalendarClock,
+  },
+
+  // Administration
+  'administration:users': {
+    name: 'Users',
+    path: '/users',
+    icon: UserCheck,
+    alias: ['/employees', '/administration/users'],
+  },
+  'administration:roles': {
+    name: 'Roles',
+    path: '/administration/roles',
+    icon: Key,
+  },
+  'administration:permissions': {
+    name: 'Permissions',
+    path: '/administration/permissions',
+    icon: CheckSquare,
+  },
+  'administration:system settings': {
+    name: 'System Settings',
+    path: '/settings',
+    icon: Settings,
+    alias: ['/administration/settings'],
+  },
+  'administration:settings': {
+    name: 'System Settings',
+    path: '/settings',
+    icon: Settings,
+    alias: ['/administration/settings'],
+  },
+};
+
+const findModuleConfig = (menuTitle: string, moduleName: string) => {
+  const cleanMenu = menuTitle.trim().toLowerCase();
+  const cleanMod = moduleName.trim().toLowerCase();
+  const exactKey = `${cleanMenu}:${cleanMod}`;
+
+  if (MODULE_REGISTRY[exactKey]) {
+    return MODULE_REGISTRY[exactKey];
+  }
+
+  // Handle prefix / partial variations (e.g. "All Passes " with trailing space)
+  for (const [key, config] of Object.entries(MODULE_REGISTRY)) {
+    const [regMenu, regMod] = key.split(':');
+    if (regMenu === cleanMenu) {
+      if (cleanMod.startsWith(regMod) || regMod.startsWith(cleanMod)) {
+        return config;
+      }
+    }
+  }
+
+  return {
+    name: moduleName.trim(),
+    path: `/${cleanMenu.replace(/[^a-z0-9]+/g, '-')}/${cleanMod.replace(/[^a-z0-9]+/g, '-')}`,
+    icon: Sparkles,
+  };
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
   setCollapsed,
@@ -86,332 +369,86 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setMobileOpen,
 }) => {
   const location = useLocation();
+  const { authorizedMenus } = useAuth();
 
-  // Navigation Menu Structure per Haatza Nest Specification
-  const menuItems: NavMenuItem[] = [
-    // 1. Dashboard (Direct)
-    {
-      type: 'direct',
-      id: 'dashboard',
-      name: 'Dashboard',
-      path: '/dashboard',
-      icon: LayoutDashboard,
-    },
+  // Dynamic Navigation Menu Structure built from authorizedMenus API response
+  const menuItems = useMemo<NavMenuItem[]>(() => {
+    // 1. Dashboard is always the first item per Requirement 12
+    const items: NavMenuItem[] = [
+      {
+        type: 'direct',
+        id: 'dashboard',
+        name: 'Dashboard',
+        path: '/dashboard',
+        icon: LayoutDashboard,
+      },
+    ];
 
-    // 2. Operations (Collapsible)
-    {
-      type: 'group',
-      id: 'operations',
-      name: 'Operations',
-      icon: ClipboardList,
-      children: [
-        {
-          name: 'Bookings',
-          path: '/bookings',
-          icon: ShoppingBag,
-          alias: ['/orders'],
-        },
-        {
-          name: 'Live Operations',
-          path: '/live-operations',
-          icon: Radio,
-          alias: ['/dispatch'],
-        },
-      ],
-    },
+    if (!authorizedMenus || authorizedMenus.length === 0) {
+      return items;
+    }
 
-    // 3. Workforce (Collapsible)
-    {
-      type: 'group',
-      id: 'workforce',
-      name: 'Workforce',
-      icon: Users,
-      children: [
-        {
-          name: 'Experts',
-          path: '/experts',
-          icon: UserCheck,
-          alias: ['/workers'],
-        },
-        {
-          name: 'Attendance',
-          path: '/attendance',
-          icon: CalendarDays,
-          alias: ['/schedule', '/workforce/attendance'],
-        },
-        {
-          name: 'Leave',
-          path: '/workforce/leave',
-          icon: CalendarOff,
-        },
-      ],
-    },
+    // Sort menus by API menu.sortOrder (Requirement 15)
+    const sortedMenus = [...authorizedMenus].sort((a, b) => {
+      const orderA = typeof a.sortOrder === 'number' ? a.sortOrder : 999;
+      const orderB = typeof b.sortOrder === 'number' ? b.sortOrder : 999;
+      return orderA - orderB;
+    });
 
-    // 4. Market (Collapsible)
-    {
-      type: 'group',
-      id: 'market',
-      name: 'Market',
-      icon: Store,
-      children: [
-        {
-          name: 'Area',
-          path: '/area',
-          icon: MapPin,
-          alias: ['/markets', '/market/area'],
-        },
-        {
-          name: 'Durations & Pricing',
-          path: '/market/durations-pricing',
-          icon: Clock,
-        },
-      ],
-    },
+    for (const menu of sortedMenus) {
+      const cleanMenuTitle = menu.menuTitle.trim();
+      const menuLower = cleanMenuTitle.toLowerCase();
+      const MenuIcon = MENU_ICONS[menuLower] || Sparkles;
 
-    // 5. Services (Direct)
-    {
-      type: 'direct',
-      id: 'services',
-      name: 'Services',
-      path: '/services',
-      icon: Sparkles,
-    },
+      // Sort modules inside menu by API module.sortOrder (Requirement 15)
+      const sortedModules = [...(menu.modules || [])].sort((a, b) => {
+        const orderA = typeof a.sortOrder === 'number' ? a.sortOrder : 999;
+        const orderB = typeof b.sortOrder === 'number' ? b.sortOrder : 999;
+        return orderA - orderB;
+      });
 
-    // 6. Pass Management (Collapsible)
-    {
-      type: 'group',
-      id: 'pass-management',
-      name: 'Pass Management',
-      icon: Ticket,
-      children: [
-        {
-          name: 'All Passes',
-          path: '/all-passes',
-          icon: Ticket,
-          alias: ['/nest-pass', '/pass-management/all-passes'],
-        },
-        {
-          name: 'Usage History',
-          path: '/pass-management/usage-history',
-          icon: History,
-        },
-      ],
-    },
+      if (sortedModules.length === 0) {
+        continue;
+      }
 
-    // 7. Customers (Collapsible)
-    {
-      type: 'group',
-      id: 'customers',
-      name: 'Customers',
-      icon: User,
-      children: [
-        {
-          name: 'Customers',
-          path: '/customers',
-          icon: User,
-        },
-      ],
-    },
-
-    // 8. Finance (Collapsible)
-    {
-      type: 'group',
-      id: 'finance',
-      name: 'Finance',
-      icon: CreditCard,
-      children: [
-        {
-          name: 'Revenue',
-          path: '/finance/revenue',
-          icon: TrendingUp,
-        },
-        {
-          name: 'Payments',
-          path: '/finance/payments',
-          icon: Receipt,
-        },
-        {
-          name: 'Refunds',
-          path: '/finance/refunds',
-          icon: RotateCcw,
-        },
-        {
-          name: 'Wallet',
-          path: '/finance/wallet',
-          icon: Wallet,
-        },
-        {
-          name: 'Payroll',
-          path: '/payroll',
-          icon: Banknote,
-          alias: ['/payouts', '/finance/payroll'],
-        },
-      ],
-    },
-
-    // 9. Marketing (Collapsible)
-    {
-      type: 'group',
-      id: 'marketing',
-      name: 'Marketing',
-      icon: Megaphone,
-      children: [
-        {
-          name: 'Offers',
-          path: '/marketing/offers',
-          icon: Tag,
-        },
-        {
-          name: 'Coupons',
-          path: '/marketing/coupons',
-          icon: Gift,
-        },
-        {
-          name: 'Campaigns',
-          path: '/marketing/campaigns',
-          icon: Flame,
-        },
-        {
-          name: 'Notifications',
-          path: '/marketing/notifications',
-          icon: Bell,
-        },
-      ],
-    },
-
-    // 10. Quality (Collapsible)
-    {
-      type: 'group',
-      id: 'quality',
-      name: 'Quality',
-      icon: Star,
-      children: [
-        {
-          name: 'Reviews & Ratings',
-          path: '/quality/reviews',
-          icon: Star,
-        },
-        {
-          name: 'Complaints',
-          path: '/quality/complaints',
-          icon: AlertTriangle,
-        },
-        {
-          name: 'Quality Reports',
-          path: '/quality/reports',
-          icon: FileCheck,
-        },
-      ],
-    },
-
-    // 11. Reports (Collapsible)
-    {
-      type: 'group',
-      id: 'reports',
-      name: 'Reports',
-      icon: BarChart3,
-      children: [
-        {
-          name: 'Operations',
-          path: '/reports/operations',
-          icon: ClipboardList,
-        },
-        {
-          name: 'Workforce',
-          path: '/reports/workforce',
-          icon: Users,
-        },
-        {
-          name: 'Market',
-          path: '/reports/market',
-          icon: Store,
-        },
-        {
-          name: 'Finance',
-          path: '/reports/finance',
-          icon: CreditCard,
-        },
-        {
-          name: 'Customers',
-          path: '/reports/customers',
-          icon: User,
-        },
-        {
-          name: 'Analytics',
-          path: '/analytics',
-          icon: LineChart,
-          alias: ['/reports', '/reports/analytics'],
-        },
-      ],
-    },
-
-    // 12. Masters (Collapsible)
-    {
-      type: 'group',
-      id: 'masters',
-      name: 'Masters',
-      icon: Sliders,
-      children: [
-        {
+      // If menu is 'Services' and has single module 'Services', render as direct item per original design
+      if (
+        menuLower === 'services' &&
+        sortedModules.length === 1 &&
+        sortedModules[0].moduleName.trim().toLowerCase() === 'services'
+      ) {
+        items.push({
+          type: 'direct',
+          id: 'services',
           name: 'Services',
-          path: '/masters/services',
+          path: '/services',
           icon: Sparkles,
-        },
-        {
-          name: 'Areas',
-          path: '/masters/areas',
-          icon: MapPin,
-        },
-        {
-          name: 'Durations',
-          path: '/masters/durations',
-          icon: Clock,
-        },
-        {
-          name: 'Pricing',
-          path: '/masters/pricing',
-          icon: DollarSign,
-        },
-        {
-          name: 'Shifts',
-          path: '/masters/shifts',
-          icon: CalendarClock,
-        },
-      ],
-    },
+        });
+        continue;
+      }
 
-    // 13. Administration (Collapsible)
-    {
-      type: 'group',
-      id: 'administration',
-      name: 'Administration',
-      icon: Shield,
-      children: [
-        {
-          name: 'Users',
-          path: '/users',
-          icon: UserCheck,
-          alias: ['/employees', '/administration/users'],
-        },
-        {
-          name: 'Roles',
-          path: '/administration/roles',
-          icon: Key,
-        },
-        {
-          name: 'Permissions',
-          path: '/administration/permissions',
-          icon: CheckSquare,
-        },
-        {
-          name: 'System Settings',
-          path: '/settings',
-          icon: Settings,
-          alias: ['/administration/settings'],
-        },
-      ],
-    },
-  ];
+      // Collapsible group with authorized child modules
+      const children: NavChildItem[] = sortedModules.map((mod) => {
+        const conf = findModuleConfig(menu.menuTitle, mod.moduleName);
+        return {
+          name: conf.name,
+          path: conf.path,
+          icon: conf.icon,
+          alias: conf.alias,
+        };
+      });
+
+      items.push({
+        type: 'group',
+        id: menuLower.replace(/[^a-z0-9]+/g, '-'),
+        name: cleanMenuTitle,
+        icon: MenuIcon,
+        children,
+      });
+    }
+
+    return items;
+  }, [authorizedMenus]);
 
   // Helper to determine if a route is currently active
   const isChildActive = (item: NavChildItem, currentPath: string): boolean => {
@@ -462,7 +499,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }
       }
     });
-  }, [location.pathname]);
+  }, [location.pathname, menuItems]);
 
   const toggleSection = (sectionId: string) => {
     if (collapsed) {

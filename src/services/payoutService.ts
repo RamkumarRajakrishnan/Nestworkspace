@@ -1,5 +1,5 @@
 import { WorkerPayout, PayoutStatus, LedgerItem } from '../types';
-import { mockPayouts } from '../data/mockPayouts';
+import { mockPayouts } from '../data/mock/mockPayouts';
 
 export const payoutService = {
   async getPayouts(): Promise<WorkerPayout[]> {

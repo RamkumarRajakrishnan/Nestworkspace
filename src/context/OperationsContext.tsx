@@ -18,8 +18,8 @@ import { assignmentService } from '../services/assignmentService';
 import { marketService } from '../services/marketService';
 import { complianceService } from '../services/complianceService';
 import { payoutService } from '../services/payoutService';
-import { mockNotifications } from '../data/mockNotifications';
-import { mockAuditLogs } from '../data/mockAuditLogs';
+import { mockNotifications } from '../data/mock/mockNotifications';
+import { mockAuditLogs } from '../data/mock/mockAuditLogs';
 
 export interface ToastMessage {
   id: string;

@@ -1,5 +1,5 @@
 import { Worker, WorkerStatus, ServiceType } from '../types';
-import { mockWorkers } from '../data/mockWorkers';
+import { mockWorkers } from '../data/mock/mockWorkers';
 import { registerEmployee } from './api';
 
 /**

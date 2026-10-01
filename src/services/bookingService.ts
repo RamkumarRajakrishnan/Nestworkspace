@@ -1,5 +1,5 @@
 import { Booking, BookingStatus } from '../types';
-import { mockBookings } from '../data/mockBookings';
+import { mockBookings } from '../data/mock/mockBookings';
 import { getBookings } from './api';
 
 /**

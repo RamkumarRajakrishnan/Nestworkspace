@@ -16,11 +16,112 @@ export const RequestTypes = {
 };
 
 // ============================================================================
-// AUTH APIs
+// AUTH & ROLE AUTHORIZATION APIs
 // ============================================================================
 
 /**
- * Authenticates an employee / admin user.
+ * Authenticates user via Nest Admin Login API.
+ * Endpoint: POST https://haatza.com/_functions/nestLogin
+ * 
+ * @param {Object} credentials - { email, password }
+ * @returns {Promise<{ success: boolean, data?: any, error?: string }>}
+ */
+export const nestLogin = async (credentials) => {
+  const emailValue = (credentials?.email || credentials?.identifier || '').trim();
+  const payload = {
+    email: emailValue,
+    password: credentials?.password || '',
+  };
+
+  try {
+    const response = await fetch(`${Serverurl}/nestLogin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    console.log('Nest Login API Response:', data);
+
+    if (data && data.status === 'success' && data.data) {
+      return {
+        success: true,
+        data: data.data,
+        message: data.message,
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : 'Invalid email or password. Please check your credentials and try again.';
+
+    console.error('Nest Login API Error:', errorMessage);
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('Nest Login Network Error:', error);
+    return {
+      success: false,
+      error: 'Unable to connect to the authentication server. Please check your connection and try again.',
+    };
+  }
+};
+
+/**
+ * Fetches authorized menus and modules for a selected location and user role.
+ * Endpoint: GET https://haatza.com/_functions/roleModules?locationId={locationId}&userRoleId={userRoleId}
+ * 
+ * @param {string} locationId - The selected location ID
+ * @param {string} userRoleId - The selected user role ID
+ * @returns {Promise<{ success: boolean, data?: any, error?: string }>}
+ */
+export const roleModules = async (locationId, userRoleId) => {
+  try {
+    const url = `${Serverurl}/roleModules?locationId=${encodeURIComponent(locationId)}&userRoleId=${encodeURIComponent(userRoleId)}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    console.log('Role Modules API Response:', data);
+
+    if (data && data.status === 'success' && data.data) {
+      return {
+        success: true,
+        data: data.data,
+        message: data.message,
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : 'Failed to retrieve authorized role modules for this role and area.';
+
+    console.error('Role Modules API Error:', errorMessage);
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('Role Modules Network Error:', error);
+    return {
+      success: false,
+      error: 'Unable to connect to the authorization server. Please try again.',
+    };
+  }
+};
+
+/**
+ * Authenticates an employee / admin user (legacy endpoint).
  * Endpoint: POST https://www.haatza.com/_functions/nestemployeeLogin
  * 
  * @param {Object} credentials - { email, password } or legacy { identifier, password }

@@ -1,5 +1,5 @@
 import { WorkerDocument, DocStatus } from '../types';
-import { mockWorkerDocuments } from '../data/mockCompliance';
+import { mockWorkerDocuments } from '../data/mock/mockCompliance';
 
 export const complianceService = {
   async getDocuments(): Promise<WorkerDocument[]> {

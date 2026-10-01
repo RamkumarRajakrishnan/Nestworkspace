@@ -236,6 +236,37 @@ export interface AuditLogEvent {
   reason?: string;
 }
 
+export interface NestRoleItem {
+  userRoleId: string;
+  locationId: string;
+  roleName: string;
+  areaName: string;
+}
+
+export interface NestLoginData {
+  userId: string;
+  roles: NestRoleItem[];
+}
+
+export interface RoleModuleItem {
+  moduleId: string;
+  moduleName: string;
+  menuTitle: string;
+  sortOrder: number;
+}
+
+export interface RoleMenuItem {
+  menuTitle: string;
+  sortOrder: number;
+  modules: RoleModuleItem[];
+}
+
+export interface RoleModulesData {
+  locationId: string;
+  userRoleId: string;
+  menus: RoleMenuItem[];
+}
+
 export interface AuthUser {
   userId: string;
   employeeId: string;
@@ -262,6 +293,13 @@ export interface AuthLocation {
 }
 
 export interface AuthSession {
+  userId: string;
+  userRoleId: string;
+  locationId: string;
+  roleName: string;
+  areaName: string;
+  email?: string;
+  authorizedMenus: RoleMenuItem[];
   user: AuthUser;
   role: AuthRole;
   locations: AuthLocation[];

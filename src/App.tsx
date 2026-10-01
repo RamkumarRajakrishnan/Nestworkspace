@@ -5,24 +5,38 @@ import { OperationsProvider } from './context/OperationsContext';
 import { MainLayout } from './components/layout/MainLayout';
 
 // Existing Page components
-import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { LiveDispatchPage } from './pages/LiveDispatchPage';
-import { OrdersPage } from './pages/OrdersPage';
-import { OrderDetailPage } from './pages/OrderDetailPage';
-import { WorkersPage } from './pages/WorkersPage';
-import { WorkerDetailPage } from './pages/WorkerDetailPage';
-import { EmployeesPage } from './pages/EmployeesPage';
-import { AssignmentsPage } from './pages/AssignmentsPage';
-import { SchedulePage } from './pages/SchedulePage';
-import { MarketsPage } from './pages/MarketsPage';
-import { MarketDetailPage } from './pages/MarketDetailPage';
-import { CompliancePage } from './pages/CompliancePage';
-import { PayoutsPage } from './pages/PayoutsPage';
-import { ReportsPage } from './pages/ReportsPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { NestPassPage } from './pages/NestPassPage';
+import { LoginPage } from './pages/Auth/LoginPage';
+import { DashboardPage } from './pages/Dashboard/DashboardPage';
+import { LiveDispatchPage } from './pages/Operations/LiveOperations/LiveDispatchPage';
+import { OrdersPage } from './pages/Operations/Bookings/OrdersPage';
+import { OrderDetailPage } from './pages/Operations/Bookings/OrderDetailPage';
+import { WorkersPage } from './pages/Workforce/Experts/WorkersPage';
+import { WorkerDetailPage } from './pages/Workforce/Experts/WorkerDetailPage';
+import { EmployeesPage } from './pages/Administration/Employees/EmployeesPage';
+import { AssignmentsPage } from './pages/Operations/Assignments/AssignmentsPage';
+import { SchedulePage } from './pages/Workforce/Attendance/SchedulePage';
+import { MarketsPage } from './pages/Market/Area/MarketsPage';
+import { MarketDetailPage } from './pages/Market/Area/MarketDetailPage';
+import { CompliancePage } from './pages/Workforce/Compliance/CompliancePage';
+import { PayoutsPage } from './pages/Finance/PayoutsPage';
+import { ReportsPage } from './pages/Reports/ReportsPage';
+import { SettingsPage } from './pages/Administration/Settings/SettingsPage';
+import { NestPassPage } from './pages/PassManagement/NestPassPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
+
+interface AuthorizedRouteProps {
+  menuTitle: string;
+  moduleName?: string;
+  children: React.ReactElement;
+}
+
+const AuthorizedRoute: React.FC<AuthorizedRouteProps> = ({ menuTitle, moduleName, children }) => {
+  const { isAuthorized } = useAuth();
+  if (!isAuthorized(menuTitle, moduleName)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
 
 const ProtectedLayout: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -45,63 +59,200 @@ export const App: React.FC = () => {
             <Route path="/" element={<ProtectedLayout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
 
-              {/* 1. Dashboard */}
+              {/* 1. Dashboard (Always accessible for authenticated users) */}
               <Route path="dashboard" element={<DashboardPage />} />
 
               {/* 2. Operations */}
               {/* Bookings (Existing Orders Page) */}
-              <Route path="bookings" element={<OrdersPage />} />
-              <Route path="bookings/:id" element={<OrderDetailPage />} />
+              <Route
+                path="bookings"
+                element={
+                  <AuthorizedRoute menuTitle="Operations" moduleName="Bookings">
+                    <OrdersPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="bookings/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Operations" moduleName="Bookings">
+                    <OrderDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
               {/* Existing Orders alias */}
-              <Route path="orders" element={<OrdersPage />} />
-              <Route path="orders/:id" element={<OrderDetailPage />} />
+              <Route
+                path="orders"
+                element={
+                  <AuthorizedRoute menuTitle="Operations" moduleName="Bookings">
+                    <OrdersPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="orders/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Operations" moduleName="Bookings">
+                    <OrderDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Live Operations (Existing Live Dispatch) */}
-              <Route path="live-operations" element={<LiveDispatchPage />} />
-              <Route path="dispatch" element={<LiveDispatchPage />} />
+              <Route
+                path="live-operations"
+                element={
+                  <AuthorizedRoute menuTitle="Operations" moduleName="Live Operations">
+                    <LiveDispatchPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="dispatch"
+                element={
+                  <AuthorizedRoute menuTitle="Operations" moduleName="Live Operations">
+                    <LiveDispatchPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* 3. Workforce */}
               {/* Experts (Existing Workers / Manage Experts Page) */}
-              <Route path="experts" element={<WorkersPage />} />
-              <Route path="experts/:id" element={<WorkerDetailPage />} />
-              <Route path="workers" element={<WorkersPage />} />
-              <Route path="workers/:id" element={<WorkerDetailPage />} />
+              <Route
+                path="experts"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Experts">
+                    <WorkersPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="experts/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Experts">
+                    <WorkerDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="workers"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Experts">
+                    <WorkersPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="workers/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Experts">
+                    <WorkerDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Attendance (Existing Schedule Page) */}
-              <Route path="attendance" element={<SchedulePage />} />
-              <Route path="workforce/attendance" element={<SchedulePage />} />
-              <Route path="schedule" element={<SchedulePage />} />
+              <Route
+                path="attendance"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Attendance">
+                    <SchedulePage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="workforce/attendance"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Attendance">
+                    <SchedulePage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="schedule"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Attendance">
+                    <SchedulePage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Leave */}
               <Route
                 path="workforce/leave"
                 element={
-                  <ModulePlaceholderPage
-                    title="Leave Management"
-                    subtitle="Manage expert time-off requests, leave approvals, and shift coverages"
-                    category="Workforce"
-                  />
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Leave">
+                    <ModulePlaceholderPage
+                      title="Leave Management"
+                      subtitle="Manage expert time-off requests, leave approvals, and shift coverages"
+                      category="Workforce"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
               {/* 4. Market */}
               {/* Area (Existing Markets Page) */}
-              <Route path="area" element={<MarketsPage />} />
-              <Route path="area/:id" element={<MarketDetailPage />} />
-              <Route path="market/area" element={<MarketsPage />} />
-              <Route path="market/area/:id" element={<MarketDetailPage />} />
-              <Route path="markets" element={<MarketsPage />} />
-              <Route path="markets/:id" element={<MarketDetailPage />} />
+              <Route
+                path="area"
+                element={
+                  <AuthorizedRoute menuTitle="Market" moduleName="Area">
+                    <MarketsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="area/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Market" moduleName="Area">
+                    <MarketDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="market/area"
+                element={
+                  <AuthorizedRoute menuTitle="Market" moduleName="Area">
+                    <MarketsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="market/area/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Market" moduleName="Area">
+                    <MarketDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="markets"
+                element={
+                  <AuthorizedRoute menuTitle="Market" moduleName="Area">
+                    <MarketsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="markets/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Market" moduleName="Area">
+                    <MarketDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Durations & Pricing */}
               <Route
                 path="market/durations-pricing"
                 element={
-                  <ModulePlaceholderPage
-                    title="Durations & Pricing"
-                    subtitle="Configure service booking duration presets, customer rate tiers, and surge pricing rules"
-                    category="Market"
-                  />
+                  <AuthorizedRoute menuTitle="Market" moduleName="Durations & Pricing">
+                    <ModulePlaceholderPage
+                      title="Durations & Pricing"
+                      subtitle="Configure service booking duration presets, customer rate tiers, and surge pricing rules"
+                      category="Market"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
@@ -109,29 +260,54 @@ export const App: React.FC = () => {
               <Route
                 path="services"
                 element={
-                  <ModulePlaceholderPage
-                    title="Services Catalog"
-                    subtitle="Configure platform service offerings, service checklists, and operational categories"
-                    category="Services"
-                  />
+                  <AuthorizedRoute menuTitle="Services" moduleName="Services">
+                    <ModulePlaceholderPage
+                      title="Services Catalog"
+                      subtitle="Configure platform service offerings, service checklists, and operational categories"
+                      category="Services"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
               {/* 6. Pass Management */}
               {/* All Passes (Existing Nest Pass Page) */}
-              <Route path="all-passes" element={<NestPassPage />} />
-              <Route path="pass-management/all-passes" element={<NestPassPage />} />
-              <Route path="nest-pass" element={<NestPassPage />} />
+              <Route
+                path="all-passes"
+                element={
+                  <AuthorizedRoute menuTitle="Pass Management" moduleName="All Passes">
+                    <NestPassPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="pass-management/all-passes"
+                element={
+                  <AuthorizedRoute menuTitle="Pass Management" moduleName="All Passes">
+                    <NestPassPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="nest-pass"
+                element={
+                  <AuthorizedRoute menuTitle="Pass Management" moduleName="All Passes">
+                    <NestPassPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Usage History */}
               <Route
                 path="pass-management/usage-history"
                 element={
-                  <ModulePlaceholderPage
-                    title="Pass Usage History"
-                    subtitle="Audit customer pass redemptions, active package balances, and session consumption"
-                    category="Pass Management"
-                  />
+                  <AuthorizedRoute menuTitle="Pass Management" moduleName="Usage History">
+                    <ModulePlaceholderPage
+                      title="Pass Usage History"
+                      subtitle="Audit customer pass redemptions, active package balances, and session consumption"
+                      category="Pass Management"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
@@ -139,11 +315,13 @@ export const App: React.FC = () => {
               <Route
                 path="customers"
                 element={
-                  <ModulePlaceholderPage
-                    title="Customers"
-                    subtitle="Customer account profiles, order histories, satisfaction scores, and support interactions"
-                    category="Customers"
-                  />
+                  <AuthorizedRoute menuTitle="Customers" moduleName="Customers">
+                    <ModulePlaceholderPage
+                      title="Customers"
+                      subtitle="Customer account profiles, order histories, satisfaction scores, and support interactions"
+                      category="Customers"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
@@ -151,87 +329,124 @@ export const App: React.FC = () => {
               <Route
                 path="finance/revenue"
                 element={
-                  <ModulePlaceholderPage
-                    title="Revenue"
-                    subtitle="Gross merchandise value (GMV), platform margin tracking, and financial growth metrics"
-                    category="Finance"
-                  />
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Revenue">
+                    <ModulePlaceholderPage
+                      title="Revenue"
+                      subtitle="Gross merchandise value (GMV), platform margin tracking, and financial growth metrics"
+                      category="Finance"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="finance/payments"
                 element={
-                  <ModulePlaceholderPage
-                    title="Payments"
-                    subtitle="Gateway transactions, payment settlement reconciliations, and collection logs"
-                    category="Finance"
-                  />
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Payments">
+                    <ModulePlaceholderPage
+                      title="Payments"
+                      subtitle="Gateway transactions, payment settlement reconciliations, and collection logs"
+                      category="Finance"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="finance/refunds"
                 element={
-                  <ModulePlaceholderPage
-                    title="Refunds"
-                    subtitle="Customer refund claims, cancellation penalties, and financial reversal records"
-                    category="Finance"
-                  />
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Refunds">
+                    <ModulePlaceholderPage
+                      title="Refunds"
+                      subtitle="Customer refund claims, cancellation penalties, and financial reversal records"
+                      category="Finance"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="finance/wallet"
                 element={
-                  <ModulePlaceholderPage
-                    title="Wallet"
-                    subtitle="User promotional credits, partner escrow deposits, and platform balance ledgers"
-                    category="Finance"
-                  />
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Wallet">
+                    <ModulePlaceholderPage
+                      title="Wallet"
+                      subtitle="User promotional credits, partner escrow deposits, and platform balance ledgers"
+                      category="Finance"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               {/* Payroll (Existing Payouts Page) */}
-              <Route path="payroll" element={<PayoutsPage />} />
-              <Route path="finance/payroll" element={<PayoutsPage />} />
-              <Route path="payouts" element={<PayoutsPage />} />
+              <Route
+                path="payroll"
+                element={
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Payroll">
+                    <PayoutsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="finance/payroll"
+                element={
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Payroll">
+                    <PayoutsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="payouts"
+                element={
+                  <AuthorizedRoute menuTitle="Finance" moduleName="Payroll">
+                    <PayoutsPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* 9. Marketing */}
               <Route
                 path="marketing/offers"
                 element={
-                  <ModulePlaceholderPage
-                    title="Offers"
-                    subtitle="Manage localized promotional banners, seasonal demand boosters, and consumer offers"
-                    category="Marketing"
-                  />
+                  <AuthorizedRoute menuTitle="Marketing" moduleName="Offers">
+                    <ModulePlaceholderPage
+                      title="Offers"
+                      subtitle="Manage localized promotional banners, seasonal demand boosters, and consumer offers"
+                      category="Marketing"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="marketing/coupons"
                 element={
-                  <ModulePlaceholderPage
-                    title="Coupons"
-                    subtitle="Create promo codes, referral discounts, usage limits, and redemption criteria"
-                    category="Marketing"
-                  />
+                  <AuthorizedRoute menuTitle="Marketing" moduleName="Coupons">
+                    <ModulePlaceholderPage
+                      title="Coupons"
+                      subtitle="Create promo codes, referral discounts, usage limits, and redemption criteria"
+                      category="Marketing"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="marketing/campaigns"
                 element={
-                  <ModulePlaceholderPage
-                    title="Campaigns"
-                    subtitle="Acquisition campaigns, cross-market activations, and conversion performance"
-                    category="Marketing"
-                  />
+                  <AuthorizedRoute menuTitle="Marketing" moduleName="Campaigns">
+                    <ModulePlaceholderPage
+                      title="Campaigns"
+                      subtitle="Acquisition campaigns, cross-market activations, and conversion performance"
+                      category="Marketing"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="marketing/notifications"
                 element={
-                  <ModulePlaceholderPage
-                    title="Notifications"
-                    subtitle="Broadcast push messages, operational SMS alerts, and marketing announcements"
-                    category="Marketing"
-                  />
+                  <AuthorizedRoute menuTitle="Marketing" moduleName="Notifications">
+                    <ModulePlaceholderPage
+                      title="Notifications"
+                      subtitle="Broadcast push messages, operational SMS alerts, and marketing announcements"
+                      category="Marketing"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
@@ -239,31 +454,37 @@ export const App: React.FC = () => {
               <Route
                 path="quality/reviews"
                 element={
-                  <ModulePlaceholderPage
-                    title="Reviews & Ratings"
-                    subtitle="Customer post-service feedback, expert rating breakdown, and sentiment telemetry"
-                    category="Quality"
-                  />
+                  <AuthorizedRoute menuTitle="Quality" moduleName="Reviews & Ratings">
+                    <ModulePlaceholderPage
+                      title="Reviews & Ratings"
+                      subtitle="Customer post-service feedback, expert rating breakdown, and sentiment telemetry"
+                      category="Quality"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="quality/complaints"
                 element={
-                  <ModulePlaceholderPage
-                    title="Complaints"
-                    subtitle="Customer incident reports, dispute tickets, and corrective resolution queues"
-                    category="Quality"
-                  />
+                  <AuthorizedRoute menuTitle="Quality" moduleName="Complaints">
+                    <ModulePlaceholderPage
+                      title="Complaints"
+                      subtitle="Customer incident reports, dispute tickets, and corrective resolution queues"
+                      category="Quality"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="quality/reports"
                 element={
-                  <ModulePlaceholderPage
-                    title="Quality Reports"
-                    subtitle="Defect ratios, expert re-training triggers, and service consistency audit logs"
-                    category="Quality"
-                  />
+                  <AuthorizedRoute menuTitle="Quality" moduleName="Quality Reports">
+                    <ModulePlaceholderPage
+                      title="Quality Reports"
+                      subtitle="Defect ratios, expert re-training triggers, and service consistency audit logs"
+                      category="Quality"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
@@ -271,143 +492,238 @@ export const App: React.FC = () => {
               <Route
                 path="reports/operations"
                 element={
-                  <ModulePlaceholderPage
-                    title="Operations Reports"
-                    subtitle="Detailed dispatch velocity, assignment latency, and fulfillment completion logs"
-                    category="Reports"
-                  />
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Operations">
+                    <ModulePlaceholderPage
+                      title="Operations Reports"
+                      subtitle="Detailed dispatch velocity, assignment latency, and fulfillment completion logs"
+                      category="Reports"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="reports/workforce"
                 element={
-                  <ModulePlaceholderPage
-                    title="Workforce Reports"
-                    subtitle="Expert active hours, on-duty attendance, and utilization efficiency summaries"
-                    category="Reports"
-                  />
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Workforce">
+                    <ModulePlaceholderPage
+                      title="Workforce Reports"
+                      subtitle="Expert active hours, on-duty attendance, and utilization efficiency summaries"
+                      category="Reports"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="reports/market"
                 element={
-                  <ModulePlaceholderPage
-                    title="Market Reports"
-                    subtitle="Nano-market density, capacity saturation levels, and cross-market demand heatmaps"
-                    category="Reports"
-                  />
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Market">
+                    <ModulePlaceholderPage
+                      title="Market Reports"
+                      subtitle="Nano-market density, capacity saturation levels, and cross-market demand heatmaps"
+                      category="Reports"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="reports/finance"
                 element={
-                  <ModulePlaceholderPage
-                    title="Finance Reports"
-                    subtitle="Consolidated earnings ledgers, payout disbursements, and financial audit files"
-                    category="Reports"
-                  />
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Finance">
+                    <ModulePlaceholderPage
+                      title="Finance Reports"
+                      subtitle="Consolidated earnings ledgers, payout disbursements, and financial audit files"
+                      category="Reports"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="reports/customers"
                 element={
-                  <ModulePlaceholderPage
-                    title="Customer Reports"
-                    subtitle="Cohort retention analytics, user frequency, and market booking distributions"
-                    category="Reports"
-                  />
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Customers">
+                    <ModulePlaceholderPage
+                      title="Customer Reports"
+                      subtitle="Cohort retention analytics, user frequency, and market booking distributions"
+                      category="Reports"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               {/* Analytics (Existing Reports Page) */}
-              <Route path="analytics" element={<ReportsPage />} />
-              <Route path="reports/analytics" element={<ReportsPage />} />
-              <Route path="reports" element={<ReportsPage />} />
+              <Route
+                path="analytics"
+                element={
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Analytics">
+                    <ReportsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="reports/analytics"
+                element={
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Analytics">
+                    <ReportsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="reports"
+                element={
+                  <AuthorizedRoute menuTitle="Reports" moduleName="Analytics">
+                    <ReportsPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* 12. Masters */}
               <Route
                 path="masters/services"
                 element={
-                  <ModulePlaceholderPage
-                    title="Master Services"
-                    subtitle="Master service type registry, skill tags, and service requirement definitions"
-                    category="Masters"
-                  />
+                  <AuthorizedRoute menuTitle="Masters" moduleName="Services">
+                    <ModulePlaceholderPage
+                      title="Master Services"
+                      subtitle="Master service type registry, skill tags, and service requirement definitions"
+                      category="Masters"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="masters/areas"
                 element={
-                  <ModulePlaceholderPage
-                    title="Master Areas"
-                    subtitle="Master geographical polygons, city boundaries, and operational zone master data"
-                    category="Masters"
-                  />
+                  <AuthorizedRoute menuTitle="Masters" moduleName="Areas">
+                    <ModulePlaceholderPage
+                      title="Master Areas"
+                      subtitle="Master geographical polygons, city boundaries, and operational zone master data"
+                      category="Masters"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="masters/durations"
                 element={
-                  <ModulePlaceholderPage
-                    title="Master Durations"
-                    subtitle="Global standard service duration options and minimum booking windows"
-                    category="Masters"
-                  />
+                  <AuthorizedRoute menuTitle="Masters" moduleName="Durations">
+                    <ModulePlaceholderPage
+                      title="Master Durations"
+                      subtitle="Global standard service duration options and minimum booking windows"
+                      category="Masters"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="masters/pricing"
                 element={
-                  <ModulePlaceholderPage
-                    title="Master Pricing"
-                    subtitle="Base tariff matrices, dynamic multiplier rules, and fee structure guidelines"
-                    category="Masters"
-                  />
+                  <AuthorizedRoute menuTitle="Masters" moduleName="Pricing">
+                    <ModulePlaceholderPage
+                      title="Master Pricing"
+                      subtitle="Base tariff matrices, dynamic multiplier rules, and fee structure guidelines"
+                      category="Masters"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="masters/shifts"
                 element={
-                  <ModulePlaceholderPage
-                    title="Master Shifts"
-                    subtitle="Operational shift hour definitions, break schedules, and overtime rules"
-                    category="Masters"
-                  />
+                  <AuthorizedRoute menuTitle="Masters" moduleName="Shifts">
+                    <ModulePlaceholderPage
+                      title="Master Shifts"
+                      subtitle="Operational shift hour definitions, break schedules, and overtime rules"
+                      category="Masters"
+                    />
+                  </AuthorizedRoute>
                 }
               />
 
               {/* 13. Administration */}
               {/* Users (Existing Employees Page) */}
-              <Route path="users" element={<EmployeesPage />} />
-              <Route path="administration/users" element={<EmployeesPage />} />
-              <Route path="employees" element={<EmployeesPage />} />
+              <Route
+                path="users"
+                element={
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Users">
+                    <EmployeesPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="administration/users"
+                element={
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Users">
+                    <EmployeesPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="employees"
+                element={
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Users">
+                    <EmployeesPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               <Route
                 path="administration/roles"
                 element={
-                  <ModulePlaceholderPage
-                    title="Roles"
-                    subtitle="Portal administrative roles, team assignments, and operational permissions"
-                    category="Administration"
-                  />
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Roles">
+                    <ModulePlaceholderPage
+                      title="Roles"
+                      subtitle="Portal administrative roles, team assignments, and operational permissions"
+                      category="Administration"
+                    />
+                  </AuthorizedRoute>
                 }
               />
               <Route
                 path="administration/permissions"
                 element={
-                  <ModulePlaceholderPage
-                    title="Permissions"
-                    subtitle="Granular resource permissions, read/write authorizations, and audit compliance"
-                    category="Administration"
-                  />
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Permissions">
+                    <ModulePlaceholderPage
+                      title="Permissions"
+                      subtitle="Granular resource permissions, read/write authorizations, and audit compliance"
+                      category="Administration"
+                    />
+                  </AuthorizedRoute>
                 }
               />
+
               {/* System Settings (Existing Settings Page) */}
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="administration/settings" element={<SettingsPage />} />
+              <Route
+                path="settings"
+                element={
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Settings">
+                    <SettingsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="administration/settings"
+                element={
+                  <AuthorizedRoute menuTitle="Administration" moduleName="Settings">
+                    <SettingsPage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Other Existing Pages */}
-              <Route path="assignments" element={<AssignmentsPage />} />
-              <Route path="compliance" element={<CompliancePage />} />
+              <Route
+                path="assignments"
+                element={
+                  <AuthorizedRoute menuTitle="Operations">
+                    <AssignmentsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="compliance"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce">
+                    <CompliancePage />
+                  </AuthorizedRoute>
+                }
+              />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

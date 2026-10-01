@@ -1,5 +1,5 @@
 import { Assignment } from '../types';
-import { mockAssignments } from '../data/mockAssignments';
+import { mockAssignments } from '../data/mock/mockAssignments';
 
 export const assignmentService = {
   async getAssignments(): Promise<Assignment[]> {

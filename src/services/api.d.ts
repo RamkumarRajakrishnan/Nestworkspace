@@ -1,4 +1,4 @@
-import { AuthSession } from '../types';
+import { AuthSession, NestLoginData, RoleModulesData } from '../types';
 
 export interface LoginCredentials {
   email?: string;
@@ -295,6 +295,8 @@ export function getNestWorkerById(tableId: string): Promise<GetNestWorkerByIdRes
 export function getExpertById(tableId: string): Promise<GetNestWorkerByIdResult>;
 export function updateNestExperts(updateData: UpdateNestExpertsPayload): Promise<UpdateNestExpertsResult>;
 export function updateExpert(updateData: UpdateNestExpertsPayload): Promise<UpdateNestExpertsResult>;
+export function nestLogin(credentials: { email?: string; identifier?: string; password: string }): Promise<{ success: boolean; data?: NestLoginData; message?: string; error?: string }>;
+export function roleModules(locationId: string, userRoleId: string): Promise<{ success: boolean; data?: RoleModulesData; message?: string; error?: string }>;
 export function loginEmployee(credentials: LoginCredentials): Promise<LoginResult>;
 export function registerEmployee(payload: RegisterEmployeePayload): Promise<RegisterEmployeeResult>;
 export function registerExpert(payload: RegisterEmployeePayload | RegisterNestExpertPayload): Promise<RegisterEmployeeResult | RegisterNestExpertResult>;
