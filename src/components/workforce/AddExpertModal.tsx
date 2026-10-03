@@ -883,10 +883,10 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
       {/* Modal Dialog Box */}
       <div className="relative z-10 w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-lg transition-all overflow-hidden my-auto animate-in fade-in zoom-in-95">
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-[#EEEEF2] bg-[#FAF9FC] px-5 py-4 shrink-0">
-          <div>
-            <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F]">New Expert Registration</h3>
-            <p className="text-xs text-[#6B6B6B] mt-0.5">
+        <div className="flex items-center justify-between border-b border-[#EEEEF2] bg-[#FAF9FC] px-5 py-4 shrink-0 gap-2">
+          <div className="min-w-0 flex-1 pr-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] truncate">New Expert Registration</h3>
+            <p className="text-xs text-[#6B6B6B] mt-0.5 truncate">
               Enter complete details and upload KYC documents to onboard a new service expert.
             </p>
           </div>
@@ -1693,7 +1693,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
           </div>
 
           {/* Modal Footer */}
-          <div className="flex items-center justify-between border-t border-[#EEEEF2] bg-[#FAF9FC] px-5 py-3.5 shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#EEEEF2] bg-[#FAF9FC] px-5 py-3.5 shrink-0">
             <div className="text-xs text-[#6B6B6B] truncate">
               {uploadStepText ? (
                 <span className="flex items-center gap-1.5 font-medium text-[#5B21B6]">
@@ -1703,7 +1703,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
               ) : null}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 self-end sm:self-auto">
               <button
                 type="button"
                 onClick={handleClose}

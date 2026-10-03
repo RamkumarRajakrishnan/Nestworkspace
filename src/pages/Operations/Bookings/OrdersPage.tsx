@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
+import { useAuth } from '../../../context/AuthContext';
 import { Booking } from '../../../types';
 import { DataTable, Column } from '../../../components/common/DataTable';
 import { StatusBadge } from '../../../components/common/StatusBadge';
@@ -55,14 +56,68 @@ const STATIC_DURATIONS = [
   { val: '240', label: '240 mins (4 hrs)' },
 ] as const;
 
+/**
+ * Normalizes duration to total minutes for consistent comparison across all formats:
+ * - '240', 240, '4 hours', '4 hrs', '4 hr', '4h', '4' -> 240
+ * - '60', 60, '1 hour', '1 hr', '1' -> 60
+ * - '120', 120, '2 hours', '2 hrs', '2' -> 120
+ * - '180', 180, '3 hours', '3 hrs', '3' -> 180
+ */
+export const parseDurationMinutes = (val: string | number | undefined | null): number | null => {
+  if (val === undefined || val === null) return null;
+  const str = String(val).trim().toLowerCase();
+  if (!str || str === 'all' || str === '—' || str === '-') return null;
+
+  const hourMatch = str.match(/^(\d+(\.\d+)?)\s*(?:hour|hours|hr|hrs|h)\b/);
+  if (hourMatch) {
+    return Math.round(parseFloat(hourMatch[1]) * 60);
+  }
+
+  const minMatch = str.match(/^(\d+(\.\d+)?)\s*(?:minute|minutes|min|mins|m)\b/);
+  if (minMatch) {
+    return Math.round(parseFloat(minMatch[1]));
+  }
+
+  const num = parseFloat(str);
+  if (!isNaN(num)) {
+    if (num <= 12) {
+      return Math.round(num * 60);
+    }
+    return Math.round(num);
+  }
+
+  return null;
+};
+
+/**
+ * Normalizes area names by trimming, converting to lower case, and stripping separators
+ * so that "Neo_Town", "neo_town", "Neo Town", "Neo-Town" match identically.
+ */
+export const normalizeAreaName = (area?: string | null): string => {
+  if (!area) return '';
+  return area.trim().toLowerCase().replace(/[_\s-]+/g, '');
+};
+
 export const OrdersPage: React.FC = () => {
   const { markets } = useOperations();
+  const { accessibleAreas, hasAllAreaAccess } = useAuth();
 
-  // Active Areas fetched dynamically from https://www.haatza.com/_functions/nestActiveAreas?page=1&pageSize=10
+  // Active Areas fetched dynamically from https://www.haatza.com/_functions/nestActiveAreas?page=1&pageSize=20
   const [activeAreas, setActiveAreas] = useState<ActiveAreaItem[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState<boolean>(true);
 
-  // Server-side filter parameters
+  // Available area options for dropdowns dynamically from user access or full system areas
+  const availableAreaOptions = useMemo(() => {
+    if (hasAllAreaAccess) {
+      if (activeAreas.length > 0) {
+        return activeAreas.map((a) => a.areaName);
+      }
+      return accessibleAreas.length > 0 ? accessibleAreas : [];
+    }
+    return accessibleAreas;
+  }, [hasAllAreaAccess, activeAreas, accessibleAreas]);
+
+  // Server-side filter parameters - default area is '' representing "All Areas"
   const [selectedArea, setSelectedArea] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedSlaAlert, setSelectedSlaAlert] = useState<string>('');
@@ -131,18 +186,13 @@ export const OrdersPage: React.FC = () => {
   const [inspectBooking, setInspectBooking] = useState<Booking | null>(null);
   const [assignBooking, setAssignBooking] = useState<Booking | null>(null);
 
-  // Fetch active areas dynamically from API on mount
-  // API: https://www.haatza.com/_functions/nestActiveAreas?page=1&pageSize=10
+  // Fetch active areas dynamically from API on mount only if full access or needed for metadata
   useEffect(() => {
     setIsLoadingAreas(true);
-    getActiveAreas(1, 10)
+    getActiveAreas(1, 20)
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          // Strictly dynamic data from the API only - no hardcoded/static entries
           setActiveAreas(res.data);
-          const firstArea = res.data[0].areaName;
-          setSelectedArea((prev) => prev || firstArea);
-          setDraftArea((prev) => prev || firstArea);
         }
       })
       .catch((err) => console.error('Failed to load active areas:', err))
@@ -156,15 +206,11 @@ export const OrdersPage: React.FC = () => {
       bookingStatus?: string;
       slaAlert?: string;
       bookingType?: string;
-      duration?: string;
       bookingId?: string;
       customerPhone?: string;
     },
     isSilent: boolean = false
   ) => {
-    const areaToFetch = filters.areaName || selectedArea;
-    if (!areaToFetch && !filters.bookingId && !filters.customerPhone) return;
-
     if (!isSilent) {
       setIsLoading(true);
     } else {
@@ -181,8 +227,8 @@ export const OrdersPage: React.FC = () => {
         apiFilterOpts.bookingId = filters.bookingId.replace(/^#/, '').trim();
       } else if (filters.customerPhone) {
         apiFilterOpts.customerPhone = filters.customerPhone.trim();
-      } else if (areaToFetch) {
-        apiFilterOpts.areaName = areaToFetch;
+      } else if (filters.areaName && filters.areaName !== 'ALL' && filters.areaName !== 'All Areas') {
+        apiFilterOpts.areaName = filters.areaName;
       }
 
       if (filters.bookingStatus && filters.bookingStatus !== 'ALL' && filters.bookingStatus !== 'All') {
@@ -194,9 +240,7 @@ export const OrdersPage: React.FC = () => {
       if (filters.bookingType && filters.bookingType !== 'ALL' && filters.bookingType !== 'All') {
         apiFilterOpts.bookingType = filters.bookingType;
       }
-      if (filters.duration) {
-        apiFilterOpts.duration = filters.duration;
-      }
+      // Note: duration is not sent to backend query to prevent backend 404/no-bookings bug; handled client-side
 
       const response = await getBookings(apiFilterOpts);
       if (response.success && Array.isArray(response.data)) {
@@ -213,40 +257,35 @@ export const OrdersPage: React.FC = () => {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [selectedArea]);
+  }, []);
 
-  // Trigger load when filter dependencies change
+  // Trigger load when server-side filter dependencies change (loads all on mount if selectedArea is '')
   useEffect(() => {
-    if (selectedArea) {
-      fetchOrders({
-        areaName: selectedArea,
-        bookingStatus: selectedStatus || undefined,
-        slaAlert: selectedSlaAlert || undefined,
-        bookingType: selectedBookingType || undefined,
-        duration: selectedDuration || undefined,
-      }, false);
-    }
-  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, selectedDuration]);
+    fetchOrders({
+      areaName: selectedArea || undefined,
+      bookingStatus: selectedStatus || undefined,
+      slaAlert: selectedSlaAlert || undefined,
+      bookingType: selectedBookingType || undefined,
+    }, false);
+  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType]);
 
   // Track the last minute we refreshed at (initialized to the current minute on mount)
   const lastRefreshedMinuteRef = useRef<number>(new Date().getMinutes());
 
-  // Requirement: Auto-refresh every 1 minute (60 seconds) without manual refreshment
-  // Use a ref to always have access to the latest filter values without resetting the interval
+  // Live clock synchronized with header integrated timer and auto-refresh on the minute (:00)
   const autoRefreshRef = useRef<() => void>(() => { });
   useEffect(() => {
     autoRefreshRef.current = () => {
-      if (selectedArea && !isLoading && !isRefreshing) {
+      if (!isLoading && !isRefreshing) {
         fetchOrders({
-          areaName: selectedArea,
+          areaName: selectedArea || undefined,
           bookingStatus: selectedStatus || undefined,
           slaAlert: selectedSlaAlert || undefined,
           bookingType: selectedBookingType || undefined,
-          duration: selectedDuration || undefined,
         }, true);
       }
     };
-  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, selectedDuration, isLoading, isRefreshing]);
+  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, isLoading, isRefreshing]);
 
   // Live clock synchronized with header integrated timer and auto-refresh on the minute (:00)
   useEffect(() => {
@@ -293,12 +332,14 @@ export const OrdersPage: React.FC = () => {
     setIsFilterOpen(false);
   };
 
-  // Clear all static filters (retains current selected area)
+  // Clear all static filters (resets area to All Areas, duration, status, search)
   const handleRemoveFilters = () => {
+    setSelectedArea('');
     setSelectedStatus('');
     setSelectedSlaAlert('');
     setSelectedBookingType('');
     setSelectedDuration('');
+    setDraftArea('');
     setDraftStatus('');
     setDraftSlaAlert('');
     setDraftBookingType('');
@@ -307,78 +348,138 @@ export const OrdersPage: React.FC = () => {
     setPage(1);
   };
 
-  // Count active filters (excluding search and area)
+  // Clear all filters from within the popover
+  const handleClearAllPopoverFilters = () => {
+    setSelectedArea('');
+    setSelectedStatus('');
+    setSelectedSlaAlert('');
+    setSelectedBookingType('');
+    setSelectedDuration('');
+    setDraftArea('');
+    setDraftStatus('');
+    setDraftSlaAlert('');
+    setDraftBookingType('');
+    setDraftDuration('');
+    setPage(1);
+    setIsFilterOpen(false);
+  };
+
+  // Count active filters (including area when filtered, duration, status, etc., excluding search)
   const activeFilterCount = useMemo(() => {
     let count = 0;
+    if (selectedArea && selectedArea !== 'ALL' && selectedArea !== 'All Areas' && selectedArea !== '') count++;
     if (selectedStatus && selectedStatus !== 'ALL' && selectedStatus !== '') count++;
     if (selectedSlaAlert && selectedSlaAlert !== 'ALL' && selectedSlaAlert !== '') count++;
     if (selectedBookingType && selectedBookingType !== 'ALL' && selectedBookingType !== '') count++;
-    if (selectedDuration) count++;
+    if (selectedDuration && selectedDuration !== 'ALL' && selectedDuration !== '') count++;
     return count;
-  }, [selectedStatus, selectedSlaAlert, selectedBookingType, selectedDuration]);
+  }, [selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, selectedDuration]);
 
-  // Comprehensive, multi-field search: Booking ID (with or without #), Customer Name/Email/Phone (formatted & raw digits), Vendor Name/ID, Service, Address, Area
+  // Combined AND filtering: Area + Duration + Status + Booking Type + SLA Alert + Search
   const filteredBookings = useMemo(() => {
-    if (!search.trim()) return orders;
-
-    const qRaw = search.trim().toLowerCase();
-    const qClean = qRaw.replace(/^#/, '').trim();
-    const qDigits = qRaw.replace(/\D/g, '');
-
     return orders.filter((b) => {
-      // 1. Booking ID / ID / Table ID (matches with #, without #, or partial)
-      const bId = String(b.bookingId || '').toLowerCase();
-      const bAltId = String(b.id || '').toLowerCase();
-      const bTableId = String(b.tableId || '').toLowerCase();
-      const matchesId =
-        bId.includes(qRaw) ||
-        bId.includes(qClean) ||
-        (`#${bId}`).includes(qRaw) ||
-        bAltId.includes(qRaw) ||
-        bAltId.includes(qClean) ||
-        bTableId.includes(qRaw) ||
-        bTableId.includes(qClean);
+      // 1. Operating Area filter (matches normalized area)
+      if (selectedArea && selectedArea !== 'ALL' && selectedArea !== 'All Areas') {
+        const bArea = b.areaName || b.areaId || '';
+        const matchesArea =
+          bArea.toLowerCase() === selectedArea.toLowerCase() ||
+          normalizeAreaName(bArea) === normalizeAreaName(selectedArea);
+        if (!matchesArea) return false;
+      }
 
-      // 2. Customer Name & Customer Email
-      const custName = String(b.customerName || b.customer?.name || '').toLowerCase();
-      const custEmail = String(b.customerEmail || b.customer?.email || '').toLowerCase();
-      const matchesCust =
-        custName.includes(qRaw) ||
-        custName.includes(qClean) ||
-        custEmail.includes(qRaw);
+      // 2. Duration filter (normalizes 240 mins == 4 hours == 4 hrs == 4)
+      if (selectedDuration && selectedDuration !== 'ALL' && selectedDuration !== 'All') {
+        const filterMin = parseDurationMinutes(selectedDuration);
+        const bookingMin = parseDurationMinutes(b.durationMinutes || b.duration);
+        if (filterMin !== null && bookingMin !== null) {
+          if (bookingMin !== filterMin) return false;
+        }
+      }
 
-      // 3. Customer Phone (both formatted string and raw numbers)
-      const rawPhone = String(b.customerPhone || b.customer?.phone || '').toLowerCase();
-      const phoneDigits = rawPhone.replace(/\D/g, '');
-      const matchesPhone =
-        rawPhone.includes(qRaw) ||
-        rawPhone.includes(qClean) ||
-        (qDigits.length >= 3 && phoneDigits.includes(qDigits));
+      // 3. Booking Status filter (including Ongoing <-> In Progress equivalence)
+      if (selectedStatus && selectedStatus !== 'ALL' && selectedStatus !== 'All') {
+        const bStatus = (b.bookingStatus || b.status || '').toLowerCase();
+        const sStatus = selectedStatus.toLowerCase();
+        if (sStatus === 'ongoing' || sStatus === 'in progress') {
+          if (bStatus !== 'ongoing' && bStatus !== 'in progress') return false;
+        } else {
+          if (bStatus !== sStatus) return false;
+        }
+      }
 
-      // 4. Vendor / Expert Name & ID
-      const vName = String(b.vendorName || '').toLowerCase();
-      const vId = String(b.vendorId || '').toLowerCase();
-      const matchesVendor = vName.includes(qRaw) || vId.includes(qRaw);
+      // 4. Booking Type / Service Type filter (scheduled / instant)
+      if (selectedBookingType && selectedBookingType !== 'ALL' && selectedBookingType !== 'All') {
+        const bType = (b.bookingType || b.service || '').toLowerCase();
+        const sType = selectedBookingType.toLowerCase();
+        if (sType === 'scheduled' || sType === 'schedule') {
+          if (bType !== 'scheduled' && bType !== 'schedule') return false;
+        } else {
+          if (bType !== sType) return false;
+        }
+      }
 
-      // 5. Service Type / Booking Type
-      const serv = String(b.service || b.bookingType || '').toLowerCase();
-      const matchesServ = serv.includes(qRaw);
+      // 5. SLA Alert filter (SLA Risk / On Time)
+      if (selectedSlaAlert && selectedSlaAlert !== 'ALL' && selectedSlaAlert !== 'All') {
+        const bAlert = (b.slaAlert || '').toLowerCase();
+        if (bAlert !== selectedSlaAlert.toLowerCase()) return false;
+      }
 
-      // 6. Address
-      const addr = String(b.address || '').toLowerCase();
-      const matchesAddr = addr.includes(qRaw);
+      // 6. Multi-field search
+      if (search.trim()) {
+        const qRaw = search.trim().toLowerCase();
+        const qClean = qRaw.replace(/^#/, '').trim();
+        const qDigits = qRaw.replace(/\D/g, '');
 
-      // 7. Area Name
-      const area = String(b.areaName || b.areaId || '').toLowerCase();
-      const matchesArea = area.includes(qRaw);
+        const bId = String(b.bookingId || '').toLowerCase();
+        const bAltId = String(b.id || '').toLowerCase();
+        const bTableId = String(b.tableId || '').toLowerCase();
+        const matchesId =
+          bId.includes(qRaw) ||
+          bId.includes(qClean) ||
+          (`#${bId}`).includes(qRaw) ||
+          bAltId.includes(qRaw) ||
+          bAltId.includes(qClean) ||
+          bTableId.includes(qRaw) ||
+          bTableId.includes(qClean);
 
-      // 8. Status (including Ongoing)
-      const status = String(b.bookingStatus || b.status || '').toLowerCase();
-      const matchesStatus = status.includes(qRaw);
+        const custName = String(b.customerName || b.customer?.name || '').toLowerCase();
+        const custEmail = String(b.customerEmail || b.customer?.email || '').toLowerCase();
+        const matchesCust =
+          custName.includes(qRaw) ||
+          custName.includes(qClean) ||
+          custEmail.includes(qRaw);
 
-      return matchesId || matchesCust || matchesPhone || matchesVendor || matchesServ || matchesAddr || matchesArea || matchesStatus;
+        const rawPhone = String(b.customerPhone || b.customer?.phone || '').toLowerCase();
+        const phoneDigits = rawPhone.replace(/\D/g, '');
+        const matchesPhone =
+          rawPhone.includes(qRaw) ||
+          rawPhone.includes(qClean) ||
+          (qDigits.length >= 3 && phoneDigits.includes(qDigits));
+
+        const vName = String(b.vendorName || '').toLowerCase();
+        const vId = String(b.vendorId || '').toLowerCase();
+        const matchesVendor = vName.includes(qRaw) || vId.includes(qRaw);
+
+        const serv = String(b.service || b.bookingType || '').toLowerCase();
+        const matchesServ = serv.includes(qRaw);
+
+        const addr = String(b.address || '').toLowerCase();
+        const matchesAddr = addr.includes(qRaw);
+
+        const area = String(b.areaName || b.areaId || '').toLowerCase();
+        const matchesAreaText = area.includes(qRaw);
+
+        const status = String(b.bookingStatus || b.status || '').toLowerCase();
+        const matchesStatus = status.includes(qRaw);
+
+        if (!matchesId && !matchesCust && !matchesPhone && !matchesVendor && !matchesServ && !matchesAddr && !matchesAreaText && !matchesStatus) {
+          return false;
+        }
+      }
+
+      return true;
     });
-  }, [orders, search]);
+  }, [orders, selectedArea, selectedDuration, selectedStatus, selectedBookingType, selectedSlaAlert, search]);
 
   // Pagination for 20 bookings only per page
   const totalPages = Math.ceil(filteredBookings.length / PAGE_SIZE) || 1;
@@ -647,11 +748,11 @@ export const OrdersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Top Filter Bar: Search Bar on Left; Auto-refresh & Refresh Button on Left beside Filter */}
+      {/* Top Filter Bar: Search Bar & Area Selector on Left; Auto-refresh & Refresh Button on Left beside Filter */}
       <div className="relative z-30 rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-4 shadow-soft-sm space-y-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Left: Search Bar */}
-          <div className="w-full lg:max-w-md">
+          <div className="w-full sm:max-w-md lg:max-w-lg">
             <SearchInput
               value={search}
               onChange={(val) => {
@@ -663,7 +764,7 @@ export const OrdersPage: React.FC = () => {
             />
           </div>
 
-          {/* Right: Auto-Refresh info + Refresh button (left beside of filters) + Remove Filters + Filter Button */}
+          {/* Right: Auto-Refresh info + Refresh button (left beside of filters) + Filter Button */}
           <div ref={filterContainerRef} className="flex items-center gap-2 sm:gap-2.5 self-start lg:self-auto shrink-0 flex-wrap relative">
             {/* Auto-Refresh Status Indicator with Live Countdown Counter */}
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-xs text-[#6B6B6B] shadow-soft-xs">
@@ -686,11 +787,10 @@ export const OrdersPage: React.FC = () => {
             <button
               type="button"
               onClick={() => fetchOrders({
-                areaName: selectedArea,
+                areaName: selectedArea || undefined,
                 bookingStatus: selectedStatus || undefined,
                 slaAlert: selectedSlaAlert || undefined,
                 bookingType: selectedBookingType || undefined,
-                duration: selectedDuration || undefined,
               }, false)}
               disabled={isLoading || isRefreshing}
               className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
@@ -699,19 +799,6 @@ export const OrdersPage: React.FC = () => {
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
               <span>Refresh</span>
             </button>
-
-            {/* Remove Filter Button (Visible only when filters or search are active) */}
-            {(activeFilterCount > 0 || search.trim().length > 0) && (
-              <button
-                type="button"
-                onClick={handleRemoveFilters}
-                className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-[#FEF2F2] px-3 py-2 text-xs font-semibold text-[#B42318] hover:bg-rose-100 transition-all shadow-soft-sm active:scale-95 cursor-pointer"
-                title="Remove all active filters and search"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Remove Filters</span>
-              </button>
-            )}
 
             {/* Filter Button */}
             <button
@@ -778,7 +865,7 @@ export const OrdersPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
                         <span>Operating Area</span>
-                        {draftArea && draftArea !== 'ALL' && (
+                        {draftArea && draftArea !== 'ALL' && draftArea !== 'All Areas' && (
                           <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
                             {draftArea}
                           </span>
@@ -793,33 +880,46 @@ export const OrdersPage: React.FC = () => {
 
                     {expandedSections.area && (
                       <div className="px-3.5 pb-3.5 pt-1 border-t border-[#EEEEF2] space-y-1.5">
-                        {isLoadingAreas ? (
-                          <div className="flex items-center gap-2 py-2 px-2 text-xs text-[#6B6B6B]">
-                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#5B21B6]" />
-                            <span>Loading active areas from API...</span>
+                        {/* "All Areas" option */}
+                        <button
+                          type="button"
+                          onClick={() => setDraftArea('')}
+                          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                            !draftArea || draftArea === 'ALL' || draftArea === 'All Areas'
+                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-purple-400" />
+                            <span>All Areas</span>
                           </div>
-                        ) : activeAreas.length === 0 ? (
+                          {(!draftArea || draftArea === 'ALL' || draftArea === 'All Areas') && (
+                            <Check className="h-3.5 w-3.5 text-[#5B21B6]" />
+                          )}
+                        </button>
+
+                        {availableAreaOptions.length === 0 ? (
                           <div className="py-2 px-2 text-xs text-[#6B6B6B]">
-                            No active areas available
+                            No accessible areas available
                           </div>
                         ) : (
-                          activeAreas.map((area) => (
+                          availableAreaOptions.map((areaName) => (
                             <button
-                              key={area.areaName}
+                              key={areaName}
                               type="button"
-                              onClick={() => setDraftArea(area.areaName)}
-                              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftArea === area.areaName
+                              onClick={() => setDraftArea(areaName)}
+                              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                                draftArea === areaName
                                   ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
-                                }`}
+                              }`}
                             >
                               <div className="flex items-center gap-1.5">
-                                <span>{area.areaName}</span>
-                                {area.city && (
-                                  <span className="text-[10px] text-[#6B6B6B]">({area.city})</span>
-                                )}
+                                <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                                <span>{areaName}</span>
                               </div>
-                              {draftArea === area.areaName && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {draftArea === areaName && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
                             </button>
                           ))
                         )}
@@ -1052,15 +1152,12 @@ export const OrdersPage: React.FC = () => {
                 <div className="border-t border-[#EEEEF2] bg-white p-3.5 flex items-center justify-between gap-3 shrink-0 rounded-b-2xl">
                   <button
                     type="button"
-                    onClick={() => {
-                      setDraftStatus('');
-                      setDraftSlaAlert('');
-                      setDraftBookingType('');
-                      setDraftDuration('');
-                    }}
-                    className="text-xs font-semibold text-[#6B6B6B] hover:text-[#B42318] px-3.5 py-2 rounded-xl border border-[#EEEEF2] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                    onClick={handleClearAllPopoverFilters}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[#B42318] hover:text-white px-3.5 py-2 rounded-xl border border-rose-200 bg-[#FEF2F2] hover:bg-[#B42318] transition-all shadow-soft-xs cursor-pointer active:scale-95"
+                    title="Clear all filters and reset"
                   >
-                    Clear All
+                    <X className="h-3.5 w-3.5" />
+                    <span>Clear All</span>
                   </button>
                   <button
                     type="button"
@@ -1184,11 +1281,10 @@ export const OrdersPage: React.FC = () => {
           <button
             type="button"
             onClick={() => fetchOrders({
-              areaName: selectedArea,
+              areaName: selectedArea || undefined,
               bookingStatus: selectedStatus || undefined,
               slaAlert: selectedSlaAlert || undefined,
               bookingType: selectedBookingType || undefined,
-              duration: selectedDuration || undefined,
             }, false)}
             className="rounded-xl bg-[#B42318] hover:bg-rose-800 text-white px-5 py-2 text-xs font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
           >
@@ -1353,7 +1449,7 @@ export const OrdersPage: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
             <button
               type="button"
               onClick={() => {
@@ -1422,11 +1518,10 @@ export const OrdersPage: React.FC = () => {
             setInspectBooking((prev) => prev ? { ...prev, bookingStatus: 'Cancelled', status: 'Cancelled' } : null);
           }
           fetchOrders({
-            areaName: selectedArea,
+            areaName: selectedArea || undefined,
             bookingStatus: selectedStatus || undefined,
             slaAlert: selectedSlaAlert || undefined,
             bookingType: selectedBookingType || undefined,
-            duration: selectedDuration || undefined,
           }, false);
         }}
       />

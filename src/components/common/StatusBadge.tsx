@@ -11,12 +11,14 @@ interface StatusBadgeProps {
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', pulse = false }) => {
   const getBadgeStyle = () => {
     switch (status) {
-      // Active / Available / Completed / Verified (Soft Green - Active / Enabled State)
+      // Active / Available / Completed / Verified / Resolved (Soft Green - Active / Enabled State)
       case 'Active':
       case 'active':
       case 'Available':
       case 'Completed':
       case 'completed':
+      case 'Resolved':
+      case 'resolved':
       case 'Verified':
       case 'Approved':
       case 'Paid':
@@ -40,9 +42,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', p
       case 'Normal':
         return 'bg-[#F3E8FF] text-[#6B21A8] border-[#E9D5FF]';
 
-      // Traveling / Pending / Under Review / Tight (Soft Orange / Amber)
+      // Traveling / Pending / Under Review / Tight / Open (Soft Orange / Amber)
       case 'Traveling':
       case 'Pending':
+      case 'pending':
+      case 'Open':
+      case 'open':
       case 'Under Review':
       case 'Queued':
       case 'Tight':
@@ -64,10 +69,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', p
       case 'booked':
         return 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]';
 
-      // Offline / Cancelled / Draft / Standby (Soft Gray)
+      // Offline / Cancelled / Draft / Standby / Closed (Soft Gray)
       case 'Offline':
       case 'Cancelled':
       case 'cancelled':
+      case 'Closed':
+      case 'closed':
       case 'Unavailable':
       case 'Draft':
       case 'Calculated':

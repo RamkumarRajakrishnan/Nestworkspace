@@ -241,11 +241,16 @@ export interface NestRoleItem {
   locationId: string;
   roleName: string;
   areaName: string;
+  [key: string]: any;
 }
 
 export interface NestLoginData {
   userId: string;
-  roles: NestRoleItem[];
+  roles?: NestRoleItem[];
+  areas?: (string | { areaName: string })[];
+  accessibleAreas?: string[];
+  hasAllAreaAccess?: boolean;
+  [key: string]: any;
 }
 
 export interface RoleModuleItem {
@@ -303,5 +308,49 @@ export interface AuthSession {
   user: AuthUser;
   role: AuthRole;
   locations: AuthLocation[];
+  accessibleAreas: string[];
+  hasAllAreaAccess: boolean;
+  allRoles?: NestRoleItem[];
+}
+
+export interface CustomerTicketConversationItem {
+  question: string;
+  answer: string;
+}
+
+export interface CustomerTicketItem {
+  tableId: string;
+  email: string;
+  phone: string | number;
+  customerName?: string;
+  customerPhone?: string | number;
+  subject: string;
+  status: string;
+  category: string;
+  ticketId?: string;
+}
+
+export interface CustomerTicketDetails {
+  tableId?: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone: string | number;
+  subject: string;
+  description?: {
+    conversation?: CustomerTicketConversationItem[];
+    [key: string]: any;
+  } | string;
+  category: string;
+  priority?: string;
+  status: string;
+  orderId?: string;
+  resolution?: string;
+  attachments?: any[];
+  closedDate?: string | null;
+  remarks?: string;
+  assignedTo?: string;
+  ticketId?: string;
+  [key: string]: any;
 }
 

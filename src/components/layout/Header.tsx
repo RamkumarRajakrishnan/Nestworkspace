@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Bell,
-  MapPin,
   Clock,
   ChevronDown,
-  Flame,
   LogOut,
   User,
-  MoreVertical,
-  Check,
   Menu
 } from 'lucide-react';
 import logoImg from '../../assets/Logo.png';
@@ -20,172 +16,12 @@ import { Modal } from '../common/Modal';
 import { UserProfileModal } from './UserProfileModal';
 import { useNavigate } from 'react-router-dom';
 
-interface MarketSelectorDropdownProps {
-  markets: any[];
-  selectedMarketId: string;
-  onSelectMarket: (id: string) => void;
-  fullWidth?: boolean;
-}
-
-const MarketSelectorDropdown: React.FC<MarketSelectorDropdownProps> = ({
-  markets,
-  selectedMarketId,
-  onSelectMarket,
-  fullWidth = false,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  const currentMarket = markets.find((m) => m.id === selectedMarketId);
-  const displayLabel = selectedMarketId === 'ALL'
-    ? 'All Nano Markets — Bangalore'
-    : currentMarket
-    ? `${currentMarket.name || currentMarket.id} (${currentMarket.capacity}%)`
-    : 'All Nano Markets — Bangalore';
-
-  return (
-    <div className={`relative ${fullWidth ? 'w-full' : 'shrink-0'}`} ref={dropdownRef}>
-      {/* Trigger Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Select Nano Market"
-        aria-expanded={isOpen}
-        className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-all shadow-soft-xs cursor-pointer select-none ${
-          fullWidth ? 'w-full' : 'min-w-[210px]'
-        } ${
-          isOpen
-            ? 'border-[#7C3AED] bg-[#F5F3FF] text-[#5B21B6] ring-2 ring-[#7C3AED]/20'
-            : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] hover:border-[#DDD6FE]'
-        }`}
-      >
-        <div className="flex items-center gap-2 min-w-0">
-          <MapPin className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
-          <span className="truncate">{displayLabel}</span>
-        </div>
-        <ChevronDown
-          className={`h-3.5 w-3.5 text-[#6B6B6B] transition-transform duration-200 shrink-0 ${
-            isOpen ? 'rotate-180 text-[#5B21B6]' : ''
-          }`}
-        />
-      </button>
-
-      {/* Styled Popover Dropdown */}
-      {isOpen && (
-        <div
-          className={`absolute ${
-            fullWidth ? 'left-0 right-0' : 'left-0 sm:left-auto sm:right-0 xl:left-0'
-          } top-full mt-1.5 z-50 w-72 sm:w-80 max-h-80 flex flex-col rounded-2xl border border-[#EEEEF2] bg-white p-1.5 shadow-2xl shadow-purple-950/15 animate-in fade-in zoom-in-95 duration-150 overflow-hidden`}
-        >
-          {/* Header */}
-          <div className="px-3 py-2 text-[10px] font-bold text-[#6B6B6B] uppercase tracking-wider border-b border-[#EEEEF2] flex items-center justify-between shrink-0 bg-white">
-            <span>Select Nano-Market ({markets.length})</span>
-            <span className="text-[#5B21B6] font-mono">Bangalore</span>
-          </div>
-
-          {/* Options list */}
-          <div className="overflow-y-auto max-h-64 py-1 space-y-0.5">
-            {/* All Nano-Markets Option */}
-            <button
-              type="button"
-              onClick={() => {
-                onSelectMarket('ALL');
-                setIsOpen(false);
-              }}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left ${
-                selectedMarketId === 'ALL'
-                  ? 'bg-[#F5F3FF] text-[#5B21B6] font-bold'
-                  : 'text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <MapPin className={`h-4 w-4 shrink-0 ${selectedMarketId === 'ALL' ? 'text-[#5B21B6]' : 'text-[#6B6B6B]'}`} />
-                <div className="truncate">
-                  <span className="block truncate font-semibold">All Nano Markets — Bangalore</span>
-                  <span className="block text-[10px] text-[#6B6B6B] font-normal">Citywide Operations</span>
-                </div>
-              </div>
-              {selectedMarketId === 'ALL' && <Check className="h-4 w-4 text-[#5B21B6] shrink-0" />}
-            </button>
-
-            {/* Individual Nano Markets */}
-            {markets.map((m) => {
-              const isSelected = selectedMarketId === m.id;
-              const cap = m.capacity ?? 0;
-              const capBadgeClass =
-                cap >= 90
-                  ? 'bg-rose-50 text-rose-700 border-rose-200'
-                  : cap >= 70
-                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => {
-                    onSelectMarket(m.id);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left ${
-                    isSelected
-                      ? 'bg-[#F5F3FF] text-[#5B21B6] font-bold'
-                      : 'text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100/70 text-[#5B21B6] shrink-0">
-                      {m.id}
-                    </span>
-                    <span className="truncate">{m.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 ml-2">
-                    <span className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full border ${capBadgeClass}`}>
-                      {cap}%
-                    </span>
-                    {isSelected && <Check className="h-4 w-4 text-[#5B21B6] shrink-0" />}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
 interface HeaderProps {
   onOpenMobileSidebar?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
-  const {
-    markets,
-    selectedMarketId,
-    setSelectedMarketId,
-    notifications,
-    runScenario1CapacityCrunch
-  } = useOperations();
+  const { notifications } = useOperations();
   const { user, role, logout } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -193,11 +29,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const profileDropdownRef = useRef<HTMLDivElement>(null);
-  const moreMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -205,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Close dropdowns on outside click
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -213,12 +47,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
         !profileDropdownRef.current.contains(event.target as Node)
       ) {
         setIsProfileDropdownOpen(false);
-      }
-      if (
-        moreMenuRef.current &&
-        !moreMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsMoreMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -267,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
 
   return (
     <>
-      <header className="flex h-16 w-full items-center justify-between border-b border-purple-200 bg-purple-100 px-2 sm:px-4 md:px-6 shadow-soft-sm gap-1 sm:gap-3">
+      <header className="flex h-16 w-full items-center justify-between border-b border-purple-200 bg-purple-100 px-2 sm:px-4 md:px-6 shadow-soft-sm gap-2 sm:gap-4">
         {/* Left: Mobile Hamburger (< md) & Navbar Logo */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
@@ -288,51 +116,29 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
           />
         </div>
 
-        {/* Right Section containing all header elements */}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-2.5 shrink-0 ml-auto">
-          {/* 1. Search Input - Responsive sizing */}
+        {/* Search Input - Balanced width & shifted right */}
+        <div className="ml-1.5 sm:ml-6 md:ml-12 lg:ml-20 w-full max-w-[200px] xs:max-w-[240px] sm:max-w-[300px] md:max-w-[360px] lg:max-w-[420px] min-w-0 flex-1">
           <SearchInput
             value={searchQuery}
             onChange={handleSearchSubmit}
-            placeholder="Search..."
-            className="w-20 min-[380px]:w-28 sm:w-36 md:w-52 lg:w-60 min-w-0"
+            placeholder="Search by ID, name, area..."
+            className="w-full"
           />
+        </div>
 
-          {/* 2. Desktop Secondary Elements: Market Selector, Scenario 1, Clock (Visible on desktop xl:) */}
-          <div className="hidden xl:flex items-center gap-2 shrink-0">
-            {/* Market Selector Dropdown */}
-            <MarketSelectorDropdown
-              markets={markets}
-              selectedMarketId={selectedMarketId}
-              onSelectMarket={setSelectedMarketId}
-            />
-
-            {/* Scenario 1: KOR-03 Crunch */}
-            <button
-              type="button"
-              onClick={() => {
-                runScenario1CapacityCrunch();
-                navigate('/markets/KOR-03');
-              }}
-              className="flex items-center gap-1.5 rounded-xl border border-[#FECDCA] bg-[#FEF2F2] px-3 py-2 text-xs font-bold text-[#B42318] hover:bg-[#FEE2E2] transition-all shadow-soft-sm active:scale-95 cursor-pointer shrink-0"
-              title="Demonstrate Scenario 1: KOR-03 100% Capacity Crunch Escalation"
-            >
-              <Flame className="h-3.5 w-3.5 text-[#B42318] animate-pulse shrink-0" />
-              <span className="whitespace-nowrap">Scenario 1: KOR-03 Crunch</span>
-            </button>
-
-            {/* Live IST Clock */}
-            <div className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs text-[#6B6B6B] font-mono font-medium shrink-0 whitespace-nowrap">
-              <Clock className="h-3.5 w-3.5 text-[#5B21B6]" />
-              <span>{formatHeaderDate(currentTime)}</span>
-            </div>
+        {/* Right Section */}
+        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 ml-auto">
+          {/* Live IST Clock */}
+          <div className="hidden lg:flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs text-[#6B6B6B] font-mono font-medium shrink-0 whitespace-nowrap shadow-soft-xs">
+            <Clock className="h-3.5 w-3.5 text-[#5B21B6]" />
+            <span>{formatHeaderDate(currentTime)}</span>
           </div>
 
-          {/* 3. Notifications Bell */}
+          {/* Notifications Bell */}
           <button
             type="button"
             onClick={() => setIsNotifOpen(true)}
-            className="relative rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors cursor-pointer shrink-0"
+            className="relative rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors cursor-pointer shrink-0 shadow-soft-xs"
             title="Operational Alerts"
           >
             <Bell className="h-4 w-4" />
@@ -343,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
             )}
           </button>
 
-          {/* 4. Admin Profile Dropdown Menu - Fully visible and properly aligned */}
+          {/* Admin Profile Dropdown Menu */}
           <div className="relative border-l border-purple-200 pl-1.5 sm:pl-3 shrink-0" ref={profileDropdownRef}>
             <button
               type="button"
@@ -381,7 +187,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
 
             {/* Dropdown Menu Popup */}
             {isProfileDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-[#EEEEF2] bg-white p-2 shadow-soft-lg z-50 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-[#EEEEF2] bg-white p-2 shadow-soft-lg z-50 animate-in fade-in zoom-in-95">
                 {/* User Mini Summary Header */}
                 <div className="border-b border-[#EEEEF2] px-3 py-2.5 bg-[#FAF9FC] rounded-xl mb-1.5">
                   <div className="text-xs font-bold text-[#1F1F1F] truncate">
@@ -425,53 +231,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
                     <span>Sign Out</span>
                   </button>
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* 5. Three-Dot / More Menu - Moved to EXTREME RIGHT without square box background */}
-          <div className="relative xl:hidden flex items-center shrink-0" ref={moreMenuRef}>
-            <button
-              type="button"
-              onClick={() => setIsMoreMenuOpen((prev) => !prev)}
-              className="flex items-center justify-center p-1 text-[#6B6B6B] hover:text-[#5B21B6] transition-colors cursor-pointer shrink-0"
-              title="More operational controls"
-              aria-label="More operational controls"
-              aria-expanded={isMoreMenuOpen}
-            >
-              <MoreVertical className="h-5 w-5" />
-            </button>
-
-            {isMoreMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-[#EEEEF2] bg-white p-3 shadow-soft-lg z-50 space-y-2.5 animate-in fade-in zoom-in-95">
-                <div className="text-[10px] font-bold text-[#6B6B6B] uppercase tracking-wider px-1">
-                  Operational Controls
-                </div>
-
-                {/* 1. All Markets dropdown inside More Menu */}
-                <MarketSelectorDropdown
-                  markets={markets}
-                  selectedMarketId={selectedMarketId}
-                  onSelectMarket={(id) => {
-                    setSelectedMarketId(id);
-                    setIsMoreMenuOpen(false);
-                  }}
-                  fullWidth
-                />
-
-                {/* 2. Scenario Button inside More Menu */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    runScenario1CapacityCrunch();
-                    navigate('/markets/KOR-03');
-                    setIsMoreMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#FECDCA] bg-[#FEF2F2] px-3 py-2 text-xs font-bold text-[#B42318] hover:bg-[#FEE2E2] transition-all cursor-pointer"
-                >
-                  <Flame className="h-3.5 w-3.5 text-[#B42318] animate-pulse" />
-                  <span>Scenario 1: KOR-03 Crunch</span>
-                </button>
               </div>
             )}
           </div>

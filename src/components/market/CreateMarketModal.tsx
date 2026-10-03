@@ -667,7 +667,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
     : INDIAN_STATES;
 
   return (
-    <div className="fixed top-16 bottom-0 right-0 left-0 md:left-[var(--sidebar-width,15rem)] z-30 flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-150">
+    <div className="fixed top-16 bottom-0 right-0 left-0 md:left-[var(--sidebar-width,15rem)] z-30 flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
       {/* Backdrop inside content area */}
       <div
         className="absolute inset-0 bg-[#1F1F1F]/40 backdrop-blur-xs transition-opacity cursor-pointer"
@@ -680,15 +680,15 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
       {/* Modal Dialog Box */}
       <div className="relative z-10 w-full max-w-4xl max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-lg transition-all overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-5 shrink-0">
-          <div>
+        <div className="flex items-start justify-between border-b border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-5 shrink-0 gap-2">
+          <div className="min-w-0 flex-1 pr-2">
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#5B21B6]/10 text-[#5B21B6]">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#5B21B6]/10 text-[#5B21B6] shrink-0">
                 <MapPin className="h-4 w-4" />
               </span>
-              <h2 className="text-base sm:text-lg font-bold text-[#1F1F1F]">Create New Market</h2>
+              <h2 className="text-base sm:text-lg font-bold text-[#1F1F1F] truncate">Create New Market</h2>
             </div>
-            <p className="mt-1 text-xs text-[#6B6B6B]">
+            <p className="mt-1 text-xs text-[#6B6B6B] break-words">
               Configure a new nano-market, operational geographic boundaries, and customer duration pricing.
             </p>
           </div>
@@ -1595,12 +1595,12 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
         </form>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between border-t border-[#EEEEF2] bg-[#FAF9FC] p-4 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#EEEEF2] bg-[#FAF9FC] p-4 shrink-0">
           <div className="text-xs text-[#6B6B6B]">
             All fields marked with <span className="text-rose-500">*</span> are required.
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 self-end sm:self-auto">
             <button
               type="button"
               onClick={onClose}

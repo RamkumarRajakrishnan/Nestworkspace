@@ -1,4 +1,4 @@
-import { AuthSession, NestLoginData, RoleModulesData } from '../types';
+import { AuthSession, NestLoginData, RoleModulesData, CustomerTicketItem, CustomerTicketDetails } from '../types';
 
 export interface LoginCredentials {
   email?: string;
@@ -81,6 +81,42 @@ export interface GetActiveAreasResult {
   success: boolean;
   data: ActiveAreaItem[];
   pagination?: any;
+  error?: string;
+}
+
+export interface VendorLiveTrackItem {
+  vendor: string;
+  workerId: string;
+  latitude: number;
+  longitude: number;
+  onlineStatus: boolean;
+  currentArea: string;
+  areaName: string;
+  lastUpdated: string;
+  areaLat?: number;
+  areaLng?: number;
+  coverageRadius?: number;
+}
+
+export interface VendorLiveTrackArea {
+  areaName: string;
+  latitude: number;
+  longitude: number;
+  coverageRadius: number;
+  vendors?: VendorLiveTrackItem[];
+}
+
+export interface VendorLiveTrackData {
+  area: VendorLiveTrackArea | null;
+  areas?: VendorLiveTrackArea[];
+  areaName?: string;
+  vendors: VendorLiveTrackItem[];
+  pagination?: any;
+}
+
+export interface GetVendorLiveTrackResult {
+  success: boolean;
+  data?: VendorLiveTrackData;
   error?: string;
 }
 
@@ -304,6 +340,8 @@ export function getBookings(filtersOrArea?: string | GetBookingsFilterOptions, p
 export function getAvailableExperts(tableId: string): Promise<GetAvailableExpertsResult>;
 export function getActiveAreas(page?: number, pageSize?: number): Promise<GetActiveAreasResult>;
 export function getAreas(page?: number, pageSize?: number): Promise<GetActiveAreasResult>;
+export function getVendorLiveTrack(areaName: string): Promise<GetVendorLiveTrackResult>;
+export function vendorLiveTrack(areaName: string): Promise<GetVendorLiveTrackResult>;
 
 export interface CreateNestAreaDuration {
   duration: string;
@@ -593,6 +631,37 @@ export interface GetNestAreaByIdResult {
 export function getNestAreas(): Promise<GetNestAreasResult>;
 export function getNestAreaById(tableId: string): Promise<GetNestAreaByIdResult>;
 export function getNestAreasByLocation(city: string, state: string, page?: number, limit?: number): Promise<GetNestAreasResult>;
+
+export interface GetCustomerTicketsResult {
+  success: boolean;
+  data: CustomerTicketItem[];
+  error?: string;
+}
+
+export interface GetCustomerTicketDetailsResult {
+  success: boolean;
+  data?: CustomerTicketDetails;
+  message?: string;
+  error?: string;
+}
+
+export interface UpdateCustomerTicketStatusPayload {
+  tableId: string;
+  status: string;
+}
+
+export interface UpdateCustomerTicketStatusResult {
+  success: boolean;
+  data?: {
+    tableId: string;
+    status: string;
+  };
+  error?: string;
+}
+
+export function getCustomerTickets(): Promise<GetCustomerTicketsResult>;
+export function getCustomerTicketDetails(tableId: string): Promise<GetCustomerTicketDetailsResult>;
+export function updateCustomerTicketStatus(payload: UpdateCustomerTicketStatusPayload): Promise<UpdateCustomerTicketStatusResult>;
 
 
 

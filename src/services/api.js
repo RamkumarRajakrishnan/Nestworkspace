@@ -1385,6 +1385,181 @@ export const getActiveAreas = async (page = 1, pageSize = 10) => {
 export const getAreas = getActiveAreas;
 
 /**
+ * Fetches real-time vendor live tracking and area coverage details.
+ * Endpoint: GET https://haatza.com/_functions/vendorLiveTrack?areaName={areaName}
+ * 
+ * @param {string} areaName - Sanitized area name to query
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data?: {
+ *     area: { areaName: string, latitude: number, longitude: number, coverageRadius: number } | null,
+ *     vendors: Array<{
+ *       vendor: string,
+ *       workerId: string,
+ *       latitude: number,
+ *       longitude: number,
+ *       onlineStatus: boolean,
+ *       currentArea: string,
+ *       areaName: string,
+ *       lastUpdated: string
+ *     }>,
+ *     pagination?: any
+ *   },
+ *   error?: string
+ * }>}
+ */
+export const getVendorLiveTrack = async (areaName) => {
+  const cleanAreaName = String(areaName || '').trim();
+  if (!cleanAreaName) {
+    return {
+      success: false,
+      error: 'Area name is required to fetch live tracking details.',
+    };
+  }
+
+  try {
+    const url = `${Serverurl}/vendorLiveTrack?areaName=${encodeURIComponent(cleanAreaName)}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    console.log('Vendor Live Track API Response:', data);
+
+    if (data && (data.status === 'success' || data.success) && data.data) {
+      const raw = data.data;
+
+      // 1. Extract ALL areas dynamically from API response (Requirement 2 & 3)
+      let areas = [];
+      if (Array.isArray(raw.areas) && raw.areas.length > 0) {
+        areas = raw.areas.map((a) => ({
+          areaName: a.areaName || cleanAreaName,
+          latitude: Number(a.latitude),
+          longitude: Number(a.longitude),
+          coverageRadius: Number(a.coverageRadius !== undefined ? a.coverageRadius : 900),
+          vendors: Array.isArray(a.vendors) ? a.vendors : [],
+        }));
+      } else if (raw.area) {
+        areas = [{
+          areaName: raw.area.areaName || cleanAreaName,
+          latitude: Number(raw.area.latitude),
+          longitude: Number(raw.area.longitude),
+          coverageRadius: Number(raw.area.coverageRadius !== undefined ? raw.area.coverageRadius : 900),
+          vendors: Array.isArray(raw.vendors) ? raw.vendors : [],
+        }];
+      } else if (raw.latitude && raw.longitude) {
+        areas = [{
+          areaName: raw.areaName || cleanAreaName,
+          latitude: Number(raw.latitude),
+          longitude: Number(raw.longitude),
+          coverageRadius: Number(raw.coverageRadius !== undefined ? raw.coverageRadius : 900),
+          vendors: Array.isArray(raw.vendors) ? raw.vendors : [],
+        }];
+      }
+
+      // Default single area for backwards compatibility
+      const area = areas.length > 0 ? areas[0] : null;
+
+      // 2. Extract ALL vendors across ALL returned areas (Requirement 6 & 8)
+      let vendors = [];
+      if (Array.isArray(raw.areas) && raw.areas.length > 0) {
+        for (const a of raw.areas) {
+          const areaName = a.areaName || cleanAreaName;
+          const areaLat = Number(a.latitude);
+          const areaLng = Number(a.longitude);
+          const coverageRadius = Number(a.coverageRadius !== undefined ? a.coverageRadius : 900);
+
+          if (Array.isArray(a.vendors)) {
+            for (const v of a.vendors) {
+              vendors.push({
+                vendor: v.vendor || v.fullName || 'Unknown Worker',
+                workerId: v.workerId || v.id || '',
+                latitude: Number(v.latitude),
+                longitude: Number(v.longitude),
+                onlineStatus: Boolean(v.onlineStatus),
+                currentArea: v.currentArea || areaName,
+                areaName: v.areaName || areaName,
+                lastUpdated: v.lastUpdated || new Date().toISOString(),
+                areaLat,
+                areaLng,
+                coverageRadius,
+              });
+            }
+          }
+        }
+
+        // Also if raw.vendors has top-level items not in sub-areas, include them
+        if (Array.isArray(raw.vendors) && raw.vendors.length > 0) {
+          for (const v of raw.vendors) {
+            const vWorkerId = v.workerId || v.id || '';
+            if (!vendors.some((existing) => existing.workerId === vWorkerId)) {
+              const matchedArea = areas.find((a) =>
+                String(a.areaName).toLowerCase() === String(v.areaName || v.currentArea || '').toLowerCase()
+              ) || areas[0];
+
+              vendors.push({
+                vendor: v.vendor || v.fullName || 'Unknown Worker',
+                workerId: vWorkerId,
+                latitude: Number(v.latitude),
+                longitude: Number(v.longitude),
+                onlineStatus: Boolean(v.onlineStatus),
+                currentArea: v.currentArea || matchedArea?.areaName || cleanAreaName,
+                areaName: v.areaName || matchedArea?.areaName || cleanAreaName,
+                lastUpdated: v.lastUpdated || new Date().toISOString(),
+                areaLat: matchedArea?.latitude,
+                areaLng: matchedArea?.longitude,
+                coverageRadius: matchedArea?.coverageRadius,
+              });
+            }
+          }
+        }
+      } else if (Array.isArray(raw.vendors)) {
+        vendors = raw.vendors.map((v) => ({
+          vendor: v.vendor || v.fullName || 'Unknown Worker',
+          workerId: v.workerId || v.id || '',
+          latitude: Number(v.latitude),
+          longitude: Number(v.longitude),
+          onlineStatus: Boolean(v.onlineStatus),
+          currentArea: v.currentArea || cleanAreaName,
+          areaName: v.areaName || cleanAreaName,
+          lastUpdated: v.lastUpdated || new Date().toISOString(),
+          areaLat: area?.latitude,
+          areaLng: area?.longitude,
+          coverageRadius: area?.coverageRadius,
+        }));
+      }
+
+      return {
+        success: true,
+        data: {
+          area,
+          areas,
+          areaName: raw.areaName || cleanAreaName,
+          vendors,
+          pagination: raw.pagination,
+        },
+      };
+    }
+
+    return {
+      success: false,
+      error: data?.message || 'Failed to fetch vendor live tracking details.',
+    };
+  } catch (error) {
+    console.error('Vendor Live Track API Error:', error);
+    return {
+      success: false,
+      error: error?.message || 'Network error while fetching vendor live tracking.',
+    };
+  }
+};
+
+export const vendorLiveTrack = getVendorLiveTrack;
+
+/**
  * Checks whether an area name is already registered/exists.
  * Endpoint: GET https://www.haatza.com/_functions/checkNestArea?areaName={areaName}
  * 
@@ -2118,6 +2293,205 @@ export const updateNestPass = async (updateData) => {
     return {
       success: false,
       error: 'Network error while updating Nest Pass. Please try again.',
+    };
+  }
+};
+
+// ============================================================================
+// CUSTOMER TICKETS & COMPLAINTS APIs
+// ============================================================================
+
+/**
+ * Fetches list of customer tickets.
+ * Endpoint: GET https://haatza.com/_functions/customerTickets
+ * 
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data: Array<{
+ *     tableId: string,
+ *     email: string,
+ *     phone: number | string,
+ *     customerName?: string,
+ *     customerPhone?: number | string,
+ *     subject: string,
+ *     status: string,
+ *     category: string
+ *   }>,
+ *   error?: string
+ * }>}
+ */
+export const getCustomerTickets = async () => {
+  try {
+    const response = await fetch(`${Serverurl}/customerTickets`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+    console.log('getCustomerTickets API Response:', data);
+
+    if (response.ok && data && (data.status === 'success' || data.success)) {
+      const tickets = Array.isArray(data.data) ? data.data : (Array.isArray(data.message) ? data.message : []);
+      return {
+        success: true,
+        data: tickets,
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : (data?.error || `Failed to fetch customer tickets (${response.status})`);
+
+    return {
+      success: false,
+      data: [],
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('getCustomerTickets API Network Error:', error);
+    return {
+      success: false,
+      data: [],
+      error: 'Network error while loading customer tickets. Please try again.',
+    };
+  }
+};
+
+/**
+ * Fetches full details for a customer ticket by tableId.
+ * Endpoint: GET https://haatza.com/_functions/customerTicketdetails?tableId={tableId}
+ * 
+ * IMPORTANT: The API specifically requires the tableId from customerTickets.
+ * Do NOT use ticketId, orderId, email, or phone.
+ * 
+ * @param {string} tableId - The unique tableId from customerTickets
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data?: any,
+ *   message?: string,
+ *   error?: string
+ * }>}
+ */
+export const getCustomerTicketDetails = async (tableId) => {
+  const cleanTableId = String(tableId || '').trim();
+  if (!cleanTableId) {
+    return {
+      success: false,
+      error: 'tableId is required to fetch customer ticket details.',
+    };
+  }
+
+  try {
+    const url = `${Serverurl}/customerTicketdetails?tableId=${encodeURIComponent(cleanTableId)}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+    console.log('getCustomerTicketDetails API Response:', data);
+
+    if (response.ok && data && (data.status === 'success' || data.success)) {
+      return {
+        success: true,
+        data: data.data || data.message?.data || data.message,
+        message: data.message || 'Customer ticket fetched successfully',
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : (data?.error || `Failed to fetch ticket details (${response.status})`);
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('getCustomerTicketDetails API Network Error:', error);
+    return {
+      success: false,
+      error: 'Network error while loading ticket details. Please try again.',
+    };
+  }
+};
+
+/**
+ * Updates status of a customer ticket.
+ * Endpoint: POST https://haatza.com/_functions/updateCustomerTicketStatus
+ * 
+ * Payload: { tableId: string, status: string }
+ * Response: { status: 'success', data: { tableId: string, status: string } }
+ * 
+ * @param {{ tableId: string, status: string }} params
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data?: { tableId: string, status: string },
+ *   error?: string
+ * }>}
+ */
+export const updateCustomerTicketStatus = async ({ tableId, status }) => {
+  const cleanTableId = String(tableId || '').trim();
+  const cleanStatus = String(status || '').trim();
+
+  if (!cleanTableId) {
+    return {
+      success: false,
+      error: 'tableId is required to update ticket status.',
+    };
+  }
+
+  if (!cleanStatus) {
+    return {
+      success: false,
+      error: 'status is required to update ticket status.',
+    };
+  }
+
+  try {
+    const url = `${Serverurl}/updateCustomerTicketStatus`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        tableId: cleanTableId,
+        status: cleanStatus,
+      }),
+    });
+
+    const data = await response.json().catch(() => null);
+    console.log('updateCustomerTicketStatus API Response:', data);
+
+    if (response.ok && data && (data.status === 'success' || data.success)) {
+      return {
+        success: true,
+        data: data.data,
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : (data?.error || `Failed to update ticket status (${response.status})`);
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('updateCustomerTicketStatus API Network Error:', error);
+    return {
+      success: false,
+      error: 'Network error while updating ticket status. Please try again.',
     };
   }
 };

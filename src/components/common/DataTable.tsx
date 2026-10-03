@@ -52,7 +52,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="w-full max-w-full overflow-hidden rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-sm">
+    <div className="w-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-sm">
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-full text-left text-xs text-[#1F1F1F]">
           <thead className="border-b border-[#EEEEF2] bg-[#FAF9FC] text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
@@ -128,7 +128,6 @@ export function DataTable<T>({
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#EEEEF2] bg-[#FAF9FC] px-4 py-3 text-xs text-[#6B6B6B]">
         <span>Showing <strong className="text-[#1F1F1F] font-semibold">{data.length}</strong> records</span>
-        <span className="font-mono text-[11px] text-[#5B21B6] font-semibold">Live Realtime Sync</span>
       </div>
     </div>
   );

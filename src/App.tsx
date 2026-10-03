@@ -22,6 +22,8 @@ import { PayoutsPage } from './pages/Finance/PayoutsPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
 import { SettingsPage } from './pages/Administration/Settings/SettingsPage';
 import { NestPassPage } from './pages/PassManagement/NestPassPage';
+import { ComplaintsPage } from './pages/Quality/ComplaintsPage';
+import { TicketDetailPage } from './pages/Quality/TicketDetailPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 
 interface AuthorizedRouteProps {
@@ -467,11 +469,23 @@ export const App: React.FC = () => {
                 path="quality/complaints"
                 element={
                   <AuthorizedRoute menuTitle="Quality" moduleName="Complaints">
-                    <ModulePlaceholderPage
-                      title="Complaints"
-                      subtitle="Customer incident reports, dispute tickets, and corrective resolution queues"
-                      category="Quality"
-                    />
+                    <ComplaintsPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="quality/complaints/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Quality" moduleName="Complaints">
+                    <TicketDetailPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="quality/tickets/:id"
+                element={
+                  <AuthorizedRoute menuTitle="Quality" moduleName="Complaints">
+                    <TicketDetailPage />
                   </AuthorizedRoute>
                 }
               />

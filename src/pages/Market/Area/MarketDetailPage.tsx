@@ -88,7 +88,7 @@ export const MarketDetailPage: React.FC = () => {
   const isActive = areaDetail?.isActive !== false;
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto w-full min-w-0">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
@@ -238,7 +238,7 @@ export const MarketDetailPage: React.FC = () => {
 
           {/* Section 2: COMPLETE Duration Tiers & Pricing Table */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#EEEEF2] pb-3">
               <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
                 <span className="font-bold text-sm text-[#5B21B6] font-mono">₹</span>
                 <span>Complete Duration Tiers & Pricing Console ({durations.length})</span>
@@ -253,7 +253,7 @@ export const MarketDetailPage: React.FC = () => {
                 No duration pricing records configured for this market.
               </div>
             ) : (
-              <div className="rounded-2xl border border-[#EEEEF2] overflow-hidden">
+              <div className="rounded-2xl border border-[#EEEEF2] overflow-hidden w-full min-w-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs min-w-[850px]">
                     <thead className="border-b border-[#EEEEF2] bg-[#FAF9FC] text-[11px] font-bold text-[#6B6B6B] uppercase font-mono">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { 
   Ticket, 
   Plus, 
@@ -39,6 +40,8 @@ const PAGE_SIZE = 20; // Strictly 20 records per page
 const STATIC_PASS_STATUSES = ['All', 'Active', 'Inactive', 'Suspended'] as const;
 
 export const NestPassPage: React.FC = () => {
+  const { accessibleAreas, hasAllAreaAccess } = useAuth();
+
   // API Data State
   const [passes, setPasses] = useState<RawNestPassItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +50,17 @@ export const NestPassPage: React.FC = () => {
   // Active Areas fetched dynamically from existing Active Area API - NO static/hardcoded areas
   const [activeAreas, setActiveAreas] = useState<ActiveAreaItem[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState<boolean>(true);
+
+  // Dynamic area options based on login permissions
+  const availableAreaOptions = useMemo(() => {
+    if (hasAllAreaAccess) {
+      if (activeAreas.length > 0) {
+        return activeAreas.map((a) => a.areaName);
+      }
+      return accessibleAreas.length > 0 ? accessibleAreas : [];
+    }
+    return accessibleAreas;
+  }, [hasAllAreaAccess, activeAreas, accessibleAreas]);
 
   // Filter State
   const [selectedArea, setSelectedArea] = useState<string>('');
@@ -109,14 +123,25 @@ export const NestPassPage: React.FC = () => {
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setActiveAreas(res.data);
-          const firstArea = res.data[0].areaName;
-          setSelectedArea((prev) => prev || firstArea);
-          setDraftArea((prev) => prev || firstArea);
         }
       })
       .catch((err) => console.error('Failed to load active areas in Nest Pass:', err))
       .finally(() => setIsLoadingAreas(false));
   }, []);
+
+  // Sync initial and selected area with available area options
+  useEffect(() => {
+    if (availableAreaOptions.length > 0) {
+      if (!selectedArea || !availableAreaOptions.includes(selectedArea)) {
+        const preferred = availableAreaOptions.find(
+          (a) => a.toLowerCase() === 'neo_town'
+        );
+        const areaToSet = preferred || availableAreaOptions[0];
+        setSelectedArea(areaToSet);
+        setDraftArea(areaToSet);
+      }
+    }
+  }, [availableAreaOptions, selectedArea]);
 
   // Fetch Nest Passes from Centralized API
   const fetchPasses = useCallback(async (targetPage = page, targetArea = selectedArea) => {
@@ -183,6 +208,7 @@ export const NestPassPage: React.FC = () => {
     setSelectedStatus('All');
     setDraftStatus('All');
     setPage(1);
+    setIsFilterOpen(false);
   };
 
   // Active filter count - status is completely static and counted when not 'All'
@@ -403,7 +429,7 @@ export const NestPassPage: React.FC = () => {
   const endRecord = Math.min(page * PAGE_SIZE, pagination.totalCount);
 
   return (
-    <div className="space-y-5 w-full max-w-full overflow-hidden">
+    <div className="space-y-5 w-full max-w-full min-w-0">
       {/* Page Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 w-full">
         <div className="min-w-0">
@@ -553,34 +579,32 @@ export const NestPassPage: React.FC = () => {
 
                     {expandedSections.area && (
                       <div className="px-3.5 pb-3.5 pt-1 border-t border-[#EEEEF2] space-y-1.5">
-                        {isLoadingAreas ? (
+                        {isLoadingAreas && availableAreaOptions.length === 0 ? (
                           <div className="flex items-center gap-2 py-2 px-2 text-xs text-[#6B6B6B]">
                             <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#5B21B6]" />
                             <span>Loading active areas from API...</span>
                           </div>
-                        ) : activeAreas.length === 0 ? (
+                        ) : availableAreaOptions.length === 0 ? (
                           <div className="py-2 px-2 text-xs text-[#6B6B6B]">
-                            No active areas available
+                            No accessible areas available
                           </div>
                         ) : (
-                          activeAreas.map((area) => (
+                          availableAreaOptions.map((areaName) => (
                             <button
-                              key={area.areaName}
+                              key={areaName}
                               type="button"
-                              onClick={() => setDraftArea(area.areaName)}
+                              onClick={() => setDraftArea(areaName)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                                draftArea === area.areaName
+                                draftArea === areaName
                                   ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
                               <div className="flex items-center gap-1.5">
-                                <span>{area.areaName}</span>
-                                {area.city && (
-                                  <span className="text-[10px] text-[#6B6B6B]">({area.city})</span>
-                                )}
+                                <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                                <span>{areaName}</span>
                               </div>
-                              {draftArea === area.areaName && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {draftArea === areaName && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
                             </button>
                           ))
                         )}
@@ -651,15 +675,12 @@ export const NestPassPage: React.FC = () => {
                 <div className="border-t border-[#EEEEF2] bg-white p-3.5 flex items-center justify-between gap-3 shrink-0 rounded-b-2xl">
                   <button
                     type="button"
-                    onClick={() => {
-                      setDraftStatus('All');
-                      if (activeAreas.length > 0) {
-                        setDraftArea(activeAreas[0].areaName);
-                      }
-                    }}
-                    className="text-xs font-semibold text-[#6B6B6B] hover:text-[#B42318] px-3.5 py-2 rounded-xl border border-[#EEEEF2] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                    onClick={handleRemoveFilters}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[#B42318] hover:text-white px-3.5 py-2 rounded-xl border border-rose-200 bg-[#FEF2F2] hover:bg-[#B42318] transition-all shadow-soft-xs cursor-pointer active:scale-95"
+                    title="Clear all filters and reset"
                   >
-                    Clear All
+                    <X className="h-3.5 w-3.5" />
+                    <span>Clear All</span>
                   </button>
                   <button
                     type="button"
@@ -724,7 +745,7 @@ export const NestPassPage: React.FC = () => {
       )}
 
       {/* Desktop View: Data Table */}
-      <div className="hidden md:block w-full max-w-full overflow-hidden">
+      <div className="hidden md:block w-full max-w-full min-w-0">
         <DataTable
           compact
           columns={columns}

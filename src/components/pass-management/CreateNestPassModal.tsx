@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   X, 
   Ticket, 
@@ -11,7 +11,8 @@ import {
   Check, 
   Image as ImageIcon,
   ChevronDown,
-  Upload 
+  Upload,
+  Search
 } from 'lucide-react';
 import { createNestPass, getActiveAreas, uploadExpertFile, ActiveAreaItem } from '../../services/api';
 import { useOperations } from '../../context/OperationsContext';
@@ -52,6 +53,38 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
   // Available Areas dynamically loaded from existing Active Area API
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState(false);
+  const [isAreaDropdownOpen, setIsAreaDropdownOpen] = useState(false);
+  const [areaSearch, setAreaSearch] = useState('');
+  const areaDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close Area Dropdown on click outside or Escape key
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (areaDropdownRef.current && !areaDropdownRef.current.contains(e.target as Node)) {
+        setIsAreaDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isAreaDropdownOpen) {
+        setIsAreaDropdownOpen(false);
+      }
+    };
+    if (isAreaDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isAreaDropdownOpen]);
+
+  // Filtered areas for search
+  const filteredAreas = useMemo(() => {
+    if (!areaSearch.trim()) return availableAreas;
+    const q = areaSearch.toLowerCase().trim();
+    return availableAreas.filter((a) => a.toLowerCase().includes(q));
+  }, [availableAreas, areaSearch]);
 
   // Status
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,6 +157,8 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setAreaName('');
+      setIsAreaDropdownOpen(false);
+      setAreaSearch('');
       setPackType('');
       setVisits('');
       setPrice('');
@@ -271,7 +306,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
   };
 
   return (
-    <div className="fixed top-16 bottom-0 right-0 left-0 md:left-[var(--sidebar-width,15rem)] z-30 flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-150">
+    <div className="fixed top-16 bottom-0 right-0 left-0 md:left-[var(--sidebar-width,15rem)] z-30 flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
       <div 
         className="absolute inset-0 bg-[#1F1F1F]/40 backdrop-blur-xs cursor-pointer" 
         onClick={isSubmitting ? undefined : onClose}
@@ -280,14 +315,14 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
 
       <div className="relative z-10 w-full max-w-2xl rounded-2xl border border-[#EEEEF2] bg-white shadow-soft-lg flex flex-col max-h-[82vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#EEEEF2] px-6 py-4 bg-[#FAF9FC] shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6]">
+        <div className="flex items-center justify-between border-b border-[#EEEEF2] px-4 sm:px-6 py-4 bg-[#FAF9FC] shrink-0 gap-2">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-2">
+            <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6] shrink-0">
               <Ticket className="h-4 w-4" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-[#1F1F1F]">Create Nest Pass</h2>
-              <p className="text-xs text-[#6B6B6B]">Add a new service package or promotional pass</p>
+            <div className="min-w-0 truncate">
+              <h2 className="text-base font-bold text-[#1F1F1F] truncate">Create Nest Pass</h2>
+              <p className="text-xs text-[#6B6B6B] truncate">Add a new service package or promotional pass</p>
             </div>
           </div>
           <button
@@ -320,32 +355,113 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                 <label className="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
                   Nano-Market Area <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-[#6B6B6B] pointer-events-none z-10" />
-                  <select
-                    value={areaName}
-                    onChange={(e) => setAreaName(e.target.value)}
-                    disabled={isLoadingAreas}
-                    className={`w-full rounded-xl border pl-9 pr-8 py-2 text-xs focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden appearance-none bg-white cursor-pointer ${
-                      validationErrors.areaName ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2]'
+                <div className="relative" ref={areaDropdownRef}>
+                  <button
+                    type="button"
+                    disabled={isLoadingAreas || availableAreas.length === 0}
+                    onClick={() => {
+                      setIsAreaDropdownOpen((prev) => !prev);
+                      setAreaSearch('');
+                    }}
+                    className={`w-full flex items-center justify-between gap-2.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-all shadow-soft-xs cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                      validationErrors.areaName
+                        ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
+                        : isAreaDropdownOpen
+                        ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#5B21B6]'
+                        : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
                     }`}
+                    aria-haspopup="listbox"
+                    aria-expanded={isAreaDropdownOpen}
                   >
-                    {isLoadingAreas ? (
-                      <option value="">Loading active areas...</option>
-                    ) : availableAreas.length === 0 ? (
-                      <option value="">No active areas found</option>
-                    ) : (
-                      <>
-                        <option value="">Select an Area</option>
-                        {availableAreas.map((a) => (
-                          <option key={a} value={a}>
-                            {a}
-                          </option>
-                        ))}
-                      </>
-                    )}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 text-[#6B6B6B] pointer-events-none" />
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <MapPin
+                        className={`h-4 w-4 shrink-0 transition-colors ${
+                          isAreaDropdownOpen ? 'text-[#5B21B6]' : 'text-[#7C3AED]'
+                        }`}
+                      />
+                      <span className={`truncate text-left ${areaName ? 'font-bold text-[#1F1F1F]' : 'text-[#9E9E9E]'}`}>
+                        {isLoadingAreas
+                          ? 'Loading active areas...'
+                          : availableAreas.length === 0
+                          ? 'No active areas found'
+                          : areaName || 'Select an Area'}
+                      </span>
+                    </div>
+
+                    <ChevronDown
+                      className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
+                        isAreaDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {/* Floating Menu Popover */}
+                  {isAreaDropdownOpen && availableAreas.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-56 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-soft-lg animate-in fade-in zoom-in-95">
+                      {availableAreas.length > 5 && (
+                        <div className="p-1.5 mb-1 border-b border-[#EEEEF2] bg-[#FAF9FC] rounded-lg">
+                          <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6B6B6B]" />
+                            <input
+                              type="text"
+                              value={areaSearch}
+                              onChange={(e) => setAreaSearch(e.target.value)}
+                              placeholder="Search area..."
+                              className="w-full pl-8 pr-2 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6]"
+                              onClick={(e) => e.stopPropagation()}
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-0.5" role="listbox">
+                        {filteredAreas.length === 0 ? (
+                          <div className="py-2.5 px-3 text-center text-xs text-[#6B6B6B]">
+                            No matching areas found
+                          </div>
+                        ) : (
+                          filteredAreas.map((a) => {
+                            const isSelected = areaName === a;
+                            return (
+                              <button
+                                key={a}
+                                type="button"
+                                role="option"
+                                aria-selected={isSelected}
+                                onClick={() => {
+                                  setAreaName(a);
+                                  setIsAreaDropdownOpen(false);
+                                  setAreaSearch('');
+                                  if (validationErrors.areaName) {
+                                    setValidationErrors((prev) => ({ ...prev, areaName: '' }));
+                                  }
+                                }}
+                                className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-left ${
+                                  isSelected
+                                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                                    : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6]'
+                                }`}
+                                title={a}
+                              >
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <MapPin
+                                    className={`h-3.5 w-3.5 shrink-0 ${
+                                      isSelected ? 'text-[#5B21B6]' : 'text-[#6B6B6B]'
+                                    }`}
+                                  />
+                                  <span className="truncate">{a}</span>
+                                </div>
+                                {isSelected && (
+                                  <Check className="h-3.5 w-3.5 text-[#5B21B6] shrink-0 stroke-[2.5]" />
+                                )}
+                              </button>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {validationErrors.areaName && (
                   <p className="text-[11px] text-rose-600 mt-1">{validationErrors.areaName}</p>
@@ -683,7 +799,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
           </div>
 
           {/* Footer Submit Buttons */}
-          <div className="border-t border-[#EEEEF2] pt-4 flex items-center justify-end gap-3 shrink-0">
+          <div className="border-t border-[#EEEEF2] pt-4 flex flex-wrap items-center justify-end gap-2.5 sm:gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}

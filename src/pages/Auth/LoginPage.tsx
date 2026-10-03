@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { NestRoleItem, NestLoginData } from '../../types';
@@ -13,7 +13,9 @@ import {
   ShieldCheck,
   Briefcase,
   MapPin,
-  ChevronDown
+  ChevronDown,
+  Check,
+  Search
 } from 'lucide-react';
 import loginBg from '../../assets/login 1.png';
 import logoImg from '../../assets/Logo.png';
@@ -44,6 +46,14 @@ export const LoginPage: React.FC = () => {
   const [roleTouched, setRoleTouched] = useState(false);
   const [areaTouched, setAreaTouched] = useState(false);
   const [roleAreaError, setRoleAreaError] = useState<string | null>(null);
+
+  // Custom Dropdown States & Refs for Role & Area selection
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isAreaDropdownOpen, setIsAreaDropdownOpen] = useState(false);
+  const [roleSearch, setRoleSearch] = useState('');
+  const [areaSearch, setAreaSearch] = useState('');
+  const roleDropdownRef = useRef<HTMLDivElement>(null);
+  const areaDropdownRef = useRef<HTMLDivElement>(null);
 
   // If already authenticated with active permissions, redirect to dashboard
   if (isAuthenticated) {
@@ -106,6 +116,7 @@ export const LoginPage: React.FC = () => {
         userId: result.data.userId,
         roles,
         email: email.trim(),
+        ...(result.data as any),
       });
 
       // Advance to Step 2
@@ -164,6 +175,44 @@ export const LoginPage: React.FC = () => {
     }
   }, [step, availableAreas, selectedAreaName]);
 
+  // Close custom dropdowns on outside click or Escape key
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target as Node)) {
+        setIsRoleDropdownOpen(false);
+      }
+      if (areaDropdownRef.current && !areaDropdownRef.current.contains(e.target as Node)) {
+        setIsAreaDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsRoleDropdownOpen(false);
+        setIsAreaDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Filtered unique roles for search
+  const filteredRoles = useMemo(() => {
+    if (!roleSearch.trim()) return uniqueRoles;
+    const q = roleSearch.toLowerCase().trim();
+    return uniqueRoles.filter((r) => r.toLowerCase().includes(q));
+  }, [uniqueRoles, roleSearch]);
+
+  // Filtered available areas for search
+  const filteredAreas = useMemo(() => {
+    if (!areaSearch.trim()) return availableAreas;
+    const q = areaSearch.toLowerCase().trim();
+    return availableAreas.filter((a) => a.toLowerCase().includes(q));
+  }, [availableAreas, areaSearch]);
+
   // Handle Step 2: Role & Area Submit
   const handleRoleAreaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,11 +248,13 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    // Call roleModules API and save authorized session
+    // Call roleModules API and save authorized session with centralized areas
     const result = await selectRoleAndArea({
       userId: loginData.userId,
       email: loginData.email,
       role: matchedRole,
+      allRoles: loginData.roles,
+      loginData: loginData as any,
     });
 
     if (result.success) {
@@ -214,7 +265,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center lg:justify-end bg-[#FAF9FC] overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center lg:justify-end bg-[#FAF9FC] overflow-y-auto py-6 sm:py-10">
       {/* Background Graphic Image */}
       <img
         src={loginBg}
@@ -226,8 +277,8 @@ export const LoginPage: React.FC = () => {
       <div className="lg:hidden absolute inset-0 bg-white/70 backdrop-blur-[2px] pointer-events-none" />
 
       {/* Main Login Card Section */}
-      <div className="relative z-20 w-full max-w-[500px] px-4 py-6 sm:px-6 lg:px-0 lg:mr-16 xl:mr-24 2xl:mr-36">
-        <div className="rounded-[32px] bg-white px-5 sm:px-10 py-10 sm:py-14 shadow-[0_24px_70px_-10px_rgba(0,0,0,0.15)] border border-[#EEEEF2]/80">
+      <div className="relative z-20 w-full max-w-[500px] px-3 sm:px-6 lg:px-0 lg:mr-16 xl:mr-24 2xl:mr-36 my-auto">
+        <div className="rounded-2xl sm:rounded-[32px] bg-white px-4.5 sm:px-10 py-7 sm:py-12 shadow-[0_24px_70px_-10px_rgba(0,0,0,0.15)] border border-[#EEEEF2]/80">
 
           {/* Brand Header: Logo image */}
           <div className="flex flex-col items-center text-center">
@@ -371,43 +422,116 @@ export const LoginPage: React.FC = () => {
               {/* Role + Area Form */}
               <form onSubmit={handleRoleAreaSubmit} className="space-y-4" noValidate>
                 {/* 1. Role Dropdown */}
-                <div>
-                  <label htmlFor="roleSelect" className="block text-xs font-semibold text-[#4A2E80] uppercase tracking-wider mb-1.5 pl-0.5">
+                <div ref={roleDropdownRef} className="relative">
+                  <label id="roleLabel" className="block text-xs font-semibold text-[#4A2E80] uppercase tracking-wider mb-1.5 pl-0.5">
                     Role
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#4A2E80]">
-                      <Briefcase className="h-4 w-4" />
-                    </div>
-                    <select
-                      id="roleSelect"
-                      value={selectedRoleName}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setSelectedRoleName(val);
-                        setSelectedAreaName(''); // reset area when role changes
-                        setRoleTouched(true);
-                        setRoleAreaError(null);
-                      }}
+                    <button
+                      type="button"
+                      id="roleSelectBtn"
+                      aria-labelledby="roleLabel"
+                      aria-haspopup="listbox"
+                      aria-expanded={isRoleDropdownOpen}
                       disabled={isLoading}
-                      className={`w-full pl-11 pr-10 py-3.5 text-sm bg-white border rounded-xl text-[#1F1F1F] focus:border-[#4A2E80] focus:ring-2 focus:ring-[#4A2E80]/15 outline-none transition-all cursor-pointer appearance-none ${
+                      onClick={() => {
+                        setIsRoleDropdownOpen((prev) => !prev);
+                        setIsAreaDropdownOpen(false);
+                        setRoleSearch('');
+                      }}
+                      className={`w-full min-w-0 flex items-center justify-between gap-2.5 pl-4 pr-3.5 py-3 text-sm rounded-xl border transition-all shadow-soft-xs cursor-pointer select-none text-left ${
                         roleTouched && !selectedRoleName
-                          ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                          : 'border-[#E5E7EB] focus:border-[#4A2E80]'
-                      }`}
+                          ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
+                          : isRoleDropdownOpen
+                          ? 'border-[#4A2E80] bg-white ring-2 ring-[#4A2E80]/15 text-[#4A2E80]'
+                          : 'border-[#E5E7EB] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      <option value="" disabled>
-                        Select Role
-                      </option>
-                      {uniqueRoles.map((roleName) => (
-                        <option key={roleName} value={roleName}>
-                          {roleName}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-[#9CA3AF]">
-                      <ChevronDown className="h-4 w-4" />
-                    </div>
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <Briefcase
+                          className={`h-4 w-4 shrink-0 transition-colors ${
+                            isRoleDropdownOpen || selectedRoleName ? 'text-[#4A2E80]' : 'text-[#9CA3AF]'
+                          }`}
+                        />
+                        <span
+                          className={`truncate text-sm ${
+                            selectedRoleName ? 'font-bold text-[#1F1F1F]' : 'font-normal text-[#9CA3AF]'
+                          }`}
+                          title={selectedRoleName || 'Select Role'}
+                        >
+                          {selectedRoleName || 'Select Role'}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 ${
+                          isRoleDropdownOpen ? 'rotate-180 text-[#4A2E80]' : ''
+                        }`}
+                      />
+                    </button>
+
+                    {/* Role Options Floating Menu */}
+                    {isRoleDropdownOpen && (
+                      <div
+                        role="listbox"
+                        aria-labelledby="roleLabel"
+                        className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-60 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-xl shadow-purple-950/10 animate-in fade-in zoom-in-95 duration-150"
+                      >
+                        {uniqueRoles.length > 5 && (
+                          <div className="p-1.5 mb-1 border-b border-[#EEEEF2] bg-[#FAF9FC] rounded-lg">
+                            <div className="relative">
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6B6B6B]" />
+                              <input
+                                type="text"
+                                value={roleSearch}
+                                onChange={(e) => setRoleSearch(e.target.value)}
+                                placeholder="Search role..."
+                                className="w-full pl-8 pr-2.5 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#4A2E80]"
+                                onClick={(e) => e.stopPropagation()}
+                                autoFocus
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-0.5">
+                          {filteredRoles.length === 0 ? (
+                            <div className="py-2.5 px-3 text-center text-xs text-[#6B6B6B]">
+                              No matching roles found
+                            </div>
+                          ) : (
+                            filteredRoles.map((roleName) => {
+                              const isSelected = selectedRoleName === roleName;
+                              return (
+                                <button
+                                  key={roleName}
+                                  type="button"
+                                  role="option"
+                                  aria-selected={isSelected}
+                                  onClick={() => {
+                                    setSelectedRoleName(roleName);
+                                    setSelectedAreaName(''); // reset area when role changes
+                                    setIsRoleDropdownOpen(false);
+                                    setRoleTouched(true);
+                                    setRoleAreaError(null);
+                                  }}
+                                  className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer text-left ${
+                                    isSelected
+                                      ? 'bg-[#EDE9FE] text-[#4A2E80] font-bold shadow-soft-xs'
+                                      : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#4A2E80]'
+                                  }`}
+                                  title={roleName}
+                                >
+                                  <span className="truncate flex-1 min-w-0">{roleName}</span>
+                                  {isSelected && (
+                                    <Check className="h-4 w-4 text-[#4A2E80] shrink-0" />
+                                  )}
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   {roleTouched && !selectedRoleName && (
                     <p className="mt-1.5 text-xs text-rose-600 font-medium pl-1">
@@ -417,41 +541,116 @@ export const LoginPage: React.FC = () => {
                 </div>
 
                 {/* 2. Area Dropdown */}
-                <div>
-                  <label htmlFor="areaSelect" className="block text-xs font-semibold text-[#4A2E80] uppercase tracking-wider mb-1.5 pl-0.5">
+                <div ref={areaDropdownRef} className="relative">
+                  <label id="areaLabel" className="block text-xs font-semibold text-[#4A2E80] uppercase tracking-wider mb-1.5 pl-0.5">
                     Area
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#4A2E80]">
-                      <MapPin className="h-4 w-4" />
-                    </div>
-                    <select
-                      id="areaSelect"
-                      value={selectedAreaName}
-                      onChange={(e) => {
-                        setSelectedAreaName(e.target.value);
-                        setAreaTouched(true);
-                        setRoleAreaError(null);
-                      }}
+                    <button
+                      type="button"
+                      id="areaSelectBtn"
+                      aria-labelledby="areaLabel"
+                      aria-haspopup="listbox"
+                      aria-expanded={isAreaDropdownOpen}
                       disabled={isLoading || !selectedRoleName}
-                      className={`w-full pl-11 pr-10 py-3.5 text-sm bg-white border rounded-xl text-[#1F1F1F] focus:border-[#4A2E80] focus:ring-2 focus:ring-[#4A2E80]/15 outline-none transition-all cursor-pointer appearance-none ${
+                      onClick={() => {
+                        if (!selectedRoleName) return;
+                        setIsAreaDropdownOpen((prev) => !prev);
+                        setIsRoleDropdownOpen(false);
+                        setAreaSearch('');
+                      }}
+                      className={`w-full min-w-0 flex items-center justify-between gap-2.5 pl-4 pr-3.5 py-3 text-sm rounded-xl border transition-all shadow-soft-xs cursor-pointer select-none text-left ${
                         areaTouched && !selectedAreaName
-                          ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                          : 'border-[#E5E7EB] focus:border-[#4A2E80]'
+                          ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
+                          : isAreaDropdownOpen
+                          ? 'border-[#4A2E80] bg-white ring-2 ring-[#4A2E80]/15 text-[#4A2E80]'
+                          : 'border-[#E5E7EB] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
                       } disabled:bg-[#FAF9FC] disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
-                      <option value="" disabled>
-                        {selectedRoleName ? 'Select Area' : 'Select a role first'}
-                      </option>
-                      {availableAreas.map((areaName) => (
-                        <option key={areaName} value={areaName}>
-                          {areaName}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-[#9CA3AF]">
-                      <ChevronDown className="h-4 w-4" />
-                    </div>
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <MapPin
+                          className={`h-4 w-4 shrink-0 transition-colors ${
+                            isAreaDropdownOpen || selectedAreaName ? 'text-[#4A2E80]' : 'text-[#9CA3AF]'
+                          }`}
+                        />
+                        <span
+                          className={`truncate text-sm ${
+                            selectedAreaName ? 'font-bold text-[#1F1F1F]' : 'font-normal text-[#9CA3AF]'
+                          }`}
+                          title={selectedAreaName || (selectedRoleName ? 'Select Area' : 'Select a role first')}
+                        >
+                          {selectedAreaName || (selectedRoleName ? 'Select Area' : 'Select a role first')}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 ${
+                          isAreaDropdownOpen ? 'rotate-180 text-[#4A2E80]' : ''
+                        }`}
+                      />
+                    </button>
+
+                    {/* Area Options Floating Menu */}
+                    {isAreaDropdownOpen && selectedRoleName && (
+                      <div
+                        role="listbox"
+                        aria-labelledby="areaLabel"
+                        className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-60 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-xl shadow-purple-950/10 animate-in fade-in zoom-in-95 duration-150"
+                      >
+                        {availableAreas.length > 5 && (
+                          <div className="p-1.5 mb-1 border-b border-[#EEEEF2] bg-[#FAF9FC] rounded-lg">
+                            <div className="relative">
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6B6B6B]" />
+                              <input
+                                type="text"
+                                value={areaSearch}
+                                onChange={(e) => setAreaSearch(e.target.value)}
+                                placeholder="Search area..."
+                                className="w-full pl-8 pr-2.5 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#4A2E80]"
+                                onClick={(e) => e.stopPropagation()}
+                                autoFocus
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-0.5">
+                          {filteredAreas.length === 0 ? (
+                            <div className="py-2.5 px-3 text-center text-xs text-[#6B6B6B]">
+                              No matching areas found
+                            </div>
+                          ) : (
+                            filteredAreas.map((areaName) => {
+                              const isSelected = selectedAreaName === areaName;
+                              return (
+                                <button
+                                  key={areaName}
+                                  type="button"
+                                  role="option"
+                                  aria-selected={isSelected}
+                                  onClick={() => {
+                                    setSelectedAreaName(areaName);
+                                    setIsAreaDropdownOpen(false);
+                                    setAreaTouched(true);
+                                    setRoleAreaError(null);
+                                  }}
+                                  className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer text-left ${
+                                    isSelected
+                                      ? 'bg-[#EDE9FE] text-[#4A2E80] font-bold shadow-soft-xs'
+                                      : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#4A2E80]'
+                                  }`}
+                                  title={areaName}
+                                >
+                                  <span className="truncate flex-1 min-w-0">{areaName}</span>
+                                  {isSelected && (
+                                    <Check className="h-4 w-4 text-[#4A2E80] shrink-0" />
+                                  )}
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   {areaTouched && !selectedAreaName && (
                     <p className="mt-1.5 text-xs text-rose-600 font-medium pl-1">

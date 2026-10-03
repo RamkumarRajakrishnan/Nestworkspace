@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Eye, EyeOff, MapPin, Check, AlertCircle, Loader2, ChevronDown } from 'lucide-react';
+import { X, Eye, EyeOff, MapPin, Check, AlertCircle, Loader2, ChevronDown, ShieldCheck } from 'lucide-react';
 import { workerService, RegisterEmployeePayload } from '../../services/workerService';
 import { getActiveAreas } from '../../services/api';
 import { useOperations } from '../../context/OperationsContext';
@@ -21,18 +21,19 @@ const DEFAULT_LOCATIONS = [
 export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { addToast } = useOperations();
 
-  // Form states
+  // Form states - start empty with no pre-filled values
   const [employeeId, setEmployeeId] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedLocations, setSelectedLocations] = useState<string[]>(['Haatza_corp']);
-  const [accessLevel, setAccessLevel] = useState('FULL');
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [accessLevel, setAccessLevel] = useState('');
 
   // UI interaction states
   const [showPassword, setShowPassword] = useState(false);
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
+  const [isAccessLevelOpen, setIsAccessLevelOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -56,31 +57,46 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const locationsDropdownRef = useRef<HTMLDivElement>(null);
+  const accessLevelDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close locations dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         locationsDropdownRef.current &&
-        !locationsDropdownRef.current.contains(event.target as Node)
+        !locationsDropdownRef.current.contains(target)
       ) {
         setIsLocationsOpen(false);
+      }
+      if (
+        accessLevelDropdownRef.current &&
+        !accessLevelDropdownRef.current.contains(target)
+      ) {
+        setIsAccessLevelOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Escape key closes modal
+  // Escape key closes dropdowns or modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && !isLoading) {
-        handleClose();
+      if (e.key === 'Escape') {
+        if (isLocationsOpen || isAccessLevelOpen) {
+          setIsLocationsOpen(false);
+          setIsAccessLevelOpen(false);
+          return;
+        }
+        if (isOpen && !isLoading) {
+          handleClose();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isLoading]);
+  }, [isOpen, isLoading, isLocationsOpen, isAccessLevelOpen]);
 
   if (!isOpen) return null;
 
@@ -159,16 +175,17 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
   };
 
   const handleClose = () => {
-    // Reset all form states
+    // Reset all form states to empty defaults
     setEmployeeId('');
     setFullName('');
     setEmail('');
     setPhone('');
     setPassword('');
-    setSelectedLocations(['Haatza_corp']);
-    setAccessLevel('FULL');
+    setSelectedLocations([]);
+    setAccessLevel('');
     setShowPassword(false);
     setIsLocationsOpen(false);
+    setIsAccessLevelOpen(false);
     setIsLoading(false);
     setApiError(null);
     setTouched({});
@@ -321,7 +338,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                     if (apiError) setApiError(null);
                   }}
                   onBlur={() => markTouched('employeeId')}
-                  placeholder="e.g. HN-1028"
+                  placeholder="Enter employee ID"
                   disabled={isLoading}
                   className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] placeholder:font-sans focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     touched.employeeId && errors.employeeId
@@ -345,7 +362,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                   value={fullName}
                   onChange={handleFullNameChange}
                   onBlur={() => markTouched('fullName')}
-                  placeholder="e.g. Arul Kumar"
+                  placeholder="Enter your name"
                   disabled={isLoading}
                   className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     touched.fullName && errors.fullName
@@ -374,7 +391,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                     if (apiError) setApiError(null);
                   }}
                   onBlur={() => markTouched('email')}
-                  placeholder="e.g. arul@haatza.in"
+                  placeholder="Enter your email"
                   disabled={isLoading}
                   className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     touched.email && errors.email
@@ -402,7 +419,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                     value={phone}
                     onChange={handlePhoneChange}
                     onBlur={() => markTouched('phone')}
-                    placeholder="9994998746"
+                    placeholder="Enter your phone number"
                     disabled={isLoading}
                     maxLength={10}
                     className={`w-full rounded-xl border bg-[#FAF9FC] pl-11 pr-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] placeholder:font-sans focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
@@ -433,7 +450,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                       if (apiError) setApiError(null);
                     }}
                     onBlur={() => markTouched('password')}
-                    placeholder="Enter account password"
+                    placeholder="Enter your password"
                     disabled={isLoading}
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.password && errors.password
@@ -455,25 +472,108 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                 )}
               </div>
 
-              {/* 6. Access Level */}
-              <div className="space-y-1.5">
+              {/* 6. Access Level - Redesigned Modern Dropdown */}
+              <div className="space-y-1.5" ref={accessLevelDropdownRef}>
                 <label htmlFor="modal-accessLevel" className="block text-xs font-semibold text-[#1F1F1F]">
                   Access Level <span className="text-rose-500">*</span>
                 </label>
-                <select
-                  id="modal-accessLevel"
-                  value={accessLevel}
-                  onChange={(e) => {
-                    setAccessLevel(e.target.value);
-                    if (apiError) setApiError(null);
-                  }}
-                  onBlur={() => markTouched('accessLevel')}
-                  disabled={isLoading}
-                  className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  <option value="FULL">FULL — Full Access</option>
-                  <option value="READ_ONLY">READ_ONLY — Read Only</option>
-                </select>
+                <div className="relative">
+                  <button
+                    id="modal-accessLevel"
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => setIsAccessLevelOpen((prev) => !prev)}
+                    onBlur={() => markTouched('accessLevel')}
+                    className={`w-full flex items-center justify-between gap-2.5 rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                      touched.accessLevel && errors.accessLevel
+                        ? 'border-rose-400 bg-rose-50/50 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
+                        : isAccessLevelOpen
+                        ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#5B21B6]'
+                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                    }`}
+                    aria-haspopup="listbox"
+                    aria-expanded={isAccessLevelOpen}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <ShieldCheck
+                        className={`h-4 w-4 shrink-0 transition-colors ${
+                          isAccessLevelOpen ? 'text-[#5B21B6]' : 'text-[#7C3AED]'
+                        }`}
+                      />
+                      <span
+                        className={`truncate text-left font-semibold ${
+                          accessLevel ? 'text-[#1F1F1F]' : 'text-[#9E9E9E]'
+                        }`}
+                      >
+                        {accessLevel === 'FULL'
+                          ? 'FULL — Full Access'
+                          : accessLevel === 'READ_ONLY'
+                          ? 'READ_ONLY — Read Only'
+                          : 'Select access level'}
+                      </span>
+                    </div>
+
+                    <ChevronDown
+                      className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
+                        isAccessLevelOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {isAccessLevelOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-40 rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-soft-lg animate-in fade-in zoom-in-95">
+                      <div className="space-y-1" role="listbox">
+                        {[
+                          {
+                            value: 'FULL',
+                            title: 'FULL',
+                            desc: 'Full Access — All administrative & operations features',
+                          },
+                          {
+                            value: 'READ_ONLY',
+                            title: 'READ_ONLY',
+                            desc: 'Read Only — View-only permissions',
+                          },
+                        ].map((opt) => {
+                          const isSelected = accessLevel === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              role="option"
+                              aria-selected={isSelected}
+                              onClick={() => {
+                                setAccessLevel(opt.value);
+                                setIsAccessLevelOpen(false);
+                                markTouched('accessLevel');
+                                if (apiError) setApiError(null);
+                              }}
+                              className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer text-left ${
+                                isSelected
+                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
+                                  : 'text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#5B21B6]'
+                              }`}
+                            >
+                              <div className="flex flex-col min-w-0 flex-1">
+                                <span className="font-bold">{opt.title}</span>
+                                <span
+                                  className={`text-[11px] ${
+                                    isSelected ? 'text-[#7C3AED]' : 'text-[#6B6B6B]'
+                                  }`}
+                                >
+                                  {opt.desc}
+                                </span>
+                              </div>
+                              {isSelected && (
+                                <Check className="h-4 w-4 text-[#5B21B6] shrink-0 stroke-[2.5]" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {touched.accessLevel && errors.accessLevel && (
                   <p className="text-[11px] text-rose-600 font-medium">{errors.accessLevel}</p>
                 )}

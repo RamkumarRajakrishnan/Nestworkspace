@@ -111,7 +111,7 @@ export const MarketsPage: React.FC = () => {
   const displayMarkets = apiMarkets;
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-6 w-full max-w-full min-w-0">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -267,33 +267,33 @@ export const MarketsPage: React.FC = () => {
                 </div>
 
                 {/* Dynamic Telemetry Metrics (Experts, Radius, Priority Area) */}
-                <div className="mt-4 grid grid-cols-3 gap-2 border-t border-[#EEEEF2] pt-3 text-center">
+                <div className="mt-4 grid grid-cols-3 gap-1.5 sm:gap-2 border-t border-[#EEEEF2] pt-3 text-center">
                   {/* Dynamic Experts */}
-                  <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-2.5">
+                  <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-1.5 sm:p-2.5">
                     <div className="flex items-center justify-center gap-1 text-[10px] font-mono uppercase font-bold text-[#6B6B6B]">
                       <Users className="h-3 w-3 text-[#5B21B6]" />
                       <span>Experts</span>
                     </div>
-                    <div className="text-lg font-bold font-mono text-[#5B21B6] mt-0.5">
+                    <div className="text-base sm:text-lg font-bold font-mono text-[#5B21B6] mt-0.5">
                       {expertsCount}
                     </div>
-                    <span className="text-[10px] text-[#6B6B6B] font-medium">Assigned</span>
+                    <span className="text-[9px] sm:text-[10px] text-[#6B6B6B] font-medium">Assigned</span>
                   </div>
 
                   {/* Dynamic Coverage Radius */}
-                  <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-2.5">
+                  <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-1.5 sm:p-2.5">
                     <div className="flex items-center justify-center gap-1 text-[10px] font-mono uppercase font-bold text-[#6B6B6B]">
                       <Radio className="h-3 w-3 text-indigo-600" />
                       <span>Radius</span>
                     </div>
-                    <div className="text-lg font-bold font-mono text-[#1F1F1F] mt-0.5">
+                    <div className="text-base sm:text-lg font-bold font-mono text-[#1F1F1F] mt-0.5">
                       {radiusMeters}m
                     </div>
-                    <span className="text-[10px] text-[#6B6B6B] font-medium">Coverage</span>
+                    <span className="text-[9px] sm:text-[10px] text-[#6B6B6B] font-medium">Coverage</span>
                   </div>
 
                   {/* Dynamic Priority Area Attractiveness (Without True/False text) */}
-                  <div className={`rounded-xl border p-2.5 transition-all flex flex-col justify-between items-center ${
+                  <div className={`rounded-xl border p-1.5 sm:p-2.5 transition-all flex flex-col justify-between items-center ${
                     isPriority
                       ? 'bg-amber-50/70 border-amber-200 text-amber-900 shadow-soft-xs'
                       : 'bg-[#FAF9FC] border-[#EEEEF2] text-[#1F1F1F]'

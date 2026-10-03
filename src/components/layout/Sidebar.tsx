@@ -234,6 +234,11 @@ const MODULE_REGISTRY: Record<
     path: '/quality/complaints',
     icon: AlertTriangle,
   },
+  'quality:customer tickets': {
+    name: 'Complaints',
+    path: '/quality/complaints',
+    icon: AlertTriangle,
+  },
   'quality:quality reports': {
     name: 'Quality Reports',
     path: '/quality/reports',

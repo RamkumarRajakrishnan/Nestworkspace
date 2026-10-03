@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useAuth } from '../../../context/AuthContext';
 import { RawApiExpert, getNestWorkers, getActiveAreas, formatImageUrl, ActiveAreaItem } from '../../../services/api';
 import { DataTable, Column } from '../../../components/common/DataTable';
 import { StatusBadge } from '../../../components/common/StatusBadge';
@@ -60,9 +61,20 @@ export const WorkersPage: React.FC = () => {
     hasPreviousPage: false,
   });
 
+  const { accessibleAreas, hasAllAreaAccess } = useAuth();
+
   // Dynamic Active Areas fetched from existing Active Area API - NO hardcoded areas
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState<boolean>(true);
+
+  // Dynamic area options based on login permissions
+  const displayAreas = useMemo(() => {
+    if (hasAllAreaAccess) {
+      if (availableAreas.length > 0) return availableAreas;
+      return accessibleAreas.length > 0 ? accessibleAreas : [];
+    }
+    return accessibleAreas;
+  }, [hasAllAreaAccess, availableAreas, accessibleAreas]);
 
   // Search state
   const [search, setSearch] = useState('');
@@ -230,6 +242,7 @@ export const WorkersPage: React.FC = () => {
     setSearch('');
     setDebouncedSearch('');
     setPage(1);
+    setIsFilterOpen(false);
   };
 
   // Count active filters (excluding search)
@@ -493,7 +506,7 @@ export const WorkersPage: React.FC = () => {
   const endRecord = Math.min(page * PAGE_SIZE, pagination.totalRecords);
 
   return (
-    <div className="space-y-5 w-full max-w-full overflow-hidden">
+    <div className="space-y-5 w-full max-w-full">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 w-full">
         <div className="min-w-0">
@@ -529,7 +542,7 @@ export const WorkersPage: React.FC = () => {
             />
           </div>
 
-          {/* Right: Remove Filter button + Filter button */}
+          {/* Right: Filter button */}
           <div ref={filterContainerRef} className="flex items-center gap-2 sm:gap-2.5 self-start sm:self-auto shrink-0 flex-wrap relative">
             {/* Refresh Button */}
             <button
@@ -541,18 +554,6 @@ export const WorkersPage: React.FC = () => {
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#5B21B6]' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
-
-            {/* Remove Filter Button */}
-            {(activeFilterCount > 0 || search.trim().length > 0) && (
-              <button
-                onClick={handleRemoveFilters}
-                className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-[#FEF2F2] px-3 py-2 text-xs font-semibold text-[#B42318] hover:bg-rose-100 transition-all shadow-soft-sm active:scale-95 cursor-pointer"
-                title="Remove all active filters and search"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Remove Filters</span>
-              </button>
-            )}
 
             {/* Filter Button */}
             <button
@@ -720,8 +721,8 @@ export const WorkersPage: React.FC = () => {
                               )}
                             </button>
 
-                            {/* Dynamic area options from existing API response */}
-                            {availableAreas.map((area) => {
+                            {/* Dynamic area options from user accessible areas / active areas */}
+                            {displayAreas.map((area) => {
                               const isSelected = draftMarkets.includes(area);
                               return (
                                 <button
@@ -755,13 +756,12 @@ export const WorkersPage: React.FC = () => {
                 <div className="border-t border-[#EEEEF2] bg-white p-3.5 flex items-center justify-between gap-3 shrink-0 rounded-b-2xl">
                   <button
                     type="button"
-                    onClick={() => {
-                      setDraftStatuses([]);
-                      setDraftMarkets([]);
-                    }}
-                    className="text-xs font-semibold text-[#6B6B6B] hover:text-[#B42318] px-3.5 py-2 rounded-xl border border-[#EEEEF2] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                    onClick={handleRemoveFilters}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[#B42318] hover:text-white px-3.5 py-2 rounded-xl border border-rose-200 bg-[#FEF2F2] hover:bg-[#B42318] transition-all shadow-soft-xs cursor-pointer active:scale-95"
+                    title="Clear all filters and reset"
                   >
-                    Clear All
+                    <X className="h-3.5 w-3.5" />
+                    <span>Clear All</span>
                   </button>
                   <button
                     type="button"

@@ -121,15 +121,15 @@ export const Drawer: React.FC<DrawerProps> = ({
       >
         {/* Header */}
         <div className="flex items-start justify-between border-b border-[#EEEEF2] p-4 sm:p-5 bg-[#FAF9FC] shrink-0">
-          <div>
-            <h2 className="text-base font-bold text-[#1F1F1F]">{title}</h2>
-            {subtitle && <p className="mt-0.5 text-xs text-[#6B6B6B] font-mono">{subtitle}</p>}
+          <div className="min-w-0 flex-1 pr-2">
+            <h2 className="text-base font-bold text-[#1F1F1F] truncate">{title}</h2>
+            {subtitle && <p className="mt-0.5 text-xs text-[#6B6B6B] font-mono truncate">{subtitle}</p>}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {actions}
             <button
               onClick={onClose}
-              className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors cursor-pointer"
+              className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors cursor-pointer shrink-0"
               title="Close"
               aria-label="Close"
             >

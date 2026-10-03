@@ -243,7 +243,7 @@ export const WorkerDetailPage: React.FC = () => {
   const joiningStatusClean = (expert.joiningStatus || 'Active').trim();
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto w-full min-w-0">
       {/* Top Navigation */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -261,9 +261,9 @@ export const WorkerDetailPage: React.FC = () => {
       </div>
 
       {/* Header Profile Hero Card */}
-      <div className="rounded-2xl border border-[#EEEEF2] bg-white p-6 shadow-soft-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="flex items-start sm:items-center gap-5">
+      <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 sm:p-6 shadow-soft-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+          <div className="flex items-start sm:items-center gap-3.5 sm:gap-5 min-w-0">
             <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-[#EEEEF2] shadow-soft-sm bg-[#EDE9FE] flex items-center justify-center relative shrink-0">
               <span className="font-bold text-2xl text-[#5B21B6] select-none">
                 {fullName ? fullName.charAt(0).toUpperCase() : <User className="h-8 w-8 text-[#5B21B6]" />}

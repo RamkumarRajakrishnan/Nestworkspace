@@ -195,7 +195,7 @@ export const CompliancePage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-6 w-full max-w-full min-w-0">
       {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F1F1F] flex items-center gap-2">

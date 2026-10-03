@@ -44,7 +44,7 @@ export const MainLayout: React.FC = () => {
           collapsed ? 'pl-0 md:pl-16' : 'pl-0 md:pl-56 lg:pl-60'
         }`}
       >
-        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 w-full min-w-0 max-w-full overflow-x-auto">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 w-full min-w-0 max-w-full">
           <Outlet />
         </main>
 
