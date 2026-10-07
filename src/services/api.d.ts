@@ -1,4 +1,4 @@
-import { AuthSession, NestLoginData, RoleModulesData, CustomerTicketItem, CustomerTicketDetails } from '../types';
+import { AuthSession, NestLoginData, RoleModulesData, CustomerTicketItem, CustomerTicketDetails, RawWorkerAttendanceRecord, RawLeaveRecord, RawUserNestPassRecord } from '../types';
 
 export interface LoginCredentials {
   email?: string;
@@ -503,6 +503,32 @@ export function getNestPassDetails(passId: string): Promise<GetNestPassDetailsRe
 export function createNestPass(passData: CreateNestPassPayload): Promise<CreateNestPassResult>;
 export function updateNestPass(updateData: UpdateNestPassPayload): Promise<UpdateNestPassResult>;
 
+export interface GetUserNestPassParams {
+  userId?: string;
+  phonenumber?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface GetUserNestPassResult {
+  success: boolean;
+  data: RawUserNestPassRecord[];
+  count?: number;
+  pagination?: {
+    currentPage: number;
+    limit: number;
+    totalRecords: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null;
+  message?: string;
+  error?: string;
+}
+
+export function getUserNestPass(params: GetUserNestPassParams): Promise<GetUserNestPassResult>;
+
 export interface CreateNestAreaDuration {
   duration: string;
   price: number;
@@ -663,6 +689,55 @@ export function getCustomerTickets(): Promise<GetCustomerTicketsResult>;
 export function getCustomerTicketDetails(tableId: string): Promise<GetCustomerTicketDetailsResult>;
 export function updateCustomerTicketStatus(payload: UpdateCustomerTicketStatusPayload): Promise<UpdateCustomerTicketStatusResult>;
 
+export interface GetWorkerAttendanceParams {
+  areaName: string;
+  fromdate?: string;
+  todate?: string;
+  attendanceStatus?: string;
+  workerId?: string;
+  workerName?: string;
+  page?: number;
+  limit?: number;
+}
 
+export interface GetWorkerAttendanceResult {
+  success: boolean;
+  data: RawWorkerAttendanceRecord[];
+  count?: number;
+  pagination?: {
+    currentPage: number;
+    limit: number;
+    totalRecords: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null;
+  message?: string;
+  error?: string;
+}
 
+export function getWorkerAttendance(params: GetWorkerAttendanceParams): Promise<GetWorkerAttendanceResult>;
 
+export interface GetExpertsLeaveParams {
+  areaName: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface GetExpertsLeaveResult {
+  success: boolean;
+  data: RawLeaveRecord[];
+  count?: number;
+  pagination?: {
+    currentPage: number;
+    limit: number;
+    totalRecords: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  } | null;
+  message?: string;
+  error?: string;
+}
+
+export function getExpertsLeaveRequest(params: GetExpertsLeaveParams): Promise<GetExpertsLeaveResult>;

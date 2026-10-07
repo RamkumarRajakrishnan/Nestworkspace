@@ -14,7 +14,9 @@ import { WorkersPage } from './pages/Workforce/Experts/WorkersPage';
 import { WorkerDetailPage } from './pages/Workforce/Experts/WorkerDetailPage';
 import { EmployeesPage } from './pages/Administration/Employees/EmployeesPage';
 import { AssignmentsPage } from './pages/Operations/Assignments/AssignmentsPage';
+import { AttendancePage } from './pages/Workforce/Attendance/AttendancePage';
 import { SchedulePage } from './pages/Workforce/Attendance/SchedulePage';
+import { LeavePage } from './pages/Workforce/Leave/LeavePage';
 import { MarketsPage } from './pages/Market/Area/MarketsPage';
 import { MarketDetailPage } from './pages/Market/Area/MarketDetailPage';
 import { CompliancePage } from './pages/Workforce/Compliance/CompliancePage';
@@ -22,6 +24,7 @@ import { PayoutsPage } from './pages/Finance/PayoutsPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
 import { SettingsPage } from './pages/Administration/Settings/SettingsPage';
 import { NestPassPage } from './pages/PassManagement/NestPassPage';
+import { UsageHistoryPage } from './pages/PassManagement/UsageHistoryPage';
 import { ComplaintsPage } from './pages/Quality/ComplaintsPage';
 import { TicketDetailPage } from './pages/Quality/TicketDetailPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
@@ -153,12 +156,12 @@ export const App: React.FC = () => {
                 }
               />
 
-              {/* Attendance (Existing Schedule Page) */}
+              {/* Attendance */}
               <Route
                 path="attendance"
                 element={
                   <AuthorizedRoute menuTitle="Workforce" moduleName="Attendance">
-                    <SchedulePage />
+                    <AttendancePage />
                   </AuthorizedRoute>
                 }
               />
@@ -166,7 +169,7 @@ export const App: React.FC = () => {
                 path="workforce/attendance"
                 element={
                   <AuthorizedRoute menuTitle="Workforce" moduleName="Attendance">
-                    <SchedulePage />
+                    <AttendancePage />
                   </AuthorizedRoute>
                 }
               />
@@ -174,7 +177,7 @@ export const App: React.FC = () => {
                 path="schedule"
                 element={
                   <AuthorizedRoute menuTitle="Workforce" moduleName="Attendance">
-                    <SchedulePage />
+                    <AttendancePage />
                   </AuthorizedRoute>
                 }
               />
@@ -184,11 +187,15 @@ export const App: React.FC = () => {
                 path="workforce/leave"
                 element={
                   <AuthorizedRoute menuTitle="Workforce" moduleName="Leave">
-                    <ModulePlaceholderPage
-                      title="Leave Management"
-                      subtitle="Manage expert time-off requests, leave approvals, and shift coverages"
-                      category="Workforce"
-                    />
+                    <LeavePage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="leave"
+                element={
+                  <AuthorizedRoute menuTitle="Workforce" moduleName="Leave">
+                    <LeavePage />
                   </AuthorizedRoute>
                 }
               />
@@ -304,11 +311,15 @@ export const App: React.FC = () => {
                 path="pass-management/usage-history"
                 element={
                   <AuthorizedRoute menuTitle="Pass Management" moduleName="Usage History">
-                    <ModulePlaceholderPage
-                      title="Pass Usage History"
-                      subtitle="Audit customer pass redemptions, active package balances, and session consumption"
-                      category="Pass Management"
-                    />
+                    <UsageHistoryPage />
+                  </AuthorizedRoute>
+                }
+              />
+              <Route
+                path="usage-history"
+                element={
+                  <AuthorizedRoute menuTitle="Pass Management" moduleName="Usage History">
+                    <UsageHistoryPage />
                   </AuthorizedRoute>
                 }
               />

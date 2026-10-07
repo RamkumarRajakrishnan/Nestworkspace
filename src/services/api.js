@@ -2297,8 +2297,150 @@ export const updateNestPass = async (updateData) => {
   }
 };
 
+/**
+ * Fetches user nest pass usage history by userId or phonenumber with server-side pagination.
+ * Endpoint: GET https://haatza.com/_functions/userNestPass?userId={userId}&page={page}&limit={limit}
+ *       or: GET https://haatza.com/_functions/userNestPass?phonenumber={phonenumber}&page={page}&limit={limit}
+ * 
+ * @param {{
+ *   userId?: string,
+ *   phonenumber?: string,
+ *   page?: number,
+ *   limit?: number
+ * }} params
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data: Array<any>,
+ *   count?: number,
+ *   pagination?: {
+ *     currentPage: number,
+ *     limit: number,
+ *     totalRecords: number,
+ *     totalPages: number,
+ *     hasNextPage: boolean,
+ *     hasPreviousPage: boolean
+ *   } | null,
+ *   message?: string,
+ *   error?: string
+ * }>}
+ */
+export const getUserNestPass = async ({
+  userId,
+  phonenumber,
+  status,
+  page = 1,
+  limit = 20,
+} = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    const cleanUserId = String(userId || '').trim();
+    const cleanPhone = String(phonenumber || '').trim();
+    const cleanStatus = String(status || '').trim();
+
+    // Send either userId or phonenumber, never both for the same search
+    if (cleanUserId) {
+      queryParams.set('userId', cleanUserId);
+    } else if (cleanPhone) {
+      queryParams.set('phonenumber', cleanPhone);
+    }
+
+    if (cleanStatus && cleanStatus !== 'All' && cleanStatus !== 'All Statuses') {
+      queryParams.set('status', cleanStatus);
+    }
+
+    if (page !== undefined && page !== null && String(page).trim() !== '') {
+      queryParams.set('page', String(page));
+    }
+
+    if (limit !== undefined && limit !== null && String(limit).trim() !== '') {
+      queryParams.set('limit', String(limit));
+    }
+
+    const url = `${Serverurl}/userNestPass?${queryParams.toString()}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (response.ok && data && (data.status === 'success' || data.success)) {
+      const records = Array.isArray(data.data) ? data.data : [];
+      const rawPag = data.pagination;
+      const pageNum = Number(rawPag?.currentPage || rawPag?.page || page) || 1;
+      const limitNum = Number(rawPag?.limit || limit) || 20;
+      const totalRecords = typeof rawPag?.totalRecords === 'number'
+        ? rawPag.totalRecords
+        : (typeof data.count === 'number' ? data.count : records.length);
+      const totalPages = typeof rawPag?.totalPages === 'number'
+        ? rawPag.totalPages
+        : Math.max(1, Math.ceil(totalRecords / limitNum));
+
+      return {
+        success: true,
+        data: records,
+        count: totalRecords,
+        pagination: {
+          currentPage: pageNum,
+          limit: limitNum,
+          totalRecords: totalRecords,
+          totalPages: totalPages,
+          hasNextPage: typeof rawPag?.hasNextPage === 'boolean' ? rawPag.hasNextPage : (pageNum < totalPages),
+          hasPreviousPage: typeof rawPag?.hasPreviousPage === 'boolean' ? rawPag.hasPreviousPage : (pageNum > 1),
+        },
+        message: data.message || 'Pass usage history fetched successfully',
+      };
+    }
+
+    // Gracefully handle empty / not found responses
+    if (
+      data &&
+      (data.status === 'success' || data.status === 'Failed' || data.status === 'failed' || data.status === 'error')
+    ) {
+      const records = Array.isArray(data?.data) ? data.data : [];
+      return {
+        success: true,
+        data: records,
+        count: records.length,
+        pagination: {
+          currentPage: Number(page) || 1,
+          limit: Number(limit) || 20,
+          totalRecords: records.length,
+          totalPages: Math.max(1, Math.ceil(records.length / (Number(limit) || 20))),
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        message: data.message || '',
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : (data?.error || `Failed to fetch pass usage history (${response.status})`);
+
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('getUserNestPass API Network Error:', error);
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: 'Network error while loading pass usage history. Please try again.',
+    };
+  }
+};
+
 // ============================================================================
 // CUSTOMER TICKETS & COMPLAINTS APIs
+
 // ============================================================================
 
 /**
@@ -2496,5 +2638,325 @@ export const updateCustomerTicketStatus = async ({ tableId, status }) => {
   }
 };
 
+// ============================================================================
+// WORKER ATTENDANCE APIs
+// ============================================================================
 
+/**
+ * Fetches worker attendance records for an operating area and date range.
+ * Endpoint: GET https://haatza.com/_functions/nestWorkerAttendance?areaName={areaName}&fromdate={fromdate}&todate={todate}&attendanceStatus={attendanceStatus}&workerId={workerId}&workerName={workerName}&page={page}&limit={limit}
+ * 
+ * @param {{
+ *   areaName: string,
+ *   fromdate?: string,
+ *   todate?: string,
+ *   attendanceStatus?: string,
+ *   workerId?: string,
+ *   workerName?: string,
+ *   page?: number,
+ *   limit?: number
+ * }} params
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data: Array<any>,
+ *   count?: number,
+ *   pagination?: {
+ *     currentPage: number,
+ *     limit: number,
+ *     totalRecords: number,
+ *     totalPages: number,
+ *     hasNextPage: boolean,
+ *     hasPreviousPage: boolean
+ *   } | null,
+ *   message?: string,
+ *   error?: string
+ * }>}
+ */
+export const getWorkerAttendance = async ({
+  areaName,
+  fromdate,
+  todate,
+  attendanceStatus,
+  workerId,
+  workerName,
+  page = 1,
+  limit = 20,
+} = {}) => {
+  const cleanAreaName = String(areaName || '').trim();
+  let cleanFromDate = String(fromdate || '').trim();
+  let cleanToDate = String(todate || '').trim();
 
+  if (!cleanAreaName) {
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: 'areaName is required to fetch attendance records.',
+    };
+  }
+
+  // Backend endpoint strictly requires fromdate and todate.
+  // If the user does not specify a date filter, safely query the current month up to today.
+  if (!cleanFromDate || !cleanToDate) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    cleanToDate = cleanToDate || `${year}-${month}-${day}`;
+    cleanFromDate = cleanFromDate || `${year}-${month}-01`;
+  }
+
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.set('areaName', cleanAreaName);
+    queryParams.set('fromdate', cleanFromDate);
+    queryParams.set('todate', cleanToDate);
+
+    const cleanStatus = String(attendanceStatus || '').trim();
+    if (cleanStatus && cleanStatus !== 'All') {
+      queryParams.set('attendanceStatus', cleanStatus);
+    }
+
+    const cleanWorkerId = String(workerId || '').trim();
+    if (cleanWorkerId) {
+      queryParams.set('workerId', cleanWorkerId);
+    }
+
+    const cleanWorkerName = String(workerName || '').trim();
+    if (cleanWorkerName) {
+      queryParams.set('workerName', cleanWorkerName);
+    }
+
+    if (page !== undefined && page !== null && String(page).trim() !== '') {
+      queryParams.set('page', String(page));
+    }
+
+    if (limit !== undefined && limit !== null && String(limit).trim() !== '') {
+      queryParams.set('limit', String(limit));
+    }
+
+    const url = `${Serverurl}/nestWorkerAttendance?${queryParams.toString()}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (response.ok && data && (data.status === 'success' || data.success)) {
+      const records = Array.isArray(data.data) ? data.data : (Array.isArray(data.message) ? data.message : []);
+      const totalCount = typeof data.count === 'number' ? data.count : records.length;
+      const rawPag = data.pagination;
+      const pageNum = Number(rawPag?.currentPage || rawPag?.page || page) || 1;
+      const limitNum = Number(rawPag?.limit || limit) || 20;
+      const totalRecords = typeof rawPag?.totalRecords === 'number'
+        ? rawPag.totalRecords
+        : (typeof rawPag?.totalCount === 'number'
+            ? rawPag.totalCount
+            : totalCount);
+      const totalPages = Number(rawPag?.totalPages) || Math.max(1, Math.ceil(totalRecords / limitNum));
+
+      return {
+        success: true,
+        data: records,
+        count: totalRecords,
+        pagination: {
+          currentPage: pageNum,
+          limit: limitNum,
+          totalRecords: totalRecords,
+          totalPages: totalPages,
+          hasNextPage: typeof rawPag?.hasNextPage === 'boolean' ? rawPag.hasNextPage : (pageNum < totalPages),
+          hasPreviousPage: typeof rawPag?.hasPreviousPage === 'boolean' ? rawPag.hasPreviousPage : (pageNum > 1),
+        },
+        message: data.message || 'Worker attendance details fetched successfully',
+      };
+    }
+
+    // Gracefully treat "no attendance / records found" as empty result instead of hard error
+    if (
+      data &&
+      (data.status === 'Failed' || data.status === 'failed') &&
+      typeof data.message === 'string' &&
+      (data.message.toLowerCase().includes('no attendance') ||
+       data.message.toLowerCase().includes('no records') ||
+       data.message.toLowerCase().includes('not found'))
+    ) {
+      return {
+        success: true,
+        data: [],
+        count: 0,
+        pagination: {
+          currentPage: Number(page) || 1,
+          limit: Number(limit) || 20,
+          totalRecords: 0,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        message: data.message,
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : (data?.error || `Failed to fetch worker attendance (${response.status})`);
+
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('getWorkerAttendance API Network Error:', error);
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: 'Network error while loading worker attendance records. Please try again.',
+    };
+  }
+};
+
+// ============================================================================
+// EXPERTS LEAVE REQUEST APIs
+// ============================================================================
+
+/**
+ * Fetches worker leave requests for an operating area with server-side pagination.
+ * Endpoint: GET https://haatza.com/_functions/expertsLeaveRequest?areaName={areaName}&page={page}&limit={limit}
+ * 
+ * @param {{
+ *   areaName: string,
+ *   page?: number,
+ *   limit?: number
+ * }} params
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data: Array<any>,
+ *   count?: number,
+ *   pagination?: {
+ *     currentPage: number,
+ *     limit: number,
+ *     totalRecords: number,
+ *     totalPages: number,
+ *     hasNextPage: boolean,
+ *     hasPreviousPage: boolean
+ *   } | null,
+ *   message?: string,
+ *   error?: string
+ * }>}
+ */
+export const getExpertsLeaveRequest = async ({
+  areaName,
+  page = 1,
+  limit = 20,
+} = {}) => {
+  const cleanAreaName = String(areaName || '').trim();
+
+  if (!cleanAreaName) {
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: 'areaName is required to fetch leave requests.',
+    };
+  }
+
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.set('areaName', cleanAreaName);
+
+    if (page !== undefined && page !== null && String(page).trim() !== '') {
+      queryParams.set('page', String(page));
+    }
+
+    if (limit !== undefined && limit !== null && String(limit).trim() !== '') {
+      queryParams.set('limit', String(limit));
+    }
+
+    const url = `${Serverurl}/expertsLeaveRequest?${queryParams.toString()}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (response.ok && data && (data.status === 'success' || data.success)) {
+      const records = Array.isArray(data.data) ? data.data : [];
+      const rawPag = data.pagination;
+      const pageNum = Number(rawPag?.currentPage || rawPag?.page || page) || 1;
+      const limitNum = Number(rawPag?.limit || limit) || 20;
+      const totalRecords = typeof rawPag?.totalRecords === 'number'
+        ? rawPag.totalRecords
+        : records.length;
+      const totalPages = Number(rawPag?.totalPages) || Math.max(1, Math.ceil(totalRecords / limitNum));
+
+      return {
+        success: true,
+        data: records,
+        count: totalRecords,
+        pagination: {
+          currentPage: pageNum,
+          limit: limitNum,
+          totalRecords: totalRecords,
+          totalPages: totalPages,
+          hasNextPage: typeof rawPag?.hasNextPage === 'boolean' ? rawPag.hasNextPage : (pageNum < totalPages),
+          hasPreviousPage: typeof rawPag?.hasPreviousPage === 'boolean' ? rawPag.hasPreviousPage : (pageNum > 1),
+        },
+        message: data.message || 'Leave requests fetched successfully',
+      };
+    }
+
+    // Gracefully handle empty / not found states
+    if (
+      data &&
+      (data.status === 'Failed' || data.status === 'failed' || data.status === 'error') &&
+      typeof data.message === 'string' &&
+      (data.message.toLowerCase().includes('no leave') ||
+       data.message.toLowerCase().includes('no records') ||
+       data.message.toLowerCase().includes('not found'))
+    ) {
+      return {
+        success: true,
+        data: [],
+        count: 0,
+        pagination: {
+          currentPage: Number(page) || 1,
+          limit: Number(limit) || 20,
+          totalRecords: 0,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        message: data.message,
+      };
+    }
+
+    const errorMessage =
+      typeof data?.message === 'string'
+        ? data.message
+        : (data?.error || `Failed to fetch leave requests (${response.status})`);
+
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: errorMessage,
+    };
+  } catch (error) {
+    console.error('getExpertsLeaveRequest API Network Error:', error);
+    return {
+      success: false,
+      data: [],
+      pagination: null,
+      error: 'Network error while loading leave requests. Please try again.',
+    };
+  }
+};

@@ -354,3 +354,78 @@ export interface CustomerTicketDetails {
   [key: string]: any;
 }
 
+export interface RawWorkerAttendanceRecord {
+  workerId: string;
+  workerName: string;
+  attendanceStatus: string;
+  areaName: string;
+  date: string;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  totalWorkedHours: string | null;
+  checkInLatitude: number | null;
+  checkInLongitude: number | null;
+  checkOutLatitude: number | null;
+  checkOutLongitude: number | null;
+  checkInLocation: string | null;
+  checkOutLocation: string | null;
+  checkInPhoto: string | null;
+  checkOutPhoto: string | null;
+  deviceId: string | null;
+  totalWorkedMinutes: number | null;
+  lastHearbeat: string | null;
+  checkoutby: string | null;
+  breakStartTime: string | null;
+  breakEndTime: string | null;
+  CheckinVerified: boolean | null;
+  [key: string]: any;
+}
+
+export interface RawLeaveRecord {
+  workerId: string | null;
+  workerName: string | null;
+  areaName: string | null;
+  leaveDate: string | null;
+  leaveType: string | null;
+  status: string | null;
+  reason?: string | null;
+  requestedAt?: string | null;
+  approvedAt?: string | null;
+  approvedBy?: string | null;
+  notes?: string | null;
+  [key: string]: any;
+}
+
+export interface LeavePagination {
+  currentPage: number;
+  limit: number;
+  totalRecords: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface RawUserNestPassRecord {
+  userId: string;
+  packId: string;
+  status: string;
+  remainingVisits: number;
+  completedVisits: number;
+  totalvisit: number;
+  duration: string | number;
+  paidAmount: number;
+  walletuseage: number;
+  razorpayorderid: string | null;
+  bookingId: string;
+  expiryDate: string;
+  [key: string]: any;
+}
+
+export interface UserNestPassPagination {
+  currentPage: number;
+  limit: number;
+  totalRecords: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
