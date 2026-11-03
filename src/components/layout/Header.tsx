@@ -91,28 +91,28 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
       .join('')
       .slice(0, 2)
       .toUpperCase()
-    : 'R';
+    : 'AC';
 
   return (
     <>
-      <header className="flex h-16 w-full items-center justify-between border-b border-purple-200 bg-purple-100 px-2 sm:px-4 md:px-6 shadow-soft-sm gap-2 sm:gap-4">
-        {/* Left: Mobile Hamburger (< md) & Navbar Logo */}
+      <header className="flex h-16 w-full items-center justify-between border-b border-[#14235E] bg-[#1B2E79] px-2 sm:px-4 md:px-6 shadow-md gap-2 sm:gap-4">
+        {/* Left: Mobile Hamburger (< md) & Navbar Logo (Cropped to Haatza only) */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={onOpenMobileSidebar}
             aria-label="Open navigation menu"
-            className="inline-flex md:hidden items-center justify-center p-1.5 sm:p-2 rounded-xl text-[#5B21B6] hover:bg-purple-200/70 active:scale-95 transition-all cursor-pointer focus:outline-none"
+            className="inline-flex md:hidden items-center justify-center p-1.5 sm:p-2 rounded-xl text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer focus:outline-none"
           >
-            <Menu className="h-5 w-5 stroke-[2.2]" />
+            <Menu className="h-5 w-5 stroke-[2.2] text-white" />
           </button>
           <img
             src="/logo.png"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = logoImg;
             }}
-            alt="Haatza Nest"
-            className="h-7 sm:h-8 w-auto max-w-[80px] xs:max-w-[100px] sm:max-w-[135px] object-contain shrink-0"
+            alt="Haatza"
+            className="h-7 sm:h-8 w-auto max-w-[80px] xs:max-w-[100px] sm:max-w-[125px] object-contain shrink-0 brightness-0 invert"
           />
         </div>
 
@@ -123,43 +123,44 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
             onChange={handleSearchSubmit}
             placeholder="Search by ID, name, area..."
             className="w-full"
+            variant="dark"
           />
         </div>
 
         {/* Right Section */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 ml-auto">
           {/* Live IST Clock */}
-          <div className="hidden lg:flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs text-[#6B6B6B] font-mono font-medium shrink-0 whitespace-nowrap shadow-soft-xs">
-            <Clock className="h-3.5 w-3.5 text-[#5B21B6]" />
-            <span>{formatHeaderDate(currentTime)}</span>
+          <div className="hidden lg:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-xs text-white font-mono font-medium shrink-0 whitespace-nowrap shadow-soft-xs">
+            <Clock className="h-3.5 w-3.5 text-white" />
+            <span className="text-white">{formatHeaderDate(currentTime)}</span>
           </div>
 
           {/* Notifications Bell */}
           <button
             type="button"
             onClick={() => setIsNotifOpen(true)}
-            className="relative rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors cursor-pointer shrink-0 shadow-soft-xs"
+            className="relative rounded-xl border border-white/20 bg-white/10 p-2 text-white hover:bg-white/20 transition-colors cursor-pointer shrink-0 shadow-soft-xs"
             title="Operational Alerts"
           >
-            <Bell className="h-4 w-4" />
+            <Bell className="h-4 w-4 text-white" />
             {unreadNotifsCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white border border-[#14235E] text-[10px] font-bold text-[#1B2E79] shadow-sm">
                 {unreadNotifsCount}
               </span>
             )}
           </button>
 
           {/* Admin Profile Dropdown Menu */}
-          <div className="relative border-l border-purple-200 pl-1.5 sm:pl-3 shrink-0" ref={profileDropdownRef}>
+          <div className="relative border-l border-white/20 pl-1.5 sm:pl-3 shrink-0" ref={profileDropdownRef}>
             <button
               type="button"
               onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-              className="flex items-center gap-1 sm:gap-2 rounded-xl p-0.5 sm:p-1 hover:bg-purple-200/50 transition-all cursor-pointer focus:outline-none"
+              className="flex items-center gap-1.5 sm:gap-2 rounded-xl p-0.5 sm:p-1 hover:bg-white/10 transition-all cursor-pointer focus:outline-none"
               aria-expanded={isProfileDropdownOpen}
               aria-haspopup="true"
               id="profile-dropdown-trigger"
             >
-              <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-[#EDE9FE] text-[#5B21B6] font-bold text-xs shadow-soft-sm shrink-0 overflow-hidden">
+              <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white text-[#1B2E79] font-bold text-xs shadow-soft-sm shrink-0 overflow-hidden">
                 {user?.profileImage ? (
                   <img
                     src={user.profileImage}
@@ -171,33 +172,33 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
                 )}
               </div>
               <div className="hidden sm:flex flex-col text-left shrink-0">
-                <span className="text-xs font-bold text-[#1F1F1F] leading-tight whitespace-nowrap">
-                  {user?.fullName || 'Ramkumar'}
+                <span className="text-xs font-bold text-white leading-tight whitespace-nowrap">
+                  {user?.fullName || 'Admin (Haatza_corp)'}
                 </span>
-                <span className="text-[10px] text-[#5B21B6] font-semibold leading-tight mt-0.5 whitespace-nowrap">
-                  {role?.roleCode || user?.employeeId || 'NEST_FIELD_EMPLOYEE'}
+                <span className="text-[10px] text-white font-medium leading-tight mt-0.5 whitespace-nowrap">
+                  {role?.roleCode || user?.employeeId || 'Admin'}
                 </span>
               </div>
               <ChevronDown
-                className={`h-3.5 w-3.5 text-[#6B6B6B] transition-transform duration-200 shrink-0 ${
-                  isProfileDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                className={`h-3.5 w-3.5 text-white transition-transform duration-200 shrink-0 ${
+                  isProfileDropdownOpen ? 'rotate-180 text-white' : ''
                 }`}
               />
             </button>
 
             {/* Dropdown Menu Popup */}
             {isProfileDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-[#EEEEF2] bg-white p-2 shadow-soft-lg z-50 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-white/20 bg-[#1B2E79] p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95">
                 {/* User Mini Summary Header */}
-                <div className="border-b border-[#EEEEF2] px-3 py-2.5 bg-[#FAF9FC] rounded-xl mb-1.5">
-                  <div className="text-xs font-bold text-[#1F1F1F] truncate">
+                <div className="border-b border-white/15 px-3 py-2.5 bg-white/10 rounded-xl mb-1.5">
+                  <div className="text-xs font-bold text-white truncate">
                     {user?.fullName || 'Nest Employee'}
                   </div>
-                  <div className="text-[11px] text-[#6B6B6B] truncate font-mono mt-0.5">
+                  <div className="text-[11px] text-white/90 truncate font-mono mt-0.5">
                     {user?.email || 'No email registered'}
                   </div>
                   {user?.employeeId && (
-                    <div className="text-[10px] text-[#5B21B6] font-mono font-semibold mt-1">
+                    <div className="text-[10px] text-white font-mono font-semibold mt-1">
                       ID: {user.employeeId}
                     </div>
                   )}
@@ -211,13 +212,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
                       setIsProfileDropdownOpen(false);
                       setIsProfileModalOpen(true);
                     }}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors cursor-pointer"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <User className="h-4 w-4 text-[#5B21B6]" />
+                    <User className="h-4 w-4 text-white" />
                     <span>My Profile & Security</span>
                   </button>
 
-                  <div className="my-1 border-t border-[#EEEEF2]" />
+                  <div className="my-1 border-t border-white/15" />
 
                   <button
                     type="button"
@@ -225,9 +226,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileSidebar }) => {
                       setIsProfileDropdownOpen(false);
                       setIsLogoutModalOpen(true);
                     }}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-[#B42318] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-red-300 hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <LogOut className="h-4 w-4 text-[#B42318]" />
+                    <LogOut className="h-4 w-4 text-red-300" />
                     <span>Sign Out</span>
                   </button>
                 </div>

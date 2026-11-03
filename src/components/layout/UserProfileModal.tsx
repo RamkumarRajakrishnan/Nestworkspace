@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -70,7 +70,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer"
+            className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer"
           >
             Close
           </button>
@@ -79,8 +79,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     >
       <div className="space-y-5">
         {/* Top Header Identity Banner */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 rounded-2xl bg-gradient-to-br from-[#FAF9FC] to-[#F5F3FF] border border-[#DDD6FE]/60 p-4">
-          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#5B21B6] text-white font-bold text-xl shadow-soft-md">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 rounded-2xl bg-gradient-to-br from-[#FAF9FC] to-[#F5F8FF] border border-[#C4D9FD]/60 p-4">
+          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#1B2E79] text-white font-bold text-xl shadow-soft-md">
             {user?.profileImage ? (
               <img
                 src={user.profileImage}
@@ -104,7 +104,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 {user?.fullName || 'Nest Employee'}
               </h2>
               {user?.employeeId && (
-                <span className="font-mono text-xs font-bold bg-[#EDE9FE] text-[#5B21B6] px-2.5 py-0.5 rounded-lg border border-[#DDD6FE]">
+                <span className="font-mono text-xs font-bold bg-[#EEF3FF] text-[#1B2E79] px-2.5 py-0.5 rounded-lg border border-[#C4D9FD]">
                   {user.employeeId}
                 </span>
               )}
@@ -112,14 +112,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-[#6B6B6B]">
               <span className="flex items-center gap-1">
-                <Mail className="h-3.5 w-3.5 text-[#5B21B6]" />
+                <Mail className="h-3.5 w-3.5 text-[#1B2E79]" />
                 {user?.email || 'No email registered'}
               </span>
               {user?.phone && (
                 <>
                   <span>•</span>
                   <span className="flex items-center gap-1 font-mono">
-                    <Phone className="h-3.5 w-3.5 text-[#5B21B6]" />
+                    <Phone className="h-3.5 w-3.5 text-[#1B2E79]" />
                     {user.phone}
                   </span>
                 </>
@@ -132,7 +132,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 Account: {user?.status || 'Active'}
               </span>
               {user?.verificationStatus && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                   <ShieldCheck className="h-3 w-3" />
                   {user.verificationStatus}
                 </span>
@@ -144,7 +144,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
         {/* User Identity Details Grid */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3">
           <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#EEEEF2] pb-2">
-            <User className="h-4 w-4 text-[#5B21B6]" />
+            <User className="h-4 w-4 text-[#1B2E79]" />
             Employee Identity & Login Telemetry
           </h3>
 
@@ -157,7 +157,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                   <button
                     type="button"
                     onClick={() => handleCopy(user.userId, 'userId')}
-                    className="text-[#6B6B6B] hover:text-[#5B21B6] transition-colors p-1"
+                    className="text-[#6B6B6B] hover:text-[#1B2E79] transition-colors p-1"
                     title="Copy User ID"
                   >
                     {copiedKey === 'userId' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
@@ -168,13 +168,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
             <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1">
               <span className="text-[#6B6B6B] text-[11px]">Employee ID</span>
-              <div className="flex items-center justify-between font-mono font-bold text-[#5B21B6]">
+              <div className="flex items-center justify-between font-mono font-bold text-[#1B2E79]">
                 <span>{user?.employeeId || 'N/A'}</span>
                 {user?.employeeId && (
                   <button
                     type="button"
                     onClick={() => handleCopy(user.employeeId, 'empId')}
-                    className="text-[#6B6B6B] hover:text-[#5B21B6] transition-colors p-1"
+                    className="text-[#6B6B6B] hover:text-[#1B2E79] transition-colors p-1"
                     title="Copy Employee ID"
                   >
                     {copiedKey === 'empId' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
@@ -185,7 +185,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
             <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1 sm:col-span-2">
               <span className="text-[#6B6B6B] text-[11px] flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5 text-[#5B21B6]" /> Last Login Session
+                <Clock className="h-3.5 w-3.5 text-[#1B2E79]" /> Last Login Session
               </span>
               <div className="font-mono text-[#1F1F1F] font-medium text-xs">
                 {formatDateTime(user?.lastLoginAt)}
@@ -197,14 +197,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
         {/* Role & Access Permissions */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3">
           <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#EEEEF2] pb-2">
-            <Key className="h-4 w-4 text-[#5B21B6]" />
+            <Key className="h-4 w-4 text-[#1B2E79]" />
             Role & Security Entitlements
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1">
               <span className="text-[#6B6B6B] text-[11px]">Role Code</span>
-              <div className="font-mono font-bold text-[#5B21B6]">
+              <div className="font-mono font-bold text-[#1B2E79]">
                 {role?.roleCode || 'NEST_FIELD_EMPLOYEE'}
               </div>
             </div>
@@ -229,7 +229,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-2">
             <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-[#5B21B6]" />
+              <MapPin className="h-4 w-4 text-[#1B2E79]" />
               Assigned Operational Locations ({locations?.length || 0})
             </h3>
             <span className="text-[11px] text-[#6B6B6B]">Geo-Fenced Access</span>
@@ -240,7 +240,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               {locations.map((loc, idx) => (
                 <div
                   key={loc.userLocationId || idx}
-                  className="flex items-center justify-between rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 text-xs hover:border-[#DDD6FE] transition-colors"
+                  className="flex items-center justify-between rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 text-xs hover:border-[#C4D9FD] transition-colors"
                 >
                   <div className="space-y-0.5 min-w-0 pr-2">
                     <div className="font-bold text-[#1F1F1F] capitalize truncate">
@@ -252,7 +252,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                   </div>
 
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className="rounded-lg bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-bold text-[#5B21B6]">
+                    <span className="rounded-lg bg-[#EEF3FF] px-2 py-0.5 text-[10px] font-bold text-[#1B2E79]">
                       {loc.accessLevel || 'FULL'}
                     </span>
                     <span className="text-[10px] text-emerald-700 font-medium">

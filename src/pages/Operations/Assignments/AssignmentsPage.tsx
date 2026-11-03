@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
 import { Booking, Assignment, APPROVED_SERVICE_TYPES } from '../../../types';
 import { DataTable, Column } from '../../../components/common/DataTable';
@@ -6,6 +6,7 @@ import { StatusBadge } from '../../../components/common/StatusBadge';
 import { AssignWorkerModal } from '../../../components/operations/AssignWorkerModal';
 import { ReassignWorkerModal } from '../../../components/operations/ReassignWorkerModal';
 import { SearchInput } from '../../../components/common/SearchInput';
+import { Pagination } from '../../../components/common/Pagination';
 import { 
   UserCheck, 
   Share2, 
@@ -31,6 +32,10 @@ export const AssignmentsPage: React.FC = () => {
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedFulfillments, setSelectedFulfillments] = useState<string[]>([]);
+
+  // Pagination state
+  const [page, setPage] = useState<number>(1);
+  const PAGE_SIZE = 15;
 
   // Popover state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -65,6 +70,7 @@ export const AssignmentsPage: React.FC = () => {
     setSelectedServices([...draftServices]);
     setSelectedFulfillments([...draftFulfillments]);
     setIsFilterOpen(false);
+    setPage(1);
   };
 
   const handleRemoveFilters = () => {
@@ -75,6 +81,7 @@ export const AssignmentsPage: React.FC = () => {
     setDraftServices([]);
     setDraftFulfillments([]);
     setSearch('');
+    setPage(1);
   };
 
   const activeFilterCount = useMemo(() => {
@@ -128,6 +135,14 @@ export const AssignmentsPage: React.FC = () => {
     });
   }, [bookings, search, selectedMarkets, selectedServices, selectedFulfillments]);
 
+  const totalPages = Math.ceil(filteredBookings.length / PAGE_SIZE) || 1;
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
+  const paginatedBookings = useMemo(() => {
+    const startIndex = (safePage - 1) * PAGE_SIZE;
+    return filteredBookings.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredBookings, safePage, PAGE_SIZE]);
+
   const toggleItem = (list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     if (list.includes(item)) {
       setList(list.filter((x) => x !== item));
@@ -151,8 +166,8 @@ export const AssignmentsPage: React.FC = () => {
       header: 'Zone / Area',
       accessor: 'areaId',
       render: (b) => (
-        <span className="font-mono text-[#5B21B6] font-semibold text-xs flex items-center gap-1 bg-[#EDE9FE] px-2 py-0.5 rounded-lg">
-          <MapPin className="h-3 w-3 text-[#5B21B6]" />
+        <span className="font-mono text-[#1B2E79] font-semibold text-xs flex items-center gap-1 bg-[#EEF3FF] px-2 py-0.5 rounded-lg">
+          <MapPin className="h-3 w-3 text-[#1B2E79]" />
           {b.areaId}
         </span>
       ),
@@ -195,7 +210,7 @@ export const AssignmentsPage: React.FC = () => {
                   e.stopPropagation();
                   navigate(`/workers/${w.id}`);
                 }}
-                className="rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] px-2 py-0.5 text-xs text-[#5B21B6] hover:bg-[#DDD6FE] cursor-pointer font-semibold transition-colors"
+                className="rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] px-2 py-0.5 text-xs text-[#1B2E79] hover:bg-[#C4D9FD] cursor-pointer font-semibold transition-colors"
               >
                 {w.name.split(' ')[0]} ({w.id})
               </span>
@@ -218,7 +233,7 @@ export const AssignmentsPage: React.FC = () => {
             {b.assignedWorkerIds.length < b.requiredWorkers ? (
               <button
                 onClick={() => setAssignBooking(b)}
-                className="rounded-xl bg-[#5B21B6] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D95] transition-all shadow-soft-sm active:scale-95"
+                className="rounded-xl bg-[#1B2E79] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#13225C] transition-all shadow-soft-sm active:scale-95"
               >
                 Assign Expert
               </button>
@@ -269,7 +284,10 @@ export const AssignmentsPage: React.FC = () => {
           <div className="w-full sm:max-w-md">
             <SearchInput
               value={search}
-              onChange={setSearch}
+              onChange={(val) => {
+                setSearch(val);
+                setPage(1);
+              }}
               placeholder="Search booking ID, customer, service..."
               className="w-full"
             />
@@ -300,16 +318,16 @@ export const AssignmentsPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -326,11 +344,11 @@ export const AssignmentsPage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Assignments</h3>
                   </div>
                   <button
@@ -353,13 +371,13 @@ export const AssignmentsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Coverage State</span>
                         {draftFulfillments.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftFulfillments.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.fulfillment ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -381,7 +399,7 @@ export const AssignmentsPage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftFulfillments.includes(item.id)}
                                 onChange={() => toggleItem(draftFulfillments, setDraftFulfillments, item.id)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {item.label}
@@ -412,13 +430,13 @@ export const AssignmentsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Service Category</span>
                         {draftServices.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftServices.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.service ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -436,7 +454,7 @@ export const AssignmentsPage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftServices.includes(serviceName)}
                                 onChange={() => toggleItem(draftServices, setDraftServices, serviceName)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {serviceName}
@@ -461,13 +479,13 @@ export const AssignmentsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Nano-Market Zone</span>
                         {draftMarkets.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftMarkets.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.market ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -485,7 +503,7 @@ export const AssignmentsPage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftMarkets.includes(m.id)}
                                 onChange={() => toggleItem(draftMarkets, setDraftMarkets, m.id)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {m.id} — {m.name}
@@ -517,7 +535,7 @@ export const AssignmentsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
                   >
                     Apply ({draftMatchingCount} bookings)
                   </button>
@@ -534,10 +552,13 @@ export const AssignmentsPage: React.FC = () => {
 
             {/* Fulfillment chips */}
             {selectedFulfillments.map((f) => (
-              <span key={f} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={f} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 {f === 'UNASSIGNED' ? 'Unassigned' : f === 'PARTIAL' ? 'Partially Assigned' : 'Fully Assigned'}
                 <button 
-                  onClick={() => setSelectedFulfillments(selectedFulfillments.filter((x) => x !== f))} 
+                  onClick={() => {
+                    setSelectedFulfillments(selectedFulfillments.filter((x) => x !== f));
+                    setPage(1);
+                  }} 
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -547,10 +568,13 @@ export const AssignmentsPage: React.FC = () => {
 
             {/* Service chips */}
             {selectedServices.map((serv) => (
-              <span key={serv} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={serv} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 {serv}
                 <button 
-                  onClick={() => setSelectedServices(selectedServices.filter((s) => s !== serv))} 
+                  onClick={() => {
+                    setSelectedServices(selectedServices.filter((s) => s !== serv));
+                    setPage(1);
+                  }} 
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -560,10 +584,13 @@ export const AssignmentsPage: React.FC = () => {
 
             {/* Market chips */}
             {selectedMarkets.map((mId) => (
-              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Market: {mId}
                 <button 
-                  onClick={() => setSelectedMarkets(selectedMarkets.filter((m) => m !== mId))} 
+                  onClick={() => {
+                    setSelectedMarkets(selectedMarkets.filter((m) => m !== mId));
+                    setPage(1);
+                  }} 
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -577,17 +604,26 @@ export const AssignmentsPage: React.FC = () => {
       {/* Assignments Table */}
       <DataTable
         columns={columns}
-        data={filteredBookings}
+        data={paginatedBookings}
         keyExtractor={(b) => b.id}
         emptyTitle="No assignments found"
         emptyDescription="All bookings are currently in terminal states or no matching filters."
+      />
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={safePage}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        totalRecords={filteredBookings.length}
+        pageSize={PAGE_SIZE}
       />
 
       {/* Audit Log Stream Preview */}
       <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-3">
         <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
           <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-1.5">
-            <History className="h-4 w-4 text-[#5B21B6]" />
+            <History className="h-4 w-4 text-[#1B2E79]" />
             Recent Dispatch & Reassignment Audit Trail
           </h3>
           <span className="text-xs font-mono text-[#6B6B6B]">Recorded Live</span>
@@ -601,7 +637,7 @@ export const AssignmentsPage: React.FC = () => {
               <div key={asg.id} className="py-2.5 flex items-center justify-between">
                 <div>
                   <div className="font-semibold text-[#1F1F1F]">
-                    Reassigned Expert: <span className="font-mono text-[#5B21B6]">{asg.workerId}</span> to Job #{asg.bookingId}
+                    Reassigned Expert: <span className="font-mono text-[#1B2E79]">{asg.workerId}</span> to Job #{asg.bookingId}
                   </div>
                   <div className="text-[11px] text-[#6B6B6B]">
                     Justification: <span className="italic text-amber-700">{asg.reassignmentReason || 'Operational intervention'}</span>

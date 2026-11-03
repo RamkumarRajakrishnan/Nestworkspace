@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { X, Eye, EyeOff, MapPin, Check, AlertCircle, Loader2, ChevronDown, ShieldCheck } from 'lucide-react';
 import { workerService, RegisterEmployeePayload } from '../../services/workerService';
 import { getActiveAreas } from '../../services/api';
@@ -304,7 +304,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors cursor-pointer disabled:opacity-50"
+            className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EEF3FF] hover:text-[#1B2E79] transition-colors cursor-pointer disabled:opacity-50"
             aria-label="Close modal"
           >
             <X className="h-5 w-5" />
@@ -343,7 +343,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                   className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] placeholder:font-sans focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     touched.employeeId && errors.employeeId
                       ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                   }`}
                 />
                 {touched.employeeId && errors.employeeId && (
@@ -367,7 +367,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                   className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     touched.fullName && errors.fullName
                       ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                   }`}
                 />
                 {touched.fullName && errors.fullName && (
@@ -396,7 +396,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                   className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                     touched.email && errors.email
                       ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                   }`}
                 />
                 {touched.email && errors.email && (
@@ -425,7 +425,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                     className={`w-full rounded-xl border bg-[#FAF9FC] pl-11 pr-3.5 py-2.5 text-xs sm:text-sm text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] placeholder:font-sans focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.phone && errors.phone
                         ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                 </div>
@@ -455,13 +455,13 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.password && errors.password
                         ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-[#9E9E9E] hover:text-[#5B21B6] p-0.5 rounded transition-colors"
+                    className="absolute right-3 top-2.5 text-[#9E9E9E] hover:text-[#1B2E79] p-0.5 rounded transition-colors"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -488,8 +488,8 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                       touched.accessLevel && errors.accessLevel
                         ? 'border-rose-400 bg-rose-50/50 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
                         : isAccessLevelOpen
-                        ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#5B21B6]'
-                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                        ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1B2E79]'
+                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                     }`}
                     aria-haspopup="listbox"
                     aria-expanded={isAccessLevelOpen}
@@ -497,7 +497,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       <ShieldCheck
                         className={`h-4 w-4 shrink-0 transition-colors ${
-                          isAccessLevelOpen ? 'text-[#5B21B6]' : 'text-[#7C3AED]'
+                          isAccessLevelOpen ? 'text-[#1B2E79]' : 'text-[#162766]'
                         }`}
                       />
                       <span
@@ -515,7 +515,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
 
                     <ChevronDown
                       className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
-                        isAccessLevelOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                        isAccessLevelOpen ? 'rotate-180 text-[#1B2E79]' : ''
                       }`}
                     />
                   </button>
@@ -550,22 +550,22 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                               }}
                               className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer text-left ${
                                 isSelected
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                                  : 'text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#5B21B6]'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold shadow-soft-xs'
+                                  : 'text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#1B2E79]'
                               }`}
                             >
                               <div className="flex flex-col min-w-0 flex-1">
                                 <span className="font-bold">{opt.title}</span>
                                 <span
                                   className={`text-[11px] ${
-                                    isSelected ? 'text-[#7C3AED]' : 'text-[#6B6B6B]'
+                                    isSelected ? 'text-[#162766]' : 'text-[#6B6B6B]'
                                   }`}
                                 >
                                   {opt.desc}
                                 </span>
                               </div>
                               {isSelected && (
-                                <Check className="h-4 w-4 text-[#5B21B6] shrink-0 stroke-[2.5]" />
+                                <Check className="h-4 w-4 text-[#1B2E79] shrink-0 stroke-[2.5]" />
                               )}
                             </button>
                           );
@@ -597,14 +597,14 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                   selectedLocations.map((loc) => (
                     <span
                       key={loc}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-1 text-xs font-mono font-semibold text-[#5B21B6] animate-in fade-in"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-1 text-xs font-mono font-semibold text-[#1B2E79] animate-in fade-in"
                     >
                       <MapPin className="h-3 w-3" />
                       <span>{loc}</span>
                       <button
                         type="button"
                         onClick={(e) => handleRemoveLocation(loc, e)}
-                        className="rounded hover:bg-[#DDD6FE] p-0.5 text-[#5B21B6] transition-colors"
+                        className="rounded hover:bg-[#C4D9FD] p-0.5 text-[#1B2E79] transition-colors"
                         title={`Remove ${loc}`}
                       >
                         <X className="h-3 w-3" />
@@ -627,17 +627,17 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                   className={`w-full flex items-center justify-between rounded-xl border bg-white px-3.5 py-2 text-xs font-semibold text-[#1F1F1F] transition-all cursor-pointer ${
                     touched.locations && errors.locations
                       ? 'border-rose-400 focus:ring-2 focus:ring-rose-500/20'
-                      : 'border-[#EEEEF2] hover:border-[#5B21B6]'
+                      : 'border-[#EEEEF2] hover:border-[#1B2E79]'
                   }`}
                   aria-expanded={isLocationsOpen}
                 >
                   <span className="flex items-center gap-2 text-[#6B6B6B]">
-                    <MapPin className="h-4 w-4 text-[#5B21B6]" />
+                    <MapPin className="h-4 w-4 text-[#1B2E79]" />
                     <span>Choose locations to dispatch / operate</span>
                   </span>
                   <ChevronDown
                     className={`h-4 w-4 text-[#6B6B6B] transition-transform duration-200 ${
-                      isLocationsOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                      isLocationsOpen ? 'rotate-180 text-[#1B2E79]' : ''
                     }`}
                   />
                 </button>
@@ -654,7 +654,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                             onClick={() => handleLocationToggle(loc.id)}
                             className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium cursor-pointer transition-colors ${
                               isSelected
-                                ? 'bg-[#F5F3FF] text-[#5B21B6] font-semibold'
+                                ? 'bg-[#F5F8FF] text-[#1B2E79] font-semibold'
                                 : 'hover:bg-[#FAF9FC] text-[#1F1F1F]'
                             }`}
                           >
@@ -662,7 +662,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
                               <div
                                 className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
                                   isSelected
-                                    ? 'border-[#5B21B6] bg-[#5B21B6] text-white'
+                                    ? 'border-[#1B2E79] bg-[#1B2E79] text-white'
                                     : 'border-[#D1D5DB] bg-white'
                                 }`}
                               >
@@ -699,7 +699,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onCl
             <button
               type="submit"
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs sm:text-sm font-bold shadow-soft-sm hover:shadow-soft-md transition-all active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs sm:text-sm font-bold shadow-soft-sm hover:shadow-soft-md transition-all active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]"
             >
               {isLoading ? (
                 <>

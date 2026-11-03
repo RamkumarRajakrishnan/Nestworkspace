@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useOperations } from '../../context/OperationsContext';
 import { 
   ResponsiveContainer, 
@@ -34,8 +34,8 @@ export const ReportsPage: React.FC = () => {
   const [selectedMarket, setSelectedMarket] = useState('ALL');
 
   const cancellationReasonsData = [
-    { name: 'No local partner found', value: 42, color: '#5B21B6' },
-    { name: 'Customer rescheduled', value: 28, color: '#7C3AED' },
+    { name: 'No local partner found', value: 42, color: '#1B2E79' },
+    { name: 'Customer rescheduled', value: 28, color: '#162766' },
     { name: 'Traffic / ETA delay', value: 18, color: '#A855F7' },
     { name: 'Incorrect address', value: 12, color: '#C084FC' },
   ];
@@ -67,7 +67,7 @@ export const ReportsPage: React.FC = () => {
             value={selectedMarket}
             onChange={(e) => setSelectedMarket(e.target.value)}
             aria-label="Filter Analytics by Nano Market"
-            className="rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 font-medium shadow-soft-sm cursor-pointer"
+            className="rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 font-medium shadow-soft-sm cursor-pointer"
           >
             <option value="ALL">All Nano-Markets (Bengaluru)</option>
             {markets.map((m) => (
@@ -129,16 +129,16 @@ export const ReportsPage: React.FC = () => {
               <AreaChart data={mockHourlyDemand}>
                 <defs>
                   <linearGradient id="orderFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#5B21B6" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#5B21B6" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#1B2E79" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#1B2E79" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#EEEEF2" vertical={false} />
                 <XAxis dataKey="hour" stroke="#6B6B6B" fontSize={11} />
                 <YAxis stroke="#6B6B6B" fontSize={11} />
                 <Tooltip contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EEEEF2', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)', fontSize: '12px', color: '#1F1F1F' }} />
-                <Area type="monotone" dataKey="orders" stroke="#5B21B6" fill="url(#orderFill)" strokeWidth={2.5} name="Order Volume" />
-                <Area type="monotone" dataKey="busyWorkers" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.1} strokeWidth={2} name="Busy Supply" />
+                <Area type="monotone" dataKey="orders" stroke="#1B2E79" fill="url(#orderFill)" strokeWidth={2.5} name="Order Volume" />
+                <Area type="monotone" dataKey="busyWorkers" stroke="#162766" fill="#162766" fillOpacity={0.1} strokeWidth={2} name="Busy Supply" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -153,7 +153,7 @@ export const ReportsPage: React.FC = () => {
               </h3>
               <p className="text-xs text-[#6B6B6B] mt-0.5">Expert travel arrival time vs 8-min target line</p>
             </div>
-            <span className="text-xs font-mono font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full">Target: 8.0 min</span>
+            <span className="text-xs font-mono font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full">Target: 8.0 min</span>
           </div>
 
           <div className="h-64 w-full">
@@ -163,7 +163,7 @@ export const ReportsPage: React.FC = () => {
                 <XAxis dataKey="time" stroke="#6B6B6B" fontSize={11} />
                 <YAxis domain={[4, 12]} stroke="#6B6B6B" fontSize={11} unit="m" />
                 <Tooltip contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EEEEF2', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)', fontSize: '12px', color: '#1F1F1F' }} />
-                <Line type="monotone" dataKey="eta" stroke="#5B21B6" strokeWidth={2.5} dot={{ r: 4, fill: '#5B21B6' }} name="Actual ETA" />
+                <Line type="monotone" dataKey="eta" stroke="#1B2E79" strokeWidth={2.5} dot={{ r: 4, fill: '#1B2E79' }} name="Actual ETA" />
                 <Line type="monotone" dataKey="target" stroke="#B42318" strokeDasharray="4 4" strokeWidth={2} name="SLA Target" />
               </LineChart>
             </ResponsiveContainer>
@@ -233,7 +233,7 @@ export const ReportsPage: React.FC = () => {
                   {mockMarketCapacityChart.map((entry, index) => (
                     <Cell 
                       key={`bar-${index}`} 
-                      fill={entry.capacity >= 90 ? '#B42318' : entry.capacity >= 70 ? '#C2410C' : '#5B21B6'} 
+                      fill={entry.capacity >= 90 ? '#B42318' : entry.capacity >= 70 ? '#C2410C' : '#1B2E79'} 
                     />
                   ))}
                 </Bar>

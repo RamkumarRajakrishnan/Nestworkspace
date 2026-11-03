@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { 
@@ -94,7 +94,7 @@ export const MarketDetailPage: React.FC = () => {
         <div className="flex items-start sm:items-center gap-3 min-w-0">
           <button
             onClick={() => navigate('/area')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer shrink-0 mt-0.5 sm:mt-0"
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors cursor-pointer shrink-0 mt-0.5 sm:mt-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -134,7 +134,7 @@ export const MarketDetailPage: React.FC = () => {
       {/* Loading State */}
       {isLoadingApi && (
         <div className="py-20 text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-[#5B21B6] mx-auto" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#1B2E79] mx-auto" />
           <div className="text-sm font-semibold text-[#1F1F1F]">Loading Market Telemetry...</div>
           <p className="text-xs text-[#6B6B6B]">
             Fetching market parameters and complete pricing tiers from API.
@@ -166,10 +166,10 @@ export const MarketDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
               <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[#5B21B6]" />
+                <MapPin className="h-4 w-4 text-[#1B2E79]" />
                 Geographic Boundary & Dispatch Spec
               </h3>
-              <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-1 rounded-lg">
+              <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-1 rounded-lg">
                 Pincode: {areaDetail.pincode ?? '—'}
               </span>
             </div>
@@ -178,7 +178,7 @@ export const MarketDetailPage: React.FC = () => {
               <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-3">
                 <span className="text-[10px] text-[#6B6B6B] uppercase font-mono">Working Hours</span>
                 <div className="font-semibold text-[#1F1F1F] mt-1 flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                  <Clock className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                   <span className="truncate">{areaDetail.workingHours || '—'}</span>
                 </div>
               </div>
@@ -240,7 +240,7 @@ export const MarketDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#EEEEF2] pb-3">
               <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-                <span className="font-bold text-sm text-[#5B21B6] font-mono">₹</span>
+                <span className="font-bold text-sm text-[#1B2E79] font-mono">₹</span>
                 <span>Complete Duration Tiers & Pricing Console ({durations.length})</span>
               </h3>
               <span className="text-xs text-[#6B6B6B] font-mono">
@@ -274,7 +274,7 @@ export const MarketDetailPage: React.FC = () => {
                     </thead>
                     <tbody className="divide-y divide-[#EEEEF2]">
                       {durations.map((d, idx) => (
-                        <tr key={d.tableId || idx} className="hover:bg-[#F5F3FF]/40 transition-colors">
+                        <tr key={d.tableId || idx} className="hover:bg-[#F5F8FF]/40 transition-colors">
                           <td className="px-3.5 py-3 font-semibold text-[#1F1F1F]">
                             <div className="flex items-center gap-1.5">
                               <span className="font-mono text-[10px] text-[#6B6B6B]">#{d.sequence ?? idx + 1}</span>
@@ -290,7 +290,7 @@ export const MarketDetailPage: React.FC = () => {
                           <td className="px-3.5 py-3 font-mono text-emerald-700 font-semibold">
                             {d.firstTimeUser != null ? `₹${d.firstTimeUser}` : '—'}
                           </td>
-                          <td className="px-3.5 py-3 font-mono text-[#7C3AED] font-semibold">
+                          <td className="px-3.5 py-3 font-mono text-[#162766] font-semibold">
                             {d.secoundtimeuser != null ? `₹${d.secoundtimeuser}` : '—'}
                           </td>
                           <td className="px-3.5 py-3 font-mono text-[#1F1F1F]">
@@ -301,7 +301,7 @@ export const MarketDetailPage: React.FC = () => {
                           </td>
                           <td className="px-3.5 py-3 text-center">
                             {d.badge ? (
-                              <span className="inline-block rounded-md bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-bold text-[#5B21B6]">
+                              <span className="inline-block rounded-md bg-[#EEF3FF] px-2 py-0.5 text-[10px] font-bold text-[#1B2E79]">
                                 {d.badge}
                               </span>
                             ) : (

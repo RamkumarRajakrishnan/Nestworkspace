@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Ticket, 
@@ -172,7 +172,7 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#EEEEF2] px-6 py-4 bg-[#FAF9FC] shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6]">
+            <div className="h-8 w-8 rounded-xl bg-[#EEF3FF] flex items-center justify-center text-[#1B2E79]">
               <Ticket className="h-4 w-4" />
             </div>
             <div>
@@ -200,9 +200,9 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
 
           {isLoading ? (
             <div className="space-y-4 py-4">
-              <div className="h-20 rounded-xl bg-[#F5F3FF] animate-pulse" />
-              <div className="h-10 rounded-xl bg-[#F5F3FF] animate-pulse" />
-              <div className="h-10 rounded-xl bg-[#F5F3FF] animate-pulse" />
+              <div className="h-20 rounded-xl bg-[#F5F8FF] animate-pulse" />
+              <div className="h-10 rounded-xl bg-[#F5F8FF] animate-pulse" />
+              <div className="h-10 rounded-xl bg-[#F5F8FF] animate-pulse" />
             </div>
           ) : (
             <>
@@ -210,7 +210,7 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
               {details && (
                 <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-md">
+                    <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-md">
                       {details.packId}
                     </span>
                     <span className="font-extrabold text-[#1F1F1F] text-sm">
@@ -220,11 +220,11 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
 
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#EEEEF2] text-[#6B6B6B]">
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="h-3 w-3 text-[#5B21B6]" />
+                      <MapPin className="h-3 w-3 text-[#1B2E79]" />
                       <span className="truncate">{details.areaName}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Layers className="h-3 w-3 text-[#5B21B6]" />
+                      <Layers className="h-3 w-3 text-[#1B2E79]" />
                       <span>{details.packType} • {details.visits} Visits</span>
                     </div>
                   </div>
@@ -238,7 +238,7 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
 
               {/* Editable Fields: Active & Offer Expiry */}
               <div className="space-y-4 pt-2">
-                <h3 className="text-xs font-bold text-[#5B21B6] uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-[#1B2E79] uppercase tracking-wider">
                   Update Configuration
                 </h3>
 
@@ -280,7 +280,7 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
                       value={offerexpire}
                       onChange={(e) => setOfferexpire(e.target.value)}
                       required
-                      className="w-full rounded-xl border border-[#EEEEF2] bg-white pl-9 pr-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden"
+                      className="w-full rounded-xl border border-[#EEEEF2] bg-white pl-9 pr-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#162766] focus:outline-hidden"
                     />
                   </div>
                   <p className="text-[11px] text-[#6B6B6B] mt-1">
@@ -309,7 +309,7 @@ export const EditNestPassModal: React.FC<EditNestPassModalProps> = ({
             <button
               type="submit"
               disabled={isSaving || isLoading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <>

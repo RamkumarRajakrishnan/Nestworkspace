@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import clsx from 'clsx';
 import { LucideIcon } from 'lucide-react';
 
@@ -38,7 +38,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         return 'bg-white/20 text-white';
       default:
         // Worker app default: soft circular light-purple icon container!
-        return 'bg-[#EDE9FE] text-[#5B21B6]';
+        return 'bg-[#EEF3FF] text-[#1B2E79]';
     }
   };
 
@@ -50,8 +50,8 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       className={clsx(
         'group relative rounded-2xl border transition-all duration-200 p-3 sm:p-3.5',
         isPurpleHighlight
-          ? 'bg-gradient-to-br from-[#5B21B6] to-[#7C3AED] text-white border-transparent shadow-soft-md'
-          : 'bg-white border-[#EEEEF2] text-[#1F1F1F] shadow-soft-sm hover:shadow-soft-md hover:border-[#DDD6FE]',
+          ? 'bg-gradient-to-br from-[#1B2E79] to-[#162766] text-white border-transparent shadow-soft-md'
+          : 'bg-white border-[#EEEEF2] text-[#1F1F1F] shadow-soft-sm hover:shadow-soft-md hover:border-[#C4D9FD]',
         onClick && 'cursor-pointer active:scale-[0.99]'
       )}
     >
@@ -88,7 +88,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         <p
           className={clsx(
             'text-[11px] font-semibold uppercase tracking-wider',
-            isPurpleHighlight ? 'text-purple-200' : 'text-[#6B6B6B]'
+            isPurpleHighlight ? 'text-blue-200' : 'text-[#6B6B6B]'
           )}
         >
           {title}
@@ -105,7 +105,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
           <p
             className={clsx(
               'text-[10px] sm:text-[11px]',
-              isPurpleHighlight ? 'text-purple-200/90' : 'text-[#6B6B6B]'
+              isPurpleHighlight ? 'text-blue-200/90' : 'text-[#6B6B6B]'
             )}
           >
             {subtext}

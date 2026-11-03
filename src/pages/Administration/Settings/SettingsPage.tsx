@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
 import { 
   Settings, 
@@ -63,7 +63,7 @@ export const SettingsPage: React.FC = () => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all ${
                 activeTab === tab.id
-                  ? 'bg-[#EDE9FE] border border-[#DDD6FE] text-[#5B21B6] shadow-soft-sm'
+                  ? 'bg-[#EEF3FF] border border-[#C4D9FD] text-[#1B2E79] shadow-soft-sm'
                   : 'bg-white border border-[#EEEEF2] text-[#6B6B6B] hover:text-[#1F1F1F] hover:bg-[#FAF9FC] shadow-soft-sm'
               }`}
             >
@@ -90,7 +90,7 @@ export const SettingsPage: React.FC = () => {
                     type="number"
                     value={initialRadius}
                     onChange={(e) => setInitialRadius(e.target.value)}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#5B21B6]"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#1B2E79]"
                   />
                   <span className="font-mono text-[#6B6B6B]">meters</span>
                 </div>
@@ -104,7 +104,7 @@ export const SettingsPage: React.FC = () => {
                     type="number"
                     value={maxRadius}
                     onChange={(e) => setMaxRadius(e.target.value)}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#5B21B6]"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#1B2E79]"
                   />
                   <span className="font-mono text-[#6B6B6B]">meters</span>
                 </div>
@@ -118,7 +118,7 @@ export const SettingsPage: React.FC = () => {
                     type="number"
                     value={slaMinutes}
                     onChange={(e) => setSlaMinutes(e.target.value)}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#5B21B6]"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#1B2E79]"
                   />
                   <span className="font-mono text-[#6B6B6B]">minutes</span>
                 </div>
@@ -133,7 +133,7 @@ export const SettingsPage: React.FC = () => {
                       type="checkbox"
                       checked={autoDispatch}
                       onChange={(e) => setAutoDispatch(e.target.checked)}
-                      className="rounded border-[#EEEEF2] text-[#5B21B6] focus:ring-0 accent-[#5B21B6]"
+                      className="rounded border-[#EEEEF2] text-[#1B2E79] focus:ring-0 accent-[#1B2E79]"
                     />
                     Enable automated batch candidate matching
                   </label>
@@ -144,7 +144,7 @@ export const SettingsPage: React.FC = () => {
             <div className="flex justify-end border-t border-[#EEEEF2] pt-4">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
+                className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95"
               >
                 <Save className="h-4 w-4" /> Save Dispatch Rules
               </button>
@@ -166,7 +166,7 @@ export const SettingsPage: React.FC = () => {
                     type="number"
                     value={surgeThreshold}
                     onChange={(e) => setSurgeThreshold(e.target.value)}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#5B21B6]"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#1B2E79]"
                   />
                   <span className="font-mono text-[#6B6B6B]">%</span>
                 </div>
@@ -186,7 +186,7 @@ export const SettingsPage: React.FC = () => {
             <div className="flex justify-end border-t border-[#EEEEF2] pt-4">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
+                className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95"
               >
                 <Save className="h-4 w-4" /> Save Market Policies
               </button>
@@ -208,7 +208,7 @@ export const SettingsPage: React.FC = () => {
                     type="number"
                     value={gpsTimeout}
                     onChange={(e) => setGpsTimeout(e.target.value)}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#5B21B6]"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2 font-mono text-[#1F1F1F] focus:outline-none focus:border-[#1B2E79]"
                   />
                   <span className="font-mono text-[#6B6B6B]">minutes</span>
                 </div>
@@ -226,7 +226,7 @@ export const SettingsPage: React.FC = () => {
             <div className="flex justify-end border-t border-[#EEEEF2] pt-4">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
+                className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95"
               >
                 <Save className="h-4 w-4" /> Save Expert Rules
               </button>
@@ -261,10 +261,10 @@ export const SettingsPage: React.FC = () => {
           <div className="space-y-5 text-xs">
             <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
               <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-                <Database className="h-4 w-4 text-[#5B21B6]" />
+                <Database className="h-4 w-4 text-[#1B2E79]" />
                 Phase 2 Architecture & Integration Blueprint
               </h3>
-              <span className="rounded-lg bg-[#EDE9FE] text-[#5B21B6] font-mono font-semibold text-[10px] px-2 py-0.5">
+              <span className="rounded-lg bg-[#EEF3FF] text-[#1B2E79] font-mono font-semibold text-[10px] px-2 py-0.5">
                 Ready for Backend Handoff
               </span>
             </div>
@@ -295,7 +295,7 @@ export const SettingsPage: React.FC = () => {
               </div>
 
               <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2">
-                <div className="flex items-center gap-2 text-[#5B21B6] font-semibold text-xs">
+                <div className="flex items-center gap-2 text-[#1B2E79] font-semibold text-xs">
                   <Radio className="h-4 w-4" />
                   WebSockets / SSE Live Sync
                 </div>
@@ -305,7 +305,7 @@ export const SettingsPage: React.FC = () => {
               </div>
 
               <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2">
-                <div className="flex items-center gap-2 text-[#7C3AED] font-semibold text-xs">
+                <div className="flex items-center gap-2 text-[#162766] font-semibold text-xs">
                   <Zap className="h-4 w-4" />
                   Dispatch Engine Microservice
                 </div>

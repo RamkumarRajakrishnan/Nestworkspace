@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Drawer } from '../common/Drawer';
 import { useOperations } from '../../context/OperationsContext';
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +39,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
       case 'high':
         return <AlertTriangle className="h-4 w-4 text-[#C2410C] shrink-0" />;
       default:
-        return <Info className="h-4 w-4 text-[#5B21B6] shrink-0" />;
+        return <Info className="h-4 w-4 text-[#1B2E79] shrink-0" />;
     }
   };
 
@@ -53,7 +53,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
       actions={
         <button
           onClick={() => notifications.forEach((n) => markNotificationRead(n.id))}
-          className="text-xs text-[#5B21B6] hover:text-[#4C1D95] transition-colors flex items-center gap-1 font-bold"
+          className="text-xs text-[#1B2E79] hover:text-[#13225C] transition-colors flex items-center gap-1 font-bold"
         >
           <Check className="h-3.5 w-3.5" /> Mark all read
         </button>
@@ -69,7 +69,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
               className={clsx(
                 'rounded-xl px-3 py-1.5 text-xs font-semibold transition-all',
                 filterCategory === cat
-                  ? 'bg-[#EDE9FE] text-[#5B21B6] shadow-soft-sm'
+                  ? 'bg-[#EEF3FF] text-[#1B2E79] shadow-soft-sm'
                   : 'bg-[#F7F5FA] text-[#6B6B6B] hover:text-[#1F1F1F]'
               )}
             >
@@ -92,7 +92,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
                   'rounded-2xl border p-4 transition-all',
                   n.read
                     ? 'border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B]'
-                    : 'border-[#DDD6FE] bg-white text-[#1F1F1F] shadow-soft-sm'
+                    : 'border-[#C4D9FD] bg-white text-[#1F1F1F] shadow-soft-sm'
                 )}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -101,7 +101,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs font-bold text-[#1F1F1F]">{n.title}</h4>
-                        <span className="rounded-full bg-[#F5F3FF] border border-[#DDD6FE] px-2 py-0.5 text-[10px] font-mono text-[#5B21B6] font-semibold">
+                        <span className="rounded-full bg-[#F5F8FF] border border-[#C4D9FD] px-2 py-0.5 text-[10px] font-mono text-[#1B2E79] font-semibold">
                           {n.category}
                         </span>
                       </div>
@@ -114,7 +114,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
                     <button
                       onClick={() => markNotificationRead(n.id)}
                       title="Mark as read"
-                      className="text-[#9CA3AF] hover:text-[#5B21B6] p-1"
+                      className="text-[#9CA3AF] hover:text-[#1B2E79] p-1"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </button>
@@ -125,7 +125,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
                   <div className="mt-3 flex justify-end border-t border-[#EEEEF2] pt-2.5">
                     <button
                       onClick={() => handleAction(n.actionUrl, n.id)}
-                      className="rounded-xl bg-[#EDE9FE] px-3 py-1.5 text-[11px] font-bold text-[#5B21B6] hover:bg-[#DDD6FE] transition-colors"
+                      className="rounded-xl bg-[#EEF3FF] px-3 py-1.5 text-[11px] font-bold text-[#1B2E79] hover:bg-[#C4D9FD] transition-colors"
                     >
                       {n.actionLabel} →
                     </button>

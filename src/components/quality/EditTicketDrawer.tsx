@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Drawer } from '../common/Drawer';
 import { StatusBadge } from '../common/StatusBadge';
 import { CustomerTicketItem } from '../../types';
@@ -139,7 +139,7 @@ export const EditTicketDrawer: React.FC<EditTicketDrawerProps> = ({
         {/* Ticket Context Info Card */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2.5 shadow-soft-xs">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full">
+            <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full">
               {ticket.category || 'Nest Booking'}
             </span>
             <StatusBadge status={currentStatus} size="sm" />
@@ -184,8 +184,8 @@ export const EditTicketDrawer: React.FC<EditTicketDrawerProps> = ({
               onClick={() => setIsDropdownOpen((prev) => !prev)}
               className={`w-full flex items-center justify-between gap-2.5 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-all shadow-soft-xs cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed ${
                 isDropdownOpen
-                  ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                  ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
               }`}
               aria-haspopup="listbox"
               aria-expanded={isDropdownOpen}
@@ -197,7 +197,7 @@ export const EditTicketDrawer: React.FC<EditTicketDrawerProps> = ({
               {/* Clear down-arrow/chevron icon indicating dropdown state */}
               <ChevronDown
                 className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
-                  isDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                  isDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                 }`}
               />
             </button>
@@ -220,14 +220,14 @@ export const EditTicketDrawer: React.FC<EditTicketDrawerProps> = ({
                         }}
                         className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-left ${
                           isSelected
-                            ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                            ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                             : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                         }`}
                       >
                         <div className="flex items-center min-w-0">
                           <StatusBadge status={st} size="sm" />
                         </div>
-                        {isSelected && <Check className="h-4 w-4 text-[#5B21B6] shrink-0" />}
+                        {isSelected && <Check className="h-4 w-4 text-[#1B2E79] shrink-0" />}
                       </button>
                     );
                   })}
@@ -254,7 +254,7 @@ export const EditTicketDrawer: React.FC<EditTicketDrawerProps> = ({
           <button
             type="submit"
             disabled={isUpdating}
-            className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {isUpdating ? (
               <>

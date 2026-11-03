@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
 import { WorkerDocument, DocStatus } from '../../../types';
 import { KpiCard } from '../../../components/common/KpiCard';
@@ -6,6 +6,7 @@ import { DataTable, Column } from '../../../components/common/DataTable';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { DocumentReviewModal } from '../../../components/workforce/DocumentReviewModal';
 import { SearchInput } from '../../../components/common/SearchInput';
+import { Pagination } from '../../../components/common/Pagination';
 import { 
   ShieldCheck, 
   Clock, 
@@ -27,6 +28,10 @@ export const CompliancePage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  // Pagination state
+  const [page, setPage] = useState<number>(1);
+  const PAGE_SIZE = 15;
 
   // Filter Popover state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -71,6 +76,7 @@ export const CompliancePage: React.FC = () => {
     setSelectedStatuses([...draftStatuses]);
     setSelectedTypes([...draftTypes]);
     setIsFilterOpen(false);
+    setPage(1);
   };
 
   const handleRemoveFilters = () => {
@@ -79,6 +85,7 @@ export const CompliancePage: React.FC = () => {
     setDraftStatuses([]);
     setDraftTypes([]);
     setSearch('');
+    setPage(1);
   };
 
   const activeFilterCount = useMemo(() => {
@@ -121,6 +128,14 @@ export const CompliancePage: React.FC = () => {
     });
   }, [documents, search, selectedStatuses, selectedTypes]);
 
+  const totalPages = Math.ceil(filteredDocs.length / PAGE_SIZE) || 1;
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
+  const paginatedDocs = useMemo(() => {
+    const startIndex = (safePage - 1) * PAGE_SIZE;
+    return filteredDocs.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredDocs, safePage, PAGE_SIZE]);
+
   const toggleItem = (list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     if (list.includes(item)) {
       setList(list.filter((x) => x !== item));
@@ -148,7 +163,7 @@ export const CompliancePage: React.FC = () => {
       header: 'Document / Policy ID',
       accessor: 'documentNumber',
       render: (d) => (
-        <span className="font-mono text-[#5B21B6] font-semibold text-xs bg-[#EDE9FE] px-2 py-0.5 rounded-lg inline-block">
+        <span className="font-mono text-[#1B2E79] font-semibold text-xs bg-[#EEF3FF] px-2 py-0.5 rounded-lg inline-block">
           {d.documentNumber}
         </span>
       ),
@@ -186,7 +201,7 @@ export const CompliancePage: React.FC = () => {
             e.stopPropagation();
             setSelectedDoc(d);
           }}
-          className="rounded-xl bg-[#5B21B6] text-white px-3 py-1.5 text-xs font-semibold hover:bg-[#4C1D95] shadow-soft-sm transition-all flex items-center gap-1.5 ml-auto active:scale-95"
+          className="rounded-xl bg-[#1B2E79] text-white px-3 py-1.5 text-xs font-semibold hover:bg-[#13225C] shadow-soft-sm transition-all flex items-center gap-1.5 ml-auto active:scale-95"
         >
           <Eye className="h-3.5 w-3.5" /> Review Document
         </button>
@@ -251,7 +266,10 @@ export const CompliancePage: React.FC = () => {
           <div className="w-full sm:max-w-md">
             <SearchInput
               value={search}
-              onChange={setSearch}
+              onChange={(val) => {
+                setSearch(val);
+                setPage(1);
+              }}
               placeholder="Search partner name, ID, doc number..."
               className="w-full"
             />
@@ -282,16 +300,16 @@ export const CompliancePage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -308,11 +326,11 @@ export const CompliancePage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Documents</h3>
                   </div>
                   <button
@@ -335,13 +353,13 @@ export const CompliancePage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Verification Status</span>
                         {draftStatuses.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatuses.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -359,7 +377,7 @@ export const CompliancePage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftStatuses.includes(st)}
                                 onChange={() => toggleItem(draftStatuses, setDraftStatuses, st)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {st}
@@ -384,13 +402,13 @@ export const CompliancePage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Document Category</span>
                         {draftTypes.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftTypes.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.type ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -408,7 +426,7 @@ export const CompliancePage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftTypes.includes(t)}
                                 onChange={() => toggleItem(draftTypes, setDraftTypes, t)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {t}
@@ -439,7 +457,7 @@ export const CompliancePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
                   >
                     Apply ({draftMatchingCount} docs)
                   </button>
@@ -456,10 +474,13 @@ export const CompliancePage: React.FC = () => {
 
             {/* Status chips */}
             {selectedStatuses.map((st) => (
-              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {st}
                 <button 
-                  onClick={() => setSelectedStatuses(selectedStatuses.filter((x) => x !== st))} 
+                  onClick={() => {
+                    setSelectedStatuses(selectedStatuses.filter((x) => x !== st));
+                    setPage(1);
+                  }} 
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -469,10 +490,13 @@ export const CompliancePage: React.FC = () => {
 
             {/* Type chips */}
             {selectedTypes.map((t) => (
-              <span key={t} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={t} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Type: {t}
                 <button 
-                  onClick={() => setSelectedTypes(selectedTypes.filter((x) => x !== t))} 
+                  onClick={() => {
+                    setSelectedTypes(selectedTypes.filter((x) => x !== t));
+                    setPage(1);
+                  }} 
                   className="hover:text-rose-600 transition-colors"
                 >
                   <X className="h-3 w-3" />
@@ -486,11 +510,20 @@ export const CompliancePage: React.FC = () => {
       {/* Documents Table */}
       <DataTable
         columns={columns}
-        data={filteredDocs}
+        data={paginatedDocs}
         keyExtractor={(d) => d.id}
         onRowClick={(d) => setSelectedDoc(d)}
         emptyTitle="No documents match criteria"
         emptyDescription="All partner compliance records have been processed."
+      />
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={safePage}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        totalRecords={filteredDocs.length}
+        pageSize={PAGE_SIZE}
       />
 
       {/* Review Modal */}

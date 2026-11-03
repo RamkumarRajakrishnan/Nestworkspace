@@ -602,7 +602,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Panel */}
       <aside
-        className={`fixed z-[60] md:z-40 flex flex-col border-r border-purple-900 bg-purple-800 transition-transform duration-300 ease-in-out md:transition-all ${
+        className={`fixed z-[60] md:z-40 flex flex-col border-r border-[#14235E] bg-[#1B2E79] transition-transform duration-300 ease-in-out md:transition-all ${
           /* Mobile Drawer: fixed off-canvas from left */
           mobileOpen
             ? 'top-0 bottom-0 left-0 translate-x-0 w-64 max-w-[80vw] shadow-2xl'
@@ -613,11 +613,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }`}
       >
         {/* Mobile Drawer Top Header: strictly visible below md (< 768px) */}
-        <div className="flex md:hidden items-center justify-end px-3.5 py-3 border-b border-purple-900 bg-purple-900/60 shrink-0">
+        <div className="flex md:hidden items-center justify-end px-3.5 py-3 border-b border-[#14235E] bg-[#14235E]/90 shrink-0">
           <button
             type="button"
             onClick={() => setMobileOpen?.(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-950/40 hover:bg-purple-700/60 text-white transition-colors cursor-pointer focus:outline-none"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus:outline-none"
             title="Close navigation menu"
             aria-label="Close navigation menu"
           >
@@ -629,7 +629,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           type="button"
           onClick={() => setCollapsed((prev) => !prev)}
-          className="hidden md:flex absolute left-[calc(100%-1px)] top-3.5 z-40 h-7 w-4 items-center justify-center rounded-r-full rounded-l-none border-y border-r border-l-0 border-purple-300 bg-white text-[#5B21B6] shadow-sm hover:bg-[#F5F3FF] hover:text-[#4C1D95] active:scale-95 transition-all cursor-pointer select-none focus:outline-none"
+          className="hidden md:flex absolute left-[calc(100%-1px)] top-3.5 z-40 h-7 w-4 items-center justify-center rounded-r-full rounded-l-none border-y border-r border-l-0 border-[#14235E] bg-white text-black shadow-sm hover:bg-[#F5F8FF] hover:text-black active:scale-95 transition-all cursor-pointer select-none focus:outline-none"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -660,8 +660,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'gap-3 px-3.5'
                   } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 ${
                     isActive
-                      ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                      : 'text-white hover:bg-purple-700/60 hover:text-white'
+                      ? 'bg-white text-black font-bold shadow-soft-xs'
+                      : 'text-white hover:bg-white/10 hover:text-white'
                   }`}
                   title={collapsed ? item.name : undefined}
                 >
@@ -691,8 +691,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'justify-between px-3.5'
                   } rounded-xl py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer select-none ${
                     isGroupActive && !isExpanded
-                      ? 'bg-purple-700/80 text-white font-bold'
-                      : 'text-white hover:bg-purple-700/60 hover:text-white'
+                      ? 'bg-white/15 text-white font-bold'
+                      : 'text-white hover:bg-white/10 hover:text-white'
                   }`}
                   title={collapsed ? item.name : undefined}
                   aria-expanded={isExpanded}
@@ -706,7 +706,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   {/* Dropdown Chevron */}
                   <ChevronDown
-                    className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 text-purple-200 ${
+                    className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 text-white/70 ${
                       isExpanded ? 'rotate-180 text-white' : ''
                     } ${collapsed ? 'block md:hidden' : 'block'}`}
                   />
@@ -715,7 +715,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Sub-menu Child Items */}
                 {isExpanded && (
                   <div
-                    className={`mt-1 space-y-0.5 pl-4 pr-1 animate-in fade-in slide-in-from-top-1 duration-150 border-l border-purple-700/60 ml-4 ${
+                    className={`mt-1 space-y-0.5 pl-4 pr-1 animate-in fade-in slide-in-from-top-1 duration-150 border-l border-white/20 ml-4 ${
                       collapsed ? 'block md:hidden' : 'block'
                     }`}
                   >
@@ -730,8 +730,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           onClick={() => setMobileOpen?.(false)}
                           className={`group relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 ${
                             active
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                              : 'text-purple-100 hover:bg-purple-700/60 hover:text-white'
+                              ? 'bg-white text-black font-bold shadow-soft-xs'
+                              : 'text-white/80 hover:bg-white/10 hover:text-white'
                           }`}
                         >
                           <ChildIcon className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
@@ -748,15 +748,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Operations Telemetry Footer */}
         <div
-          className={`border-t border-purple-900/60 p-2.5 sm:p-3 bg-purple-800/80 shrink-0 ${
+          className={`border-t border-[#14235E] p-2.5 sm:p-3 bg-[#14235E]/40 shrink-0 ${
             collapsed ? 'block md:hidden' : 'block'
           }`}
         >
-          <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl bg-purple-900/50 p-2 sm:p-2.5 border border-purple-700/50 shadow-soft-sm">
+          <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl bg-white/10 p-2 sm:p-2.5 border border-[#14235E]/80 shadow-soft-sm">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className="text-[11px] font-bold text-white truncate">Dispatch Engine Live</span>
-              <span className="text-[10px] text-purple-200 font-mono truncate">Cluster: Bengaluru South</span>
+              <span className="text-[10px] text-white/70 font-mono truncate">Cluster: Bengaluru South</span>
             </div>
           </div>
         </div>
@@ -772,8 +772,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             transform: 'translateY(-50%)',
           }}
         >
-          <div className="relative rounded-lg bg-[#5B21B6] px-3 py-1.5 text-xs font-semibold text-white shadow-xl shadow-purple-950/40 border border-purple-400/30 whitespace-nowrap flex items-center">
-            <span className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#5B21B6]" />
+          <div className="relative rounded-lg bg-[#14235E] px-3 py-1.5 text-xs font-semibold text-white shadow-xl shadow-blue-950/40 border border-white/20 whitespace-nowrap flex items-center">
+            <span className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#14235E]" />
             {activeTooltip.text}
           </div>
         </div>

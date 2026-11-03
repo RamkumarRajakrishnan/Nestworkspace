@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   X,
   Plus,
@@ -683,7 +683,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
         <div className="flex items-start justify-between border-b border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-5 shrink-0 gap-2">
           <div className="min-w-0 flex-1 pr-2">
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#5B21B6]/10 text-[#5B21B6] shrink-0">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1B2E79]/10 text-[#1B2E79] shrink-0">
                 <MapPin className="h-4 w-4" />
               </span>
               <h2 className="text-base sm:text-lg font-bold text-[#1F1F1F] truncate">Create New Market</h2>
@@ -697,7 +697,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors cursor-pointer disabled:opacity-50"
+            className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EEF3FF] hover:text-[#1B2E79] transition-colors cursor-pointer disabled:opacity-50"
             title="Close"
           >
             <X className="h-4 w-4" />
@@ -716,7 +716,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
 
           {/* SECTION 1: Market Core Identity */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#5B21B6]">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1B2E79]">
               <Compass className="h-3.5 w-3.5" />
               <span>1. Market Identity & Location</span>
             </div>
@@ -741,14 +741,14 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                         ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400'
                         : areaNameStatus === 'available'
                         ? 'border-emerald-500 bg-emerald-50/30'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
                     }`}
                   />
 
                   {/* Indicator Icon */}
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
                     {areaNameStatus === 'checking' && (
-                      <Loader2 className="h-4 w-4 animate-spin text-[#5B21B6]" />
+                      <Loader2 className="h-4 w-4 animate-spin text-[#1B2E79]" />
                     )}
                     {areaNameStatus === 'available' && (
                       <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -789,7 +789,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     className={`w-full flex items-center justify-between rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs font-semibold transition-all text-left ${
                       errors.city
                         ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400 text-[#1F1F1F]'
-                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                     }`}
                   >
                     <span className={city ? 'text-[#1F1F1F]' : 'text-[#9E9E9E]'}>
@@ -797,7 +797,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     </span>
                     <ChevronDown
                       className={`h-4 w-4 text-[#6B6B6B] transition-transform ${
-                        isCityDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                        isCityDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                       }`}
                     />
                   </button>
@@ -812,7 +812,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             value={citySearchTerm}
                             onChange={(e) => setCitySearchTerm(e.target.value)}
                             placeholder="Search city..."
-                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6]"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79]"
                             autoFocus
                             onClick={(e) => e.stopPropagation()}
                           />
@@ -835,8 +835,8 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                               city === c
-                                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
-                                : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6]'
+                                ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
+                                : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                             }`}
                           >
                             {c}
@@ -861,7 +861,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     className={`w-full flex items-center justify-between rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs font-semibold transition-all text-left ${
                       errors.state
                         ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400 text-[#1F1F1F]'
-                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                     }`}
                   >
                     <span className={state ? 'text-[#1F1F1F]' : 'text-[#9E9E9E]'}>
@@ -869,7 +869,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     </span>
                     <ChevronDown
                       className={`h-4 w-4 text-[#6B6B6B] transition-transform ${
-                        isStateDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                        isStateDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                       }`}
                     />
                   </button>
@@ -884,7 +884,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             value={stateSearchTerm}
                             onChange={(e) => setStateSearchTerm(e.target.value)}
                             placeholder="Search state..."
-                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6]"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79]"
                             autoFocus
                             onClick={(e) => e.stopPropagation()}
                           />
@@ -907,8 +907,8 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                               state === s
-                                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
-                                : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6]'
+                                ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
+                                : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                             }`}
                           >
                             {s}
@@ -942,8 +942,8 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     errors.country
                       ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400 text-[#1F1F1F]'
                       : country
-                      ? 'border-[#EEEEF2] text-[#1F1F1F] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
-                      : 'border-[#EEEEF2] text-[#9E9E9E] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
+                      ? 'border-[#EEEEF2] text-[#1F1F1F] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
+                      : 'border-[#EEEEF2] text-[#9E9E9E] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
                   }`}
                 >
                   <option value="">Select country</option>
@@ -967,7 +967,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] transition-all focus:outline-none ${
                     errors.pincode
                       ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
                   }`}
                 />
                 {errors.pincode && (
@@ -987,18 +987,18 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     className={`w-full flex items-center justify-between rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs font-semibold transition-all text-left ${
                       errors.workingHours
                         ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400 text-[#1F1F1F]'
-                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                        : 'border-[#EEEEF2] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <Clock className="h-3.5 w-3.5 text-[#5B21B6]" />
+                      <Clock className="h-3.5 w-3.5 text-[#1B2E79]" />
                       <span className={workingHours ? 'text-[#1F1F1F]' : 'text-[#9E9E9E]'}>
                         {workingHours || 'Select working hours'}
                       </span>
                     </div>
                     <ChevronDown
                       className={`h-4 w-4 text-[#6B6B6B] transition-transform ${
-                        isHoursDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                        isHoursDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                       }`}
                     />
                   </button>
@@ -1020,8 +1020,8 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                           }}
                           className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                             workingHours === h
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
-                              : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6]'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
+                              : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                           }`}
                         >
                           {h}
@@ -1037,7 +1037,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
 
           {/* SECTION 2: Geographic Coordinates & Dispatch Radius */}
           <div className="space-y-4 border-t border-[#EEEEF2] pt-5">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#5B21B6]">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1B2E79]">
               <MapPin className="h-3.5 w-3.5" />
               <span>2. Geography & Dispatch Telemetry</span>
             </div>
@@ -1063,7 +1063,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] transition-all focus:outline-none ${
                     errors.latitude
                       ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
                   }`}
                 />
                 {errors.latitude && (
@@ -1091,7 +1091,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] transition-all focus:outline-none ${
                     errors.longitude
                       ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
                   }`}
                 />
                 {errors.longitude && (
@@ -1122,7 +1122,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] transition-all focus:outline-none ${
                     errors.coverageRadius
                       ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400'
-                      : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:bg-white focus:ring-2 focus:ring-[#5B21B6]/15'
+                      : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:bg-white focus:ring-2 focus:ring-[#1B2E79]/15'
                   }`}
                 />
                 {errors.coverageRadius && (
@@ -1149,7 +1149,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   }}
                   placeholder="Enter surge pricing"
                   className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] focus:outline-none ${
-                    errors.surgePricing ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400' : 'border-[#EEEEF2] focus:border-[#5B21B6]'
+                    errors.surgePricing ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400' : 'border-[#EEEEF2] focus:border-[#1B2E79]'
                   }`}
                 />
                 {errors.surgePricing && (
@@ -1172,7 +1172,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     });
                   }}
                   placeholder="Enter estimated time"
-                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6] ${
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79] ${
                     errors.estimatedTimeInMinutes ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400' : 'border-[#EEEEF2]'
                   }`}
                 />
@@ -1196,7 +1196,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                     });
                   }}
                   placeholder="Enter nearest worker distance"
-                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6] ${
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono text-[#1F1F1F] bg-[#FAF9FC] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79] ${
                     errors.nearestWorkerDistanceMeters ? 'border-rose-400 bg-rose-50/40 ring-1 ring-rose-400' : 'border-[#EEEEF2]'
                   }`}
                 />
@@ -1218,7 +1218,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   type="button"
                   onClick={() => setIsActive((prev) => !prev)}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    isActive ? 'bg-[#5B21B6]' : 'bg-[#D1D5DB]'
+                    isActive ? 'bg-[#1B2E79]' : 'bg-[#D1D5DB]'
                   }`}
                 >
                   <span
@@ -1239,7 +1239,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   type="button"
                   onClick={() => setPriorityArea((prev) => !prev)}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    priorityArea ? 'bg-[#5B21B6]' : 'bg-[#D1D5DB]'
+                    priorityArea ? 'bg-[#1B2E79]' : 'bg-[#D1D5DB]'
                   }`}
                 >
                   <span
@@ -1260,7 +1260,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                   type="button"
                   onClick={() => setWorkersAvailable((prev) => !prev)}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    workersAvailable ? 'bg-[#5B21B6]' : 'bg-[#D1D5DB]'
+                    workersAvailable ? 'bg-[#1B2E79]' : 'bg-[#D1D5DB]'
                   }`}
                 >
                   <span
@@ -1277,8 +1277,8 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
           <div className="space-y-4 border-t border-[#EEEEF2] pt-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#5B21B6]">
-                  <span className="font-bold text-sm leading-none font-mono text-[#5B21B6]">₹</span>
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1B2E79]">
+                  <span className="font-bold text-sm leading-none font-mono text-[#1B2E79]">₹</span>
                   <span>3. Duration Tiers & User Pricing</span>
                 </div>
                 <p className="text-[11px] text-[#6B6B6B] mt-0.5">
@@ -1298,7 +1298,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                       }
                     }}
                     defaultValue=""
-                    className="rounded-xl border border-[#5B21B6]/30 bg-[#EDE9FE] px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#DDD6FE] transition-colors focus:outline-none cursor-pointer"
+                    className="rounded-xl border border-[#1B2E79]/30 bg-[#EEF3FF] px-3 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#C4D9FD] transition-colors focus:outline-none cursor-pointer"
                   >
                     <option value="" disabled>
                       Select duration
@@ -1337,12 +1337,12 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                 return (
                   <div
                     key={item.id}
-                    className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 transition-all hover:border-[#DDD6FE] space-y-3"
+                    className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 transition-all hover:border-[#C4D9FD] space-y-3"
                   >
                     {/* Duration Card Top Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#EEEEF2] pb-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#5B21B6] text-[11px] font-bold text-white font-mono">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#1B2E79] text-[11px] font-bold text-white font-mono">
                           #{index + 1}
                         </span>
                         <div className="text-sm font-bold text-[#1F1F1F] flex items-center gap-2">
@@ -1363,7 +1363,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             type="button"
                             onClick={() => updateDurationItem(item.id, { isActive: !item.isActive })}
                             className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                              item.isActive ? 'bg-[#5B21B6]' : 'bg-[#D1D5DB]'
+                              item.isActive ? 'bg-[#1B2E79]' : 'bg-[#D1D5DB]'
                             }`}
                           >
                             <span
@@ -1417,8 +1417,8 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                               durationError
                                 ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F]'
                                 : item.duration
-                                ? 'border-[#EEEEF2] text-[#1F1F1F] focus:border-[#5B21B6]'
-                                : 'border-[#EEEEF2] text-[#9E9E9E] focus:border-[#5B21B6]'
+                                ? 'border-[#EEEEF2] text-[#1F1F1F] focus:border-[#1B2E79]'
+                                : 'border-[#EEEEF2] text-[#9E9E9E] focus:border-[#1B2E79]'
                             }`}
                           >
                             <option value="">Select duration</option>
@@ -1457,7 +1457,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             placeholder="Enter price"
                             className={`w-full rounded-xl border px-3 py-2 text-xs font-mono text-[#1F1F1F] bg-white placeholder:text-[#9E9E9E] focus:outline-none ${
-                              priceError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#5B21B6]'
+                              priceError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#1B2E79]'
                             }`}
                           />
                           {priceError && <p className="text-[10px] text-rose-600">{priceError}</p>}
@@ -1483,7 +1483,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             placeholder="Enter original price"
                             className={`w-full rounded-xl border px-3 py-2 text-xs font-mono text-[#1F1F1F] bg-white placeholder:text-[#9E9E9E] focus:outline-none ${
-                              origPriceError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#5B21B6]'
+                              origPriceError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#1B2E79]'
                             }`}
                           />
                           {origPriceError && <p className="text-[10px] text-rose-600">{origPriceError}</p>}
@@ -1501,7 +1501,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                               })
                             }
                             placeholder="Enter badge"
-                            className="w-full rounded-xl border border-[#EEEEF2] bg-white px-3 py-2 text-xs font-medium text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6]"
+                            className="w-full rounded-xl border border-[#EEEEF2] bg-white px-3 py-2 text-xs font-medium text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79]"
                           />
                         </div>
                       </div>
@@ -1528,7 +1528,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             placeholder="Enter first-time user price"
                             className={`w-full rounded-xl border px-3 py-2 text-xs font-mono text-[#1F1F1F] bg-white placeholder:text-[#9E9E9E] focus:outline-none ${
-                              firstUserError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#5B21B6]'
+                              firstUserError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#1B2E79]'
                             }`}
                           />
                           {firstUserError && <p className="text-[10px] text-rose-600">{firstUserError}</p>}
@@ -1554,7 +1554,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             placeholder="Enter second-time user price"
                             className={`w-full rounded-xl border px-3 py-2 text-xs font-mono text-[#1F1F1F] bg-white placeholder:text-[#9E9E9E] focus:outline-none ${
-                              secoundUserError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#5B21B6]'
+                              secoundUserError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#1B2E79]'
                             }`}
                           />
                           {secoundUserError && <p className="text-[10px] text-rose-600">{secoundUserError}</p>}
@@ -1580,7 +1580,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
                             }}
                             placeholder="Enter regular user price"
                             className={`w-full rounded-xl border px-3 py-2 text-xs font-mono text-[#1F1F1F] bg-white placeholder:text-[#9E9E9E] focus:outline-none ${
-                              regularUserError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#5B21B6]'
+                              regularUserError ? 'border-rose-400 bg-rose-50/40' : 'border-[#EEEEF2] focus:border-[#1B2E79]'
                             }`}
                           />
                           {regularUserError && <p className="text-[10px] text-rose-600">{regularUserError}</p>}
@@ -1605,7 +1605,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-xl border border-[#EEEEF2] bg-white px-4 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#F5F3FF] hover:border-[#DDD6FE] transition-all cursor-pointer disabled:opacity-50"
+              className="rounded-xl border border-[#EEEEF2] bg-white px-4 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#F5F8FF] hover:border-[#C4D9FD] transition-all cursor-pointer disabled:opacity-50"
             >
               Cancel
             </button>
@@ -1614,7 +1614,7 @@ export const CreateMarketModal: React.FC<CreateMarketModalProps> = ({
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || areaNameStatus === 'checking' || areaNameStatus === 'duplicate'}
-              className="flex items-center gap-2 rounded-xl bg-[#5B21B6] px-5 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 rounded-xl bg-[#1B2E79] px-5 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

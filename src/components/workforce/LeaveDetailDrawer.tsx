@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Drawer } from '../common/Drawer';
 import { StatusBadge } from '../common/StatusBadge';
 import { RawLeaveRecord } from '../../types';
@@ -106,9 +106,9 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
       <div className="space-y-4 w-full max-w-full overflow-hidden">
         {/* Top Header Card: Leave Overview */}
         <div className="flex items-center gap-3.5 sm:gap-4 rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-4.5 w-full overflow-hidden">
-          <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EDE9FE] flex items-center justify-center relative">
-            <span className="font-bold text-xl text-[#5B21B6] select-none">
-              {workerName !== '—' ? workerName.charAt(0).toUpperCase() : <User className="h-7 w-7 text-[#5B21B6]" />}
+          <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EEF3FF] flex items-center justify-center relative">
+            <span className="font-bold text-xl text-[#1B2E79] select-none">
+              {workerName !== '—' ? workerName.charAt(0).toUpperCase() : <User className="h-7 w-7 text-[#1B2E79]" />}
             </span>
           </div>
           <div className="flex-1 min-w-0">
@@ -119,7 +119,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
               <StatusBadge status={status} size="sm" pulse={status === 'Pending'} />
             </div>
             <div className="mt-1 flex items-center gap-2.5 text-xs text-[#6B6B6B] flex-wrap">
-              <span className="font-mono text-[11px] font-semibold text-[#5B21B6]">
+              <span className="font-mono text-[11px] font-semibold text-[#1B2E79]">
                 ID: {workerId}
               </span>
               <span className="flex items-center gap-1 font-mono text-[11px] text-[#6B6B6B]">
@@ -128,12 +128,12 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
               </span>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#5B21B6] font-semibold truncate max-w-[180px]">
-                <MapPin className="h-3 w-3 text-[#5B21B6] shrink-0" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#1B2E79] font-semibold truncate max-w-[180px]">
+                <MapPin className="h-3 w-3 text-[#1B2E79] shrink-0" />
                 <span className="truncate">{areaName}</span>
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 text-[10px] text-[#5B21B6] font-semibold">
-                <CalendarDays className="h-3 w-3 text-[#5B21B6] shrink-0" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 text-[10px] text-[#1B2E79] font-semibold">
+                <CalendarDays className="h-3 w-3 text-[#1B2E79] shrink-0" />
                 <span>{leaveType}</span>
               </span>
             </div>
@@ -143,7 +143,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
         {/* 1. Employee Information Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <User className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Employee Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
@@ -155,7 +155,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">EMPLOYEE ID</span>
-              <div className="font-mono text-[#5B21B6] font-bold mt-0.5 truncate">{workerId}</div>
+              <div className="font-mono text-[#1B2E79] font-bold mt-0.5 truncate">{workerId}</div>
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">AREA</span>
@@ -167,7 +167,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
         {/* 2. Leave Information Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <CalendarDays className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <CalendarDays className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Leave Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -179,7 +179,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">LEAVE TYPE</span>
-              <div className="font-mono text-[#5B21B6] font-bold mt-0.5 truncate">
+              <div className="font-mono text-[#1B2E79] font-bold mt-0.5 truncate">
                 {leaveType}
               </div>
             </div>
@@ -201,7 +201,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
         {/* 3. Request Information Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <FileCheck className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <FileCheck className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Request Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -219,7 +219,7 @@ export const LeaveDetailDrawer: React.FC<LeaveDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">APPROVED BY</span>
-              <div className="font-mono text-[#5B21B6] font-semibold mt-0.5 truncate">
+              <div className="font-mono text-[#1B2E79] font-semibold mt-0.5 truncate">
                 {approvedBy}
               </div>
             </div>

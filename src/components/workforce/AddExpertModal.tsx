@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   X, 
   AlertCircle, 
@@ -125,14 +125,14 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           hasError
             ? 'border-rose-400 bg-rose-50/50 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
             : isOpen
-            ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/20 shadow-soft-sm text-[#1F1F1F]'
-            : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+            ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/20 shadow-soft-sm text-[#1F1F1F]'
+            : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
         }`}
       >
         {/* Left side: Icon + Label separated cleanly with flex gap (ZERO overlap) */}
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-[#5B21B6] shrink-0" />
+            <Loader2 className="h-4 w-4 animate-spin text-[#1B2E79] shrink-0" />
           ) : selectedOption?.icon ? (
             selectedOption.icon
           ) : icon ? (
@@ -149,7 +149,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           {selectedOption?.badge}
           <ChevronDown
             className={`h-4 w-4 text-[#6B6B6B] transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-[#5B21B6]' : ''
+              isOpen ? 'rotate-180 text-[#1B2E79]' : ''
             }`}
           />
         </div>
@@ -167,7 +167,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={searchPlaceholder}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]"
                   autoFocus
                   onClick={(e) => e.stopPropagation()}
                 />
@@ -193,8 +193,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                     }}
                     className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
-                        : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6]'
+                        ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
+                        : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -204,7 +204,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
                     <div className="flex items-center gap-2 shrink-0">
                       {option.badge}
-                      {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6] stroke-[2.5]" />}
+                      {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79] stroke-[2.5]" />}
                     </div>
                   </button>
                 );
@@ -825,7 +825,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
   const areaOptions: CustomSelectOption[] = availableAreas.map((area) => ({
     value: area,
     label: area,
-    icon: <MapPin className="h-4 w-4 text-[#5B21B6] shrink-0" />,
+    icon: <MapPin className="h-4 w-4 text-[#1B2E79] shrink-0" />,
   }));
 
   // 2. Gender Options
@@ -833,12 +833,12 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
     { 
       value: 'Male', 
       label: 'Male', 
-      icon: <User className="h-4 w-4 text-[#5B21B6] shrink-0" /> 
+      icon: <User className="h-4 w-4 text-[#1B2E79] shrink-0" /> 
     },
     { 
       value: 'Female', 
       label: 'Female', 
-      icon: <User className="h-4 w-4 text-[#7C3AED] shrink-0" /> 
+      icon: <User className="h-4 w-4 text-[#162766] shrink-0" /> 
     },
     { 
       value: 'Other', 
@@ -851,7 +851,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
   const shiftOptions: CustomSelectOption[] = [6, 8, 10, 12].map((num) => ({
     value: String(num),
     label: `${num} Hours`,
-    icon: <Clock className="h-4 w-4 text-[#5B21B6] shrink-0" />,
+    icon: <Clock className="h-4 w-4 text-[#1B2E79] shrink-0" />,
   }));
 
   // 5. Bank Name Options (from bankList API)
@@ -860,9 +860,9 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
     return {
       value: bank.name,
       label: bank.name,
-      icon: <CreditCard className="h-4 w-4 text-[#5B21B6] shrink-0" />,
+      icon: <CreditCard className="h-4 w-4 text-[#1B2E79] shrink-0" />,
       badge: prefix ? (
-        <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[#F5F3FF] text-[#5B21B6] border border-[#DDD6FE]">
+        <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[#F5F8FF] text-[#1B2E79] border border-[#C4D9FD]">
           {prefix}
         </span>
       ) : undefined,
@@ -894,7 +894,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors cursor-pointer disabled:opacity-50"
+            className="rounded-xl p-1.5 text-[#6B6B6B] hover:bg-[#EEF3FF] hover:text-[#1B2E79] transition-colors cursor-pointer disabled:opacity-50"
             aria-label="Close modal"
           >
             <X className="h-5 w-5" />
@@ -915,7 +915,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
             {/* SECTION 1: Personal Details */}
             <div className="space-y-3.5">
               <div className="flex items-center gap-2 border-b border-[#EEEEF2] pb-2">
-                <User className="h-4 w-4 text-[#5B21B6] shrink-0" />
+                <User className="h-4 w-4 text-[#1B2E79] shrink-0" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">Personal Details</h4>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -937,7 +937,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.fullName && errors.fullName
                         ? 'border-rose-400 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   {touched.fullName && errors.fullName && (
@@ -967,7 +967,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                       className={`w-full rounded-xl border bg-[#FAF9FC] pl-11 pr-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                         touched.mobileNumber && errors.mobileNumber
                           ? 'border-rose-400 focus:ring-rose-500/20'
-                          : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                          : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                       }`}
                     />
                   </div>
@@ -1006,7 +1006,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     value={dateOfBirth}
                     onChange={(e) => setDateOfBirth(e.target.value)}
                     disabled={isLoading}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-2 focus:ring-[#5B21B6]/20 transition-all disabled:opacity-50"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-2 focus:ring-[#1B2E79]/20 transition-all disabled:opacity-50"
                   />
                 </div>
 
@@ -1026,14 +1026,14 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                   {profileImageFile || uploadedProfileImageUrl ? (
                     <div className={`flex items-center justify-between rounded-xl border p-2.5 transition-all ${
                       isUploadingProfileImage 
-                        ? 'border-purple-300 bg-purple-50/50' 
+                        ? 'border-blue-300 bg-blue-50/50' 
                         : profileImageError 
                         ? 'border-rose-300 bg-rose-50' 
-                        : 'border-[#DDD6FE] bg-[#F5F3FF]'
+                        : 'border-[#C4D9FD] bg-[#F5F8FF]'
                     }`}>
                       <div className="flex items-center gap-3 min-w-0">
                         {profileImagePreview || uploadedProfileImageUrl ? (
-                          <div className="relative h-11 w-11 shrink-0 rounded-full overflow-hidden border border-[#DDD6FE] shadow-soft-xs bg-white">
+                          <div className="relative h-11 w-11 shrink-0 rounded-full overflow-hidden border border-[#C4D9FD] shadow-soft-xs bg-white">
                             <img
                               src={profileImagePreview || uploadedProfileImageUrl}
                               alt="Profile Preview"
@@ -1046,7 +1046,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                             )}
                           </div>
                         ) : (
-                          <ImageIcon className="h-8 w-8 text-[#5B21B6] shrink-0" />
+                          <ImageIcon className="h-8 w-8 text-[#1B2E79] shrink-0" />
                         )}
                         <div className="min-w-0">
                           <div className="text-xs font-semibold text-[#1F1F1F] truncate max-w-[220px] sm:max-w-sm">
@@ -1055,7 +1055,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                           <div className="text-[10px] text-[#6B6B6B] font-mono flex items-center gap-1.5 mt-0.5">
                             {profileImageFile && <span>{formatFileSize(profileImageFile.size)}</span>}
                             {isUploadingProfileImage ? (
-                              <span className="text-[#5B21B6] font-semibold flex items-center gap-1">
+                              <span className="text-[#1B2E79] font-semibold flex items-center gap-1">
                                 <Loader2 className="h-2.5 w-2.5 animate-spin" /> Uploading to server...
                               </span>
                             ) : uploadedProfileImageUrl ? (
@@ -1071,7 +1071,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                           type="button"
                           onClick={() => profileImageInputRef.current?.click()}
                           disabled={isLoading || isUploadingProfileImage}
-                          className="rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B21B6] hover:bg-[#FAF9FC] transition-colors cursor-pointer disabled:opacity-50"
+                          className="rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1B2E79] hover:bg-[#FAF9FC] transition-colors cursor-pointer disabled:opacity-50"
                         >
                           Change
                         </button>
@@ -1105,11 +1105,11 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                       className={`flex flex-col sm:flex-row items-center justify-center gap-2 rounded-xl border border-dashed p-3.5 text-center cursor-pointer transition-all ${
                         touched.profileImage && errors.profileImage
                           ? 'border-rose-400 bg-rose-50/50'
-                          : 'border-[#DDD6FE] bg-[#FAF9FC] hover:bg-[#F5F3FF] hover:border-[#5B21B6]'
+                          : 'border-[#C4D9FD] bg-[#FAF9FC] hover:bg-[#F5F8FF] hover:border-[#1B2E79]'
                       }`}
                     >
-                      <Upload className="h-4 w-4 text-[#5B21B6]" />
-                      <span className="text-xs font-semibold text-[#5B21B6]">
+                      <Upload className="h-4 w-4 text-[#1B2E79]" />
+                      <span className="text-xs font-semibold text-[#1B2E79]">
                         Choose Profile Image (Optional - JPG, PNG, WebP)
                       </span>
                     </div>
@@ -1126,7 +1126,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
             {/* SECTION 2: Location Details */}
             <div className="space-y-3.5">
               <div className="flex items-center gap-2 border-b border-[#EEEEF2] pb-2">
-                <MapPin className="h-4 w-4 text-[#5B21B6] shrink-0" />
+                <MapPin className="h-4 w-4 text-[#1B2E79] shrink-0" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">Location Details</h4>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -1140,7 +1140,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                       <button
                         type="button"
                         onClick={fetchAreas}
-                        className="text-[11px] text-[#5B21B6] hover:underline flex items-center gap-1 font-semibold"
+                        className="text-[11px] text-[#1B2E79] hover:underline flex items-center gap-1 font-semibold"
                       >
                         <RotateCw className="h-2.5 w-2.5" /> Retry
                       </button>
@@ -1156,7 +1156,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     }}
                     options={areaOptions}
                     placeholder="Select active area"
-                    icon={<MapPin className="h-4 w-4 text-[#5B21B6] shrink-0" />}
+                    icon={<MapPin className="h-4 w-4 text-[#1B2E79] shrink-0" />}
                     disabled={isLoading}
                     isLoading={isLoadingAreas}
                     loadingText="Loading active areas..."
@@ -1187,7 +1187,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.address && errors.address
                         ? 'border-rose-400 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   {touched.address && errors.address && (
@@ -1205,7 +1205,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     onChange={(e) => setLatitude(e.target.value)}
                     placeholder="Enter latitude"
                     disabled={isLoading}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-2 focus:ring-[#5B21B6]/20 transition-all disabled:opacity-50"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-2 focus:ring-[#1B2E79]/20 transition-all disabled:opacity-50"
                   />
                 </div>
 
@@ -1219,7 +1219,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     onChange={(e) => setLongitude(e.target.value)}
                     placeholder="Enter longitude"
                     disabled={isLoading}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-2 focus:ring-[#5B21B6]/20 transition-all disabled:opacity-50"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-2 focus:ring-[#1B2E79]/20 transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -1228,7 +1228,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
             {/* SECTION 3: Identity & KYC Documents */}
             <div className="space-y-3.5">
               <div className="flex items-center gap-2 border-b border-[#EEEEF2] pb-2">
-                <FileText className="h-4 w-4 text-[#5B21B6] shrink-0" />
+                <FileText className="h-4 w-4 text-[#1B2E79] shrink-0" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
                   Identity & Verification Documents
                 </h4>
@@ -1268,19 +1268,19 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                       className={`w-full rounded-xl border bg-[#FAF9FC] pl-3.5 pr-9 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                         aadhaarRegisteredError || (touched.aadhaarNumber && errors.aadhaarNumber)
                           ? 'border-rose-400 focus:ring-rose-500/20'
-                          : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                          : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                       }`}
                     />
                     {isCheckingAadhaar && (
                       <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <Loader2 className="h-4 w-4 animate-spin text-[#5B21B6]" />
+                        <Loader2 className="h-4 w-4 animate-spin text-[#1B2E79]" />
                       </div>
                     )}
                   </div>
 
                   {/* Loading State */}
                   {isCheckingAadhaar && (
-                    <p className="text-[11px] text-[#5B21B6] font-medium flex items-center gap-1.5 mt-1">
+                    <p className="text-[11px] text-[#1B2E79] font-medium flex items-center gap-1.5 mt-1">
                       <Loader2 className="h-3 w-3 animate-spin shrink-0" />
                       <span>Checking Aadhaar...</span>
                     </p>
@@ -1328,7 +1328,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono uppercase placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.panNumber && errors.panNumber
                         ? 'border-rose-400 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   {touched.panNumber && errors.panNumber && (
@@ -1347,9 +1347,9 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     onChange={(e) => handleDocFileSelection(e, setAadhaarFrontFile)}
                   />
                   {aadhaarFrontFile ? (
-                    <div className="flex items-center justify-between rounded-xl border border-[#DDD6FE] bg-[#F5F3FF] p-2.5">
+                    <div className="flex items-center justify-between rounded-xl border border-[#C4D9FD] bg-[#F5F8FF] p-2.5">
                       <div className="flex items-center gap-2 min-w-0">
-                        <FileCheck className="h-5 w-5 text-[#5B21B6] shrink-0" />
+                        <FileCheck className="h-5 w-5 text-[#1B2E79] shrink-0" />
                         <div className="min-w-0">
                           <div className="text-xs font-semibold text-[#1F1F1F] truncate max-w-[150px]">
                             {aadhaarFrontFile.name}
@@ -1373,10 +1373,10 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                   ) : (
                     <div
                       onClick={() => aadhaarFrontInputRef.current?.click()}
-                      className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#DDD6FE] bg-[#FAF9FC] hover:bg-[#F5F3FF] hover:border-[#5B21B6] p-2.5 text-center cursor-pointer transition-all"
+                      className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#C4D9FD] bg-[#FAF9FC] hover:bg-[#F5F8FF] hover:border-[#1B2E79] p-2.5 text-center cursor-pointer transition-all"
                     >
-                      <Upload className="h-3.5 w-3.5 text-[#5B21B6]" />
-                      <span className="text-xs font-semibold text-[#5B21B6]">Upload Aadhaar Front</span>
+                      <Upload className="h-3.5 w-3.5 text-[#1B2E79]" />
+                      <span className="text-xs font-semibold text-[#1B2E79]">Upload Aadhaar Front</span>
                     </div>
                   )}
                 </div>
@@ -1392,9 +1392,9 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     onChange={(e) => handleDocFileSelection(e, setAadhaarBackFile)}
                   />
                   {aadhaarBackFile ? (
-                    <div className="flex items-center justify-between rounded-xl border border-[#DDD6FE] bg-[#F5F3FF] p-2.5">
+                    <div className="flex items-center justify-between rounded-xl border border-[#C4D9FD] bg-[#F5F8FF] p-2.5">
                       <div className="flex items-center gap-2 min-w-0">
-                        <FileCheck className="h-5 w-5 text-[#5B21B6] shrink-0" />
+                        <FileCheck className="h-5 w-5 text-[#1B2E79] shrink-0" />
                         <div className="min-w-0">
                           <div className="text-xs font-semibold text-[#1F1F1F] truncate max-w-[150px]">
                             {aadhaarBackFile.name}
@@ -1418,10 +1418,10 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                   ) : (
                     <div
                       onClick={() => aadhaarBackInputRef.current?.click()}
-                      className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#DDD6FE] bg-[#FAF9FC] hover:bg-[#F5F3FF] hover:border-[#5B21B6] p-2.5 text-center cursor-pointer transition-all"
+                      className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#C4D9FD] bg-[#FAF9FC] hover:bg-[#F5F8FF] hover:border-[#1B2E79] p-2.5 text-center cursor-pointer transition-all"
                     >
-                      <Upload className="h-3.5 w-3.5 text-[#5B21B6]" />
-                      <span className="text-xs font-semibold text-[#5B21B6]">Upload Aadhaar Back</span>
+                      <Upload className="h-3.5 w-3.5 text-[#1B2E79]" />
+                      <span className="text-xs font-semibold text-[#1B2E79]">Upload Aadhaar Back</span>
                     </div>
                   )}
                 </div>
@@ -1437,9 +1437,9 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     onChange={(e) => handleDocFileSelection(e, setPanCardFile)}
                   />
                   {panCardFile ? (
-                    <div className="flex items-center justify-between rounded-xl border border-[#DDD6FE] bg-[#F5F3FF] p-2.5">
+                    <div className="flex items-center justify-between rounded-xl border border-[#C4D9FD] bg-[#F5F8FF] p-2.5">
                       <div className="flex items-center gap-2 min-w-0">
-                        <FileCheck className="h-5 w-5 text-[#5B21B6] shrink-0" />
+                        <FileCheck className="h-5 w-5 text-[#1B2E79] shrink-0" />
                         <div className="min-w-0">
                           <div className="text-xs font-semibold text-[#1F1F1F] truncate max-w-[200px]">
                             {panCardFile.name}
@@ -1463,10 +1463,10 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                   ) : (
                     <div
                       onClick={() => panCardInputRef.current?.click()}
-                      className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#DDD6FE] bg-[#FAF9FC] hover:bg-[#F5F3FF] hover:border-[#5B21B6] p-2.5 text-center cursor-pointer transition-all"
+                      className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#C4D9FD] bg-[#FAF9FC] hover:bg-[#F5F8FF] hover:border-[#1B2E79] p-2.5 text-center cursor-pointer transition-all"
                     >
-                      <Upload className="h-3.5 w-3.5 text-[#5B21B6]" />
-                      <span className="text-xs font-semibold text-[#5B21B6]">Upload PAN Card Document (Optional)</span>
+                      <Upload className="h-3.5 w-3.5 text-[#1B2E79]" />
+                      <span className="text-xs font-semibold text-[#1B2E79]">Upload PAN Card Document (Optional)</span>
                     </div>
                   )}
                 </div>
@@ -1476,7 +1476,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
             {/* SECTION 4: Bank Details * */}
             <div className="space-y-3.5">
               <div className="flex items-center gap-2 border-b border-[#EEEEF2] pb-2">
-                <CreditCard className="h-4 w-4 text-[#5B21B6] shrink-0" />
+                <CreditCard className="h-4 w-4 text-[#1B2E79] shrink-0" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
                   Bank Details <span className="text-rose-500">*</span>
                 </h4>
@@ -1492,7 +1492,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                       <button
                         type="button"
                         onClick={fetchBanks}
-                        className="text-[11px] text-[#5B21B6] hover:underline flex items-center gap-1 font-semibold"
+                        className="text-[11px] text-[#1B2E79] hover:underline flex items-center gap-1 font-semibold"
                       >
                         <RotateCw className="h-2.5 w-2.5" /> Retry
                       </button>
@@ -1518,7 +1518,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     placeholder="Select bank"
                     searchable={true}
                     searchPlaceholder="Search bank name..."
-                    icon={<CreditCard className="h-4 w-4 text-[#5B21B6] shrink-0" />}
+                    icon={<CreditCard className="h-4 w-4 text-[#1B2E79] shrink-0" />}
                     disabled={isLoading}
                     isLoading={isLoadingBanks}
                     loadingText="Loading banks..."
@@ -1550,7 +1550,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.accountNumber && errors.accountNumber
                         ? 'border-rose-400 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   {touched.accountNumber && errors.accountNumber && (
@@ -1578,7 +1578,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono uppercase placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.ifscCode && errors.ifscCode
                         ? 'border-rose-400 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   {touched.ifscCode && errors.ifscCode && (
@@ -1604,7 +1604,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     className={`w-full rounded-xl border bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                       touched.accountHolderName && errors.accountHolderName
                         ? 'border-rose-400 focus:ring-rose-500/20'
-                        : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                        : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                     }`}
                   />
                   {touched.accountHolderName && errors.accountHolderName && (
@@ -1617,7 +1617,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
             {/* SECTION 5: Operational & Other Details */}
             <div className="space-y-3.5">
               <div className="flex items-center gap-2 border-b border-[#EEEEF2] pb-2">
-                <Briefcase className="h-4 w-4 text-[#5B21B6] shrink-0" />
+                <Briefcase className="h-4 w-4 text-[#1B2E79] shrink-0" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
                   Operational & Other Details
                 </h4>
@@ -1637,7 +1637,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     }}
                     options={shiftOptions}
                     placeholder="Select shift hours"
-                    icon={<Clock className="h-4 w-4 text-[#5B21B6] shrink-0" />}
+                    icon={<Clock className="h-4 w-4 text-[#1B2E79] shrink-0" />}
                     disabled={isLoading}
                     hasError={Boolean(touched.shiftTimeing && errors.shiftTimeing)}
                   />
@@ -1667,7 +1667,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                       className={`w-full rounded-xl border bg-[#FAF9FC] pl-8 pr-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono font-semibold placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
                         touched.monthlySalary && errors.monthlySalary
                           ? 'border-rose-400 focus:ring-rose-500/20'
-                          : 'border-[#EEEEF2] focus:border-[#5B21B6] focus:ring-[#5B21B6]/20'
+                          : 'border-[#EEEEF2] focus:border-[#1B2E79] focus:ring-[#1B2E79]/20'
                       }`}
                     />
                   </div>
@@ -1685,7 +1685,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
                     onChange={(e) => setReferredBy(e.target.value)}
                     placeholder="Enter referrer ID"
                     disabled={isLoading}
-                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-2 focus:ring-[#5B21B6]/20 transition-all disabled:opacity-50"
+                    className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2.5 text-xs text-[#1F1F1F] font-mono placeholder:text-[#9E9E9E] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-2 focus:ring-[#1B2E79]/20 transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -1696,7 +1696,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#EEEEF2] bg-[#FAF9FC] px-5 py-3.5 shrink-0">
             <div className="text-xs text-[#6B6B6B] truncate">
               {uploadStepText ? (
-                <span className="flex items-center gap-1.5 font-medium text-[#5B21B6]">
+                <span className="flex items-center gap-1.5 font-medium text-[#1B2E79]">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   {uploadStepText}
                 </span>
@@ -1715,7 +1715,7 @@ export const AddExpertModal: React.FC<AddExpertModalProps> = ({ isOpen, onClose,
               <button
                 type="submit"
                 disabled={isLoading || isUploadingProfileImage}
-                className="flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Ticket, 
@@ -29,6 +29,7 @@ import {
   ActiveAreaItem
 } from '../../services/api';
 import { DataTable, Column } from '../../components/common/DataTable';
+import { Pagination } from '../../components/common/Pagination';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { NestPassDetailsDrawer } from '../../components/pass-management/NestPassDetailsDrawer';
 import { CreateNestPassModal } from '../../components/pass-management/CreateNestPassModal';
@@ -257,7 +258,7 @@ export const NestPassPage: React.FC = () => {
       align: 'center',
       className: 'w-[10%] min-w-[90px]',
       render: (p) => (
-        <div className="flex items-center justify-center gap-1.5 font-mono text-xs font-bold text-[#5B21B6]">
+        <div className="flex items-center justify-center gap-1.5 font-mono text-xs font-bold text-[#1B2E79]">
           <Ticket className="h-3.5 w-3.5 shrink-0" />
           <span>{p.packId || '—'}</span>
         </div>
@@ -274,7 +275,7 @@ export const NestPassPage: React.FC = () => {
       className: 'w-[12%] min-w-[110px]',
       render: (p) => (
         <div className="flex justify-center">
-          <span className="inline-flex items-center gap-1 font-mono text-[#5B21B6] font-semibold text-[11px] bg-[#EDE9FE] px-2 py-0.5 rounded-lg max-w-[120px] truncate">
+          <span className="inline-flex items-center gap-1 font-mono text-[#1B2E79] font-semibold text-[11px] bg-[#EEF3FF] px-2 py-0.5 rounded-lg max-w-[120px] truncate">
             <MapPin className="h-2.5 w-2.5 shrink-0" />
             <span className="truncate">{p.areaName || '—'}</span>
           </span>
@@ -367,7 +368,7 @@ export const NestPassPage: React.FC = () => {
       className: 'w-[12%] min-w-[105px]',
       render: (p) => (
         <div className="flex items-center justify-center gap-1 font-mono text-xs text-[#1F1F1F]">
-          <Calendar className="h-3 w-3 text-[#5B21B6] shrink-0" />
+          <Calendar className="h-3 w-3 text-[#1B2E79] shrink-0" />
           <span>{formatDate(p.offerexpire)}</span>
         </div>
       ),
@@ -407,14 +408,14 @@ export const NestPassPage: React.FC = () => {
         <div className="flex items-center justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setInspectPassId(p.passId)}
-            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-xs cursor-pointer"
+            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-xs cursor-pointer"
             title="View Details"
           >
             <Eye className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setEditPassId(p.passId)}
-            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-xs cursor-pointer"
+            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-xs cursor-pointer"
             title="Edit Pass"
           >
             <Pencil className="h-3.5 w-3.5" />
@@ -434,7 +435,7 @@ export const NestPassPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 w-full">
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F1F1F] flex items-center gap-2 truncate">
-            <Ticket className="h-6 w-6 text-[#5B21B6]" />
+            <Ticket className="h-6 w-6 text-[#1B2E79]" />
             Nest Pass
           </h1>
           <p className="text-xs sm:text-sm text-[#6B6B6B] mt-0.5 truncate">
@@ -446,7 +447,7 @@ export const NestPassPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer shrink-0"
+          className="flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer shrink-0"
         >
           <Plus className="h-4 w-4" />
           <span>Create Nest Pass</span>
@@ -459,11 +460,11 @@ export const NestPassPage: React.FC = () => {
           {/* Left: Active Area Indicator */}
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-[#5B21B6]" />
+              <MapPin className="h-4 w-4 text-[#1B2E79]" />
               Active Area:
             </span>
             {selectedArea ? (
-              <span className="rounded-lg bg-[#EDE9FE] px-2.5 py-1 text-xs font-bold text-[#5B21B6]">
+              <span className="rounded-lg bg-[#EEF3FF] px-2.5 py-1 text-xs font-bold text-[#1B2E79]">
                 {selectedArea}
               </span>
             ) : (
@@ -478,10 +479,10 @@ export const NestPassPage: React.FC = () => {
               type="button"
               onClick={() => fetchPasses(page, selectedArea)}
               disabled={isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               title="Refresh Nest Passes manually"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span>Refresh</span>
             </button>
 
@@ -510,16 +511,16 @@ export const NestPassPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -536,11 +537,11 @@ export const NestPassPage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Nest Passes</h3>
                   </div>
                   <button
@@ -562,16 +563,16 @@ export const NestPassPage: React.FC = () => {
                       className="w-full flex items-center justify-between p-3.5 text-xs font-bold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                         <span>Operating Area</span>
                         {draftArea && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftArea}
                           </span>
                         )}
                       </div>
                       {expandedSections.area ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -581,7 +582,7 @@ export const NestPassPage: React.FC = () => {
                       <div className="px-3.5 pb-3.5 pt-1 border-t border-[#EEEEF2] space-y-1.5">
                         {isLoadingAreas && availableAreaOptions.length === 0 ? (
                           <div className="flex items-center gap-2 py-2 px-2 text-xs text-[#6B6B6B]">
-                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#5B21B6]" />
+                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#1B2E79]" />
                             <span>Loading active areas from API...</span>
                           </div>
                         ) : availableAreaOptions.length === 0 ? (
@@ -596,15 +597,15 @@ export const NestPassPage: React.FC = () => {
                               onClick={() => setDraftArea(areaName)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 draftArea === areaName
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
                               <div className="flex items-center gap-1.5">
-                                <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                                <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                                 <span>{areaName}</span>
                               </div>
-                              {draftArea === areaName && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {draftArea === areaName && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           ))
                         )}
@@ -622,13 +623,13 @@ export const NestPassPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Status</span>
                         {draftStatus && draftStatus !== 'All' && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatus}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -642,7 +643,7 @@ export const NestPassPage: React.FC = () => {
                             st === 'Active'
                               ? 'bg-emerald-500'
                               : st === 'Inactive'
-                              ? 'bg-[#7C3AED]'
+                              ? 'bg-[#162766]'
                               : st === 'Suspended'
                               ? 'bg-rose-500'
                               : 'bg-gray-400';
@@ -654,7 +655,7 @@ export const NestPassPage: React.FC = () => {
                               onClick={() => setDraftStatus(st)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
@@ -662,7 +663,7 @@ export const NestPassPage: React.FC = () => {
                                 <span className={`h-2 w-2 rounded-full ${dotColor}`} />
                                 <span>{st}</span>
                               </div>
-                              {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           );
                         })}
@@ -685,7 +686,7 @@ export const NestPassPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all cursor-pointer"
                   >
                     Apply Filters
                   </button>
@@ -702,7 +703,7 @@ export const NestPassPage: React.FC = () => {
 
             {/* Operating Area indicator (Dynamic scope from area API) */}
             {selectedArea && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 <MapPin className="h-3 w-3" />
                 Area: {selectedArea}
               </span>
@@ -710,7 +711,7 @@ export const NestPassPage: React.FC = () => {
 
             {/* Status chip (Completely static UI filter, not connected to table data) */}
             {selectedStatus && selectedStatus !== 'All' && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {selectedStatus}
                 <button 
                   type="button"
@@ -767,7 +768,7 @@ export const NestPassPage: React.FC = () => {
           </div>
         ) : displayedPasses.length === 0 ? (
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-8 text-center shadow-soft-sm">
-            <Ticket className="h-8 w-8 text-[#5B21B6] mx-auto mb-2 opacity-50" />
+            <Ticket className="h-8 w-8 text-[#1B2E79] mx-auto mb-2 opacity-50" />
             <h3 className="text-sm font-bold text-[#1F1F1F]">No Nest Passes found</h3>
             <p className="text-xs text-[#6B6B6B] mt-1">No promotional passes found for {selectedArea || 'this area'}.</p>
           </div>
@@ -782,11 +783,11 @@ export const NestPassPage: React.FC = () => {
               {/* Card Header: Pack ID, Price & Status */}
               <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-1.5">
                 <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6] font-mono text-xs font-bold shrink-0">
+                  <div className="h-8 w-8 rounded-xl bg-[#EEF3FF] flex items-center justify-center text-[#1B2E79] font-mono text-xs font-bold shrink-0">
                     <Ticket className="h-4 w-4" />
                   </div>
                   <div>
-                    <span className="font-mono text-xs font-bold text-[#5B21B6]">{p.packId}</span>
+                    <span className="font-mono text-xs font-bold text-[#1B2E79]">{p.packId}</span>
                     <div className="font-extrabold text-sm text-[#1F1F1F]">{formatPrice(p.price)}</div>
                   </div>
                 </div>
@@ -824,7 +825,7 @@ export const NestPassPage: React.FC = () => {
                   onClick={() => setEditPassId(p.passId)}
                   className="flex items-center gap-1 rounded-xl border border-[#EEEEF2] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                 >
-                  <Pencil className="h-3.5 w-3.5 text-[#5B21B6]" />
+                  <Pencil className="h-3.5 w-3.5 text-[#1B2E79]" />
                   <span>Edit</span>
                 </button>
                 <button
@@ -832,7 +833,7 @@ export const NestPassPage: React.FC = () => {
                   onClick={() => setInspectPassId(p.passId)}
                   title="View Details"
                   aria-label="View Details"
-                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white shadow-soft-xs transition-colors cursor-pointer shrink-0"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white shadow-soft-xs transition-colors cursor-pointer shrink-0"
                 >
                   <Eye className="h-4 w-4" />
                 </button>
@@ -844,66 +845,20 @@ export const NestPassPage: React.FC = () => {
 
       {/* Pagination Controls - Server-Side (20 per page) */}
       {pagination.totalCount > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#EEEEF2] bg-white px-4 py-3 rounded-2xl shadow-soft-sm w-full">
-          <div className="text-xs text-[#6B6B6B]">
-            Showing <strong className="text-[#1F1F1F] font-semibold">{startRecord}</strong> to{' '}
-            <strong className="text-[#1F1F1F] font-semibold">{endRecord}</strong> of{' '}
-            <strong className="text-[#1F1F1F] font-semibold">{pagination.totalCount}</strong> passes (20 per page)
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Previous Button */}
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || !pagination.hasPreviousPage || isLoading}
-              className="flex items-center gap-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              <span>Previous</span>
-            </button>
-
-            {/* Page number buttons */}
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => {
-              if (
-                pagination.totalPages > 7 &&
-                pageNum !== 1 &&
-                pageNum !== pagination.totalPages &&
-                Math.abs(pageNum - page) > 1
-              ) {
-                if (pageNum === 2 || pageNum === pagination.totalPages - 1) {
-                  return <span key={pageNum} className="px-1 text-xs text-[#6B6B6B]">...</span>;
-                }
-                return null;
-              }
-
-              const isActive = pageNum === page;
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setPage(pageNum)}
-                  disabled={isLoading}
-                  className={`h-8 w-8 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#5B21B6] text-white shadow-soft-xs'
-                      : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-
-            {/* Next Button */}
-            <button
-              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-              disabled={page >= pagination.totalPages || !pagination.hasNextPage || isLoading}
-              className="flex items-center gap-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={page}
+          totalPages={pagination.totalPages}
+          totalRecords={pagination.totalCount}
+          pageSize={PAGE_SIZE}
+          startRecord={startRecord}
+          endRecord={endRecord}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading}
+          recordLabel="passes"
+        />
       )}
 
       {/* Details Drawer */}

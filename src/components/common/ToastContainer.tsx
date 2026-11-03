@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useOperations } from '../../context/OperationsContext';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
@@ -19,7 +19,7 @@ export const ToastContainer: React.FC = () => {
             case 'warning':
               return <AlertTriangle className="h-4 w-4 text-[#C2410C] shrink-0" />;
             default:
-              return <Info className="h-4 w-4 text-[#5B21B6] shrink-0" />;
+              return <Info className="h-4 w-4 text-[#1B2E79] shrink-0" />;
           }
         };
 
@@ -28,7 +28,7 @@ export const ToastContainer: React.FC = () => {
             case 'success': return 'border-[#A6F4C5] bg-white';
             case 'error': return 'border-[#FECDCA] bg-white';
             case 'warning': return 'border-[#FED7AA] bg-white';
-            default: return 'border-[#DDD6FE] bg-white';
+            default: return 'border-[#C4D9FD] bg-white';
           }
         };
 

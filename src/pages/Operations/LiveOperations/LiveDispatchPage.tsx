@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import {
   getActiveAreas,
@@ -443,8 +443,8 @@ export const LiveDispatchPage: React.FC = () => {
                 }}
                 className={`group flex items-center justify-between gap-2.5 h-9 min-w-[190px] sm:min-w-[210px] max-w-[260px] rounded-xl border px-3 text-xs font-bold transition-all shadow-soft-xs cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed ${
                   isAreaDropdownOpen
-                    ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#5B21B6]'
-                    : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                    ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1B2E79]'
+                    : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                 }`}
                 aria-haspopup="listbox"
                 aria-expanded={isAreaDropdownOpen}
@@ -452,7 +452,7 @@ export const LiveDispatchPage: React.FC = () => {
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <MapPin
                     className={`h-3.5 w-3.5 shrink-0 transition-colors ${
-                      isAreaDropdownOpen ? 'text-[#5B21B6]' : 'text-[#7C3AED] group-hover:text-[#5B21B6]'
+                      isAreaDropdownOpen ? 'text-[#1B2E79]' : 'text-[#162766] group-hover:text-[#1B2E79]'
                     }`}
                   />
                   <span className="truncate text-left font-bold text-[#1F1F1F]">
@@ -466,7 +466,7 @@ export const LiveDispatchPage: React.FC = () => {
 
                 <ChevronDown
                   className={`h-3.5 w-3.5 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
-                    isAreaDropdownOpen ? 'rotate-180 text-[#5B21B6]' : 'group-hover:text-[#1F1F1F]'
+                    isAreaDropdownOpen ? 'rotate-180 text-[#1B2E79]' : 'group-hover:text-[#1F1F1F]'
                   }`}
                 />
               </button>
@@ -484,7 +484,7 @@ export const LiveDispatchPage: React.FC = () => {
                           value={areaSearch}
                           onChange={(e) => setAreaSearch(e.target.value)}
                           placeholder="Search operating area..."
-                          className="w-full pl-8 pr-2.5 py-1 text-xs rounded-lg bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]"
+                          className="w-full pl-8 pr-2.5 py-1 text-xs rounded-lg bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]"
                           onClick={(e) => e.stopPropagation()}
                           autoFocus
                         />
@@ -514,21 +514,21 @@ export const LiveDispatchPage: React.FC = () => {
                             }}
                             className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer text-left ${
                               isSelected
-                                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                                : 'text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#5B21B6] font-medium'
+                                ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold shadow-soft-xs'
+                                : 'text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#1B2E79] font-medium'
                             }`}
                             title={areaName}
                           >
                             <div className="flex items-center gap-2 min-w-0 flex-1">
                               <MapPin
                                 className={`h-3.5 w-3.5 shrink-0 ${
-                                  isSelected ? 'text-[#5B21B6]' : 'text-[#6B6B6B]'
+                                  isSelected ? 'text-[#1B2E79]' : 'text-[#6B6B6B]'
                                 }`}
                               />
                               <span className="truncate">{areaName}</span>
                             </div>
                             {isSelected && (
-                              <Check className="h-3.5 w-3.5 text-[#5B21B6] shrink-0 stroke-[2.5]" />
+                              <Check className="h-3.5 w-3.5 text-[#1B2E79] shrink-0 stroke-[2.5]" />
                             )}
                           </button>
                         );
@@ -545,7 +545,7 @@ export const LiveDispatchPage: React.FC = () => {
             type="button"
             onClick={() => fetchLiveTrack(selectedArea)}
             disabled={loadingTracking || !selectedArea}
-            className="flex items-center gap-2 rounded-xl bg-purple-600 px-3.5 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-purple-700 active:scale-95 transition-all cursor-pointer focus:outline-none disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-blue-700 active:scale-95 transition-all cursor-pointer focus:outline-none disabled:opacity-50"
             title="Refresh Real-Time Locations"
           >
             <RefreshCw
@@ -560,7 +560,7 @@ export const LiveDispatchPage: React.FC = () => {
       {lastSyncedTime && !error && (
         <div className="flex items-center justify-between px-2 text-[11px] text-slate-400">
           <div className="flex items-center gap-1.5">
-            <Clock className="h-3 w-3 text-purple-500" />
+            <Clock className="h-3 w-3 text-blue-500" />
             <span>Last synchronized: {lastSyncedTime.toLocaleTimeString()}</span>
           </div>
           <span className="font-medium text-slate-500">
@@ -597,7 +597,7 @@ export const LiveDispatchPage: React.FC = () => {
         <div className="flex flex-col justify-between rounded-2xl bg-white p-3.5 sm:p-4 shadow-soft-sm border border-slate-200/80">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-xs font-semibold">Total Workers</span>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
               <Users className="h-4 w-4" />
             </div>
           </div>
@@ -681,24 +681,24 @@ export const LiveDispatchPage: React.FC = () => {
         </div>
 
         {/* Coverage Radius / Operating Areas (Requirement 11) */}
-        <div className="flex flex-col justify-between rounded-2xl bg-white p-3.5 sm:p-4 shadow-soft-sm border border-purple-200 bg-purple-50/20">
-          <div className="flex items-center justify-between text-purple-700">
+        <div className="flex flex-col justify-between rounded-2xl bg-white p-3.5 sm:p-4 shadow-soft-sm border border-blue-200 bg-blue-50/20">
+          <div className="flex items-center justify-between text-blue-700">
             <span className="text-xs font-bold">
               {metrics.areasCount > 1 ? 'Total Areas' : 'Coverage Radius'}
             </span>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-600 text-white shadow-xs">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs">
               <Compass className="h-4 w-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black tracking-tight text-purple-900">
+            <span className="text-2xl font-black tracking-tight text-blue-900">
               {metrics.areasCount > 1 ? metrics.areasCount : metrics.radius}
             </span>
-            <span className="text-xs font-bold text-purple-700">
+            <span className="text-xs font-bold text-blue-700">
               {metrics.areasCount > 1 ? (metrics.areasCount === 1 ? 'Area' : 'Areas') : 'meters'}
             </span>
           </div>
-          <p className="mt-1 text-[11px] text-purple-700 font-medium truncate">
+          <p className="mt-1 text-[11px] text-blue-700 font-medium truncate">
             {metrics.areasCount > 1
               ? `${rawAreas.map((a) => a.areaName).join(', ')}`
               : 'Geofence boundary'}
@@ -713,7 +713,7 @@ export const LiveDispatchPage: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-1.5 px-1">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-purple-600" />
+              <Activity className="h-4 w-4 text-blue-600" />
               Live Operations Map
             </h2>
             <span className="text-xs text-slate-400">
@@ -759,7 +759,7 @@ export const LiveDispatchPage: React.FC = () => {
                 placeholder="Search worker or ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                className="w-full rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
               {searchQuery && (
                 <button
@@ -779,7 +779,7 @@ export const LiveDispatchPage: React.FC = () => {
                 onClick={() => setFilterType('ALL')}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
                   filterType === 'ALL'
-                    ? 'bg-white text-purple-700 shadow-soft-xs'
+                    ? 'bg-white text-blue-700 shadow-soft-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -836,7 +836,7 @@ export const LiveDispatchPage: React.FC = () => {
         {/* Empty State (Requirement 20) */}
         {!loadingTracking && filteredWorkers.length === 0 && (
           <div className="flex flex-col items-center justify-center p-12 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-3">
               <Users className="h-6 w-6" />
             </div>
             <h4 className="text-sm font-bold text-slate-900">
@@ -854,7 +854,7 @@ export const LiveDispatchPage: React.FC = () => {
                   setSearchQuery('');
                   setFilterType('ALL');
                 }}
-                className="mt-3 text-xs font-bold text-purple-600 hover:text-purple-700 cursor-pointer"
+                className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
               >
                 Clear all filters
               </button>
@@ -902,13 +902,13 @@ export const LiveDispatchPage: React.FC = () => {
                   return (
                     <tr
                       key={worker.workerId}
-                      className="hover:bg-purple-50/40 transition-colors group cursor-pointer"
+                      className="hover:bg-blue-50/40 transition-colors group cursor-pointer"
                       onClick={() => setDrawerWorker(worker)}
                     >
                       {/* Worker Name & Avatar */}
                       <td className="px-4 sm:px-6 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-100 text-purple-700 font-bold text-xs shrink-0 shadow-soft-xs">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 text-blue-700 font-bold text-xs shrink-0 shadow-soft-xs">
                             {worker.vendor.charAt(0).toUpperCase()}
                           </div>
                           <div className="flex flex-col min-w-0">
@@ -983,8 +983,8 @@ export const LiveDispatchPage: React.FC = () => {
 
                       {/* Area (Requirement 12: Include corresponding area name) */}
                       <td className="px-4 py-3 whitespace-nowrap text-slate-700">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200/60">
-                          <MapPin className="h-3 w-3 text-purple-500 shrink-0" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/60">
+                          <MapPin className="h-3 w-3 text-blue-500 shrink-0" />
                           <span>{worker.areaName || worker.currentArea || 'N/A'}</span>
                         </span>
                       </td>
@@ -1008,7 +1008,7 @@ export const LiveDispatchPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleFocusWorkerOnMap(worker)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 hover:bg-purple-100 transition-colors shadow-soft-xs cursor-pointer"
+                            className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-colors shadow-soft-xs cursor-pointer"
                             title="Locate and zoom on map"
                           >
                             <Navigation className="h-3 w-3" />
@@ -1048,12 +1048,12 @@ export const LiveDispatchPage: React.FC = () => {
             aria-modal="true"
             aria-labelledby="worker-modal-title"
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg rounded-2xl bg-white shadow-2xl border border-purple-100 overflow-hidden animate-in zoom-in-95 duration-150"
+            className="w-full max-w-lg rounded-2xl bg-white shadow-2xl border border-blue-100 overflow-hidden animate-in zoom-in-95 duration-150"
           >
             {/* Modal Top Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white font-bold text-base shadow-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-base shadow-sm">
                   {drawerWorker.vendor.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -1130,12 +1130,12 @@ export const LiveDispatchPage: React.FC = () => {
               </div>
 
               {/* Haversine Geodetic Computation Details */}
-              <div className="rounded-xl bg-purple-50/50 p-4 border border-purple-100 space-y-2.5">
+              <div className="rounded-xl bg-blue-50/50 p-4 border border-blue-100 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-purple-900">
+                  <span className="font-semibold text-blue-900">
                     Distance to Area Center:
                   </span>
-                  <span className="font-black text-base text-purple-700">
+                  <span className="font-black text-base text-blue-700">
                     {formatDistance(drawerWorker.distanceMeters)}
                   </span>
                 </div>
@@ -1207,7 +1207,7 @@ export const LiveDispatchPage: React.FC = () => {
                   setDrawerWorker(null);
                   handleFocusWorkerOnMap(drawerWorker);
                 }}
-                className="flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-purple-700 active:scale-95 transition-all cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-blue-700 active:scale-95 transition-all cursor-pointer"
               >
                 <Navigation className="h-3.5 w-3.5" />
                 <span>Locate on Live Map</span>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { WorkerPayout, LedgerItem } from '../../types';
 import { useOperations } from '../../context/OperationsContext';
@@ -65,7 +65,7 @@ export const PayoutAdjustmentModal: React.FC<PayoutAdjustmentModalProps> = ({
               onClick={() => setType('Adjustment Credit')}
               className={`rounded-xl p-2.5 text-xs font-bold border text-center transition-all ${
                 type === 'Adjustment Credit'
-                  ? 'border-[#7C3AED] bg-[#EDE9FE] text-[#5B21B6] shadow-soft-sm'
+                  ? 'border-[#162766] bg-[#EEF3FF] text-[#1B2E79] shadow-soft-sm'
                   : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B]'
               }`}
             >
@@ -95,7 +95,7 @@ export const PayoutAdjustmentModal: React.FC<PayoutAdjustmentModalProps> = ({
               min="1"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] py-2 pl-8 pr-3 text-xs text-[#1F1F1F] font-bold font-mono focus:outline-none focus:border-[#7C3AED] focus:bg-white"
+              className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] py-2 pl-8 pr-3 text-xs text-[#1F1F1F] font-bold font-mono focus:outline-none focus:border-[#162766] focus:bg-white"
             />
           </div>
         </div>
@@ -113,7 +113,7 @@ export const PayoutAdjustmentModal: React.FC<PayoutAdjustmentModalProps> = ({
               setError('');
             }}
             placeholder="e.g. Overtime retention bonus, damaged uniform kit deduction, customer tipping bonus..."
-            className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] p-2.5 text-xs text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#7C3AED] focus:bg-white"
+            className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] p-2.5 text-xs text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#162766] focus:bg-white"
           />
         </div>
 
@@ -124,7 +124,7 @@ export const PayoutAdjustmentModal: React.FC<PayoutAdjustmentModalProps> = ({
             type="text"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
-            className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] py-2 px-3 text-xs text-[#1F1F1F] font-mono focus:outline-none focus:border-[#7C3AED] focus:bg-white"
+            className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] py-2 px-3 text-xs text-[#1F1F1F] font-mono focus:outline-none focus:border-[#162766] focus:bg-white"
           />
         </div>
 
@@ -140,7 +140,7 @@ export const PayoutAdjustmentModal: React.FC<PayoutAdjustmentModalProps> = ({
           </button>
           <button
             type="submit"
-            className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white hover:bg-[#4C1D95] shadow-soft-sm active:scale-95"
+            className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white hover:bg-[#13225C] shadow-soft-sm active:scale-95"
           >
             Apply Adjustment
           </button>

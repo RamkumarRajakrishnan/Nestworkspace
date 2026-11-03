@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useOperations } from '../../../context/OperationsContext';
 import { StatusBadge } from '../../../components/common/StatusBadge';
@@ -183,14 +183,14 @@ export const WorkerDetailPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/experts')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <span className="text-xs font-mono text-[#6B6B6B]">Loading Expert Profile...</span>
         </div>
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-12 text-center shadow-soft-sm space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-[#5B21B6] mx-auto" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#1B2E79] mx-auto" />
           <p className="text-xs text-[#6B6B6B]">Fetching complete expert information from server...</p>
         </div>
       </div>
@@ -204,7 +204,7 @@ export const WorkerDetailPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/experts')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -219,7 +219,7 @@ export const WorkerDetailPage: React.FC = () => {
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => fetchExpertData()}
-              className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2 text-xs font-bold transition-all shadow-soft-sm cursor-pointer"
+              className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2 text-xs font-bold transition-all shadow-soft-sm cursor-pointer"
             >
               Retry
             </button>
@@ -249,7 +249,7 @@ export const WorkerDetailPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/experts')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors cursor-pointer"
             title="Return to Experts Directory"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -264,9 +264,9 @@ export const WorkerDetailPage: React.FC = () => {
       <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 sm:p-6 shadow-soft-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
           <div className="flex items-start sm:items-center gap-3.5 sm:gap-5 min-w-0">
-            <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-[#EEEEF2] shadow-soft-sm bg-[#EDE9FE] flex items-center justify-center relative shrink-0">
-              <span className="font-bold text-2xl text-[#5B21B6] select-none">
-                {fullName ? fullName.charAt(0).toUpperCase() : <User className="h-8 w-8 text-[#5B21B6]" />}
+            <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-[#EEEEF2] shadow-soft-sm bg-[#EEF3FF] flex items-center justify-center relative shrink-0">
+              <span className="font-bold text-2xl text-[#1B2E79] select-none">
+                {fullName ? fullName.charAt(0).toUpperCase() : <User className="h-8 w-8 text-[#1B2E79]" />}
               </span>
               {avatarUrl ? (
                 <img
@@ -293,8 +293,8 @@ export const WorkerDetailPage: React.FC = () => {
                   pulse={(isEditMode ? editJoiningStatus : joiningStatusClean) === 'Active'} 
                 />
                 <span className="text-[#D1D5DB] select-none font-light">|</span>
-                <span className="inline-flex items-center gap-1 font-mono text-[#5B21B6] font-semibold bg-[#EDE9FE] px-2.5 py-0.5 rounded-lg text-xs">
-                  <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                <span className="inline-flex items-center gap-1 font-mono text-[#1B2E79] font-semibold bg-[#EEF3FF] px-2.5 py-0.5 rounded-lg text-xs">
+                  <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                   {isEditMode ? (editAreaName || expert.areaName || '—') : (expert.areaName || '—')} Zone
                 </span>
                 <span className="text-[#D1D5DB] select-none font-light">|</span>
@@ -344,7 +344,7 @@ export const WorkerDetailPage: React.FC = () => {
                 syncEditFields(expert);
                 setIsEditMode(true);
               }}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer"
             >
               <Pencil className="h-3.5 w-3.5" />
               <span>Edit Profile</span>
@@ -361,7 +361,7 @@ export const WorkerDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
               <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-[#5B21B6]" />
+                <Briefcase className="h-4 w-4 text-[#1B2E79]" />
                 Operational & Area Entitlements
               </h2>
               <StatusBadge status={joiningStatusClean} size="sm" />
@@ -373,7 +373,7 @@ export const WorkerDetailPage: React.FC = () => {
                 <span className="text-[11px] text-[#6B6B6B] font-mono uppercase font-semibold">
                   Base Area
                 </span>
-                <div className="font-mono text-sm font-bold text-[#5B21B6]">
+                <div className="font-mono text-sm font-bold text-[#1B2E79]">
                   {expert.areaName || '—'}
                 </div>
               </div>
@@ -403,7 +403,7 @@ export const WorkerDetailPage: React.FC = () => {
                 <span className="text-[11px] text-[#6B6B6B] font-mono uppercase font-semibold">
                   Referred By
                 </span>
-                <div className="font-mono text-xs font-semibold text-[#7C3AED]">
+                <div className="font-mono text-xs font-semibold text-[#162766]">
                   {expert.referredBy || '—'}
                 </div>
               </div>
@@ -414,7 +414,7 @@ export const WorkerDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
               <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">
-                <FileCheck className="h-4 w-4 text-[#5B21B6]" />
+                <FileCheck className="h-4 w-4 text-[#1B2E79]" />
                 Identity & KYC Documentation
               </h2>
               <StatusBadge status={expert.verificationStatus || 'Verified'} size="sm" />
@@ -435,7 +435,7 @@ export const WorkerDetailPage: React.FC = () => {
                       href={expert.aadhaarFront}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors"
+                      className="inline-flex items-center gap-1 rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors"
                     >
                       <span>Front Doc</span>
                       <ExternalLink className="h-3 w-3" />
@@ -446,7 +446,7 @@ export const WorkerDetailPage: React.FC = () => {
                       href={expert.aadhaarBack}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors"
+                      className="inline-flex items-center gap-1 rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors"
                     >
                       <span>Back Doc</span>
                       <ExternalLink className="h-3 w-3" />
@@ -472,7 +472,7 @@ export const WorkerDetailPage: React.FC = () => {
                       href={expert.panCard}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors"
+                      className="inline-flex items-center gap-1 rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors"
                     >
                       <span>View PAN Document</span>
                       <ExternalLink className="h-3 w-3" />
@@ -491,7 +491,7 @@ export const WorkerDetailPage: React.FC = () => {
           {/* Card 3: Personal Information */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-3 text-xs">
             <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider border-b border-[#EEEEF2] pb-3 flex items-center gap-2">
-              <User className="h-4 w-4 text-[#5B21B6]" />
+              <User className="h-4 w-4 text-[#1B2E79]" />
               Personal Information
             </h3>
 
@@ -499,7 +499,7 @@ export const WorkerDetailPage: React.FC = () => {
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">PHONE / MOBILE</span>
                 <div className="font-mono text-[#1F1F1F] font-semibold mt-0.5 flex items-center gap-1.5">
-                  <Phone className="h-3 w-3 text-[#5B21B6]" />
+                  <Phone className="h-3 w-3 text-[#1B2E79]" />
                   {expert.mobileNumber || '—'}
                 </div>
               </div>
@@ -520,7 +520,7 @@ export const WorkerDetailPage: React.FC = () => {
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">GPS COORDINATES</span>
                 <div className="font-mono text-[#1F1F1F] mt-0.5 flex items-center gap-1">
-                  <Radio className="h-3 w-3 text-[#5B21B6]" />
+                  <Radio className="h-3 w-3 text-[#1B2E79]" />
                   {expert.latitude && expert.longitude
                     ? `${Number(expert.latitude).toFixed(4)}° N, ${Number(expert.longitude).toFixed(4)}° E`
                     : '—'}
@@ -532,7 +532,7 @@ export const WorkerDetailPage: React.FC = () => {
           {/* Card 4: Banking & Financials */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4 text-xs">
             <h3 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider border-b border-[#EEEEF2] pb-3 flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-[#5B21B6]" />
+              <CreditCard className="h-4 w-4 text-[#1B2E79]" />
               Banking & Salary Details
             </h3>
 
@@ -617,7 +617,7 @@ export const WorkerDetailPage: React.FC = () => {
           {/* Section 1: Operational & Area Entitlements */}
           <div className="space-y-3">
             <h4 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-wider border-b border-[#EEEEF2] pb-1.5 flex items-center gap-1.5">
-              <Briefcase className="h-3.5 w-3.5 text-[#5B21B6]" />
+              <Briefcase className="h-3.5 w-3.5 text-[#1B2E79]" />
               Operational & Area Entitlements
             </h4>
 
@@ -630,7 +630,7 @@ export const WorkerDetailPage: React.FC = () => {
                 value={editAreaName}
                 onChange={(e) => setEditAreaName(e.target.value)}
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               >
                 {availableAreas.map((area) => (
                   <option key={area} value={area}>
@@ -649,7 +649,7 @@ export const WorkerDetailPage: React.FC = () => {
                 value={editJoiningStatus}
                 onChange={(e) => setEditJoiningStatus(e.target.value)}
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
@@ -668,7 +668,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditShiftTimeing(e.target.value)}
                 placeholder="Enter shift hours"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
 
@@ -683,7 +683,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditReferredBy(e.target.value)}
                 placeholder="Enter referrer ID"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
           </div>
@@ -691,7 +691,7 @@ export const WorkerDetailPage: React.FC = () => {
           {/* Section 2: Banking & Compensation Details */}
           <div className="space-y-3 pt-2">
             <h4 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-wider border-b border-[#EEEEF2] pb-1.5 flex items-center gap-1.5">
-              <CreditCard className="h-3.5 w-3.5 text-[#5B21B6]" />
+              <CreditCard className="h-3.5 w-3.5 text-[#1B2E79]" />
               Banking & Compensation
             </h4>
 
@@ -706,7 +706,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditMonthlySalary(e.target.value)}
                 placeholder="Enter monthly salary"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
 
@@ -721,7 +721,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditBankName(e.target.value)}
                 placeholder="Enter bank name"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
 
@@ -736,7 +736,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditAccountNumber(e.target.value)}
                 placeholder="Enter account number"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
 
@@ -751,7 +751,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditIfscCode(e.target.value.toUpperCase())}
                 placeholder="Enter IFSC code"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono uppercase font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-mono uppercase font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
 
@@ -766,7 +766,7 @@ export const WorkerDetailPage: React.FC = () => {
                 onChange={(e) => setEditAccountHolderName(e.target.value)}
                 placeholder="Enter account holder name"
                 disabled={isSaving}
-                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#5B21B6] focus:ring-1 focus:ring-[#5B21B6]/20 transition-all"
+                className="flex-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-medium text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1B2E79] focus:ring-1 focus:ring-[#1B2E79]/20 transition-all"
               />
             </div>
           </div>
@@ -787,7 +787,7 @@ export const WorkerDetailPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? (
                 <>

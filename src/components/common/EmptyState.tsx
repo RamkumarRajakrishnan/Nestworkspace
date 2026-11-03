@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { PackageOpen, LucideIcon } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -18,7 +18,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#EDE9FE] text-[#5B21B6]">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#EEF3FF] text-[#1B2E79]">
         <Icon className="h-7 w-7" />
       </div>
       <h3 className="mt-4 text-sm font-bold text-[#1F1F1F]">{title}</h3>
@@ -26,7 +26,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {actionText && onAction && (
         <button
           onClick={onAction}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm transition-all hover:bg-[#4C1D95] active:scale-95"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm transition-all hover:bg-[#13225C] active:scale-95"
         >
           {actionText}
         </button>

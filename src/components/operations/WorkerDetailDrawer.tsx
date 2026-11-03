@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Drawer } from '../common/Drawer';
 import { Worker } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
@@ -62,7 +62,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
               navigate(`/workers/${worker.id}`);
               onClose();
             }}
-            className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#F5F3FF] transition-colors shadow-soft-sm active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#F5F8FF] transition-colors shadow-soft-sm active:scale-95"
             title="Open Full Expert Profile Page"
           >
             <span>Full Profile</span>
@@ -92,7 +92,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
                 {worker.skills.map((s, idx) => (
-                  <span key={idx} className="rounded-full bg-white border border-[#EEEEF2] px-2 py-0.5 text-[10px] text-[#5B21B6] font-semibold">
+                  <span key={idx} className="rounded-full bg-white border border-[#EEEEF2] px-2 py-0.5 text-[10px] text-[#1B2E79] font-semibold">
                     {s}
                   </span>
                 ))}
@@ -105,7 +105,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
             {worker.status === 'Available' ? (
               <button
                 onClick={() => onAssignClick && onAssignClick(worker)}
-                className="rounded-xl bg-[#5B21B6] px-4 py-2.5 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                className="rounded-xl bg-[#1B2E79] px-4 py-2.5 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-all flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <Briefcase className="h-3.5 w-3.5" />
                 Assign Immediate Job
@@ -131,7 +131,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
           {/* Live Telemetry & GPS Stats */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4.5 space-y-3 shadow-soft-sm">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-              <Radio className="h-3.5 w-3.5 text-[#5B21B6]" />
+              <Radio className="h-3.5 w-3.5 text-[#1B2E79]" />
               Live Telemetry & GPS Coordinates
             </h4>
 
@@ -144,7 +144,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
               </div>
               <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2]">
                 <span className="text-[10px] text-[#6B6B6B] font-mono">LAST LOCATION UPDATE</span>
-                <div className="font-mono text-[#5B21B6] font-bold mt-0.5">{worker.lastGpsUpdate}</div>
+                <div className="font-mono text-[#1B2E79] font-bold mt-0.5">{worker.lastGpsUpdate}</div>
               </div>
               <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2]">
                 <span className="text-[10px] text-[#6B6B6B] font-mono">GPS ACCURACY</span>
@@ -152,7 +152,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
               </div>
               <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2]">
                 <span className="text-[10px] text-[#6B6B6B] font-mono">CURRENT ASSIGNMENT</span>
-                <div className="font-mono text-[#7C3AED] font-bold mt-0.5">{worker.currentJobId || 'None (Idle)'}</div>
+                <div className="font-mono text-[#162766] font-bold mt-0.5">{worker.currentJobId || 'None (Idle)'}</div>
               </div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
             </div>
             <div className="rounded-2xl border border-[#EEEEF2] bg-white p-3.5 text-center shadow-soft-sm">
               <div className="text-[10px] text-[#6B6B6B] uppercase font-mono font-medium">Earnings Today</div>
-              <div className="text-lg font-bold font-mono text-[#5B21B6] mt-1">₹{worker.todayEarnings}</div>
+              <div className="text-lg font-bold font-mono text-[#1B2E79] mt-1">₹{worker.todayEarnings}</div>
             </div>
             <div className="rounded-2xl border border-[#EEEEF2] bg-white p-3.5 text-center shadow-soft-sm">
               <div className="text-[10px] text-[#6B6B6B] uppercase font-mono font-medium">Compliance</div>
@@ -179,11 +179,11 @@ export const WorkerDetailDrawer: React.FC<WorkerDetailDrawerProps> = ({
           <div className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4.5 space-y-2 text-xs">
             <h4 className="font-bold text-[#1F1F1F]">Direct Contact Information</h4>
             <div className="flex items-center gap-2 text-[#6B6B6B]">
-              <Phone className="h-3.5 w-3.5 text-[#5B21B6]" />
+              <Phone className="h-3.5 w-3.5 text-[#1B2E79]" />
               <span className="font-mono text-[#1F1F1F] font-medium">{worker.phone}</span>
             </div>
             <div className="flex items-center gap-2 text-[#6B6B6B]">
-              <Mail className="h-3.5 w-3.5 text-[#5B21B6]" />
+              <Mail className="h-3.5 w-3.5 text-[#1B2E79]" />
               <span className="text-[#1F1F1F]">{worker.email}</span>
             </div>
           </div>

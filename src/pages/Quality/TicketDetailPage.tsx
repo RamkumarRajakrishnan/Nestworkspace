@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { CustomerTicketDetails, CustomerTicketItem, CustomerTicketConversationItem } from '../../types';
 import { getCustomerTicketDetails } from '../../services/api';
@@ -95,7 +95,7 @@ export const TicketDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="py-24 text-center space-y-3">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#5B21B6]" />
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#1B2E79]" />
         <h2 className="text-sm font-semibold text-[#1F1F1F]">Loading Customer Ticket Details...</h2>
         <p className="text-xs text-[#6B6B6B]">Retrieving incident records from support engine</p>
       </div>
@@ -118,7 +118,7 @@ export const TicketDetailPage: React.FC = () => {
           {id && (
             <button
               onClick={() => fetchFullDetails(id)}
-              className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D95] transition-all shadow-soft-sm cursor-pointer"
+              className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white hover:bg-[#13225C] transition-all shadow-soft-sm cursor-pointer"
             >
               Retry
             </button>
@@ -187,7 +187,7 @@ export const TicketDetailPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/quality/complaints')}
-            className="shrink-0 rounded-xl border border-[#EEEEF2] bg-white p-2.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
+            className="shrink-0 rounded-xl border border-[#EEEEF2] bg-white p-2.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors cursor-pointer"
             title="Back to Customer Tickets"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -198,7 +198,7 @@ export const TicketDetailPage: React.FC = () => {
                 Customer Ticket Details
               </h1>
               {ticketId !== '—' && (
-                <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full">
+                <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full">
                   #{ticketId}
                 </span>
               )}
@@ -219,7 +219,7 @@ export const TicketDetailPage: React.FC = () => {
               className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3.5 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-all shadow-soft-sm cursor-pointer disabled:opacity-50"
               title="Refresh ticket data"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
           )}
@@ -227,7 +227,7 @@ export const TicketDetailPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsEditOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
           >
             <Pencil className="h-3.5 w-3.5" />
             <span>Edit Status</span>
@@ -243,7 +243,7 @@ export const TicketDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 sm:p-6 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#EEEEF2]">
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-[#5B21B6]" />
+                <Tag className="h-4 w-4 text-[#1B2E79]" />
                 <h3 className="text-sm font-bold text-[#1F1F1F] uppercase font-mono tracking-wider">
                   Ticket Information
                 </h3>
@@ -254,7 +254,7 @@ export const TicketDetailPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="space-y-1">
                 <span className="text-[11px] font-semibold text-[#6B6B6B] block">Ticket ID</span>
-                <span className="font-mono text-sm font-bold text-[#5B21B6] block">
+                <span className="font-mono text-sm font-bold text-[#1B2E79] block">
                   {ticketId}
                 </span>
               </div>
@@ -293,13 +293,13 @@ export const TicketDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 sm:p-6 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#EEEEF2]">
               <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-[#5B21B6]" />
+                <MessageSquare className="h-4 w-4 text-[#1B2E79]" />
                 <h3 className="text-sm font-bold text-[#1F1F1F] uppercase font-mono tracking-wider">
                   Conversation Log
                 </h3>
               </div>
               {conversations.length > 0 && (
-                <span className="text-[11px] font-mono font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full">
+                <span className="text-[11px] font-mono font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full">
                   {conversations.length} {conversations.length === 1 ? 'Message' : 'Messages'}
                 </span>
               )}
@@ -316,7 +316,7 @@ export const TicketDetailPage: React.FC = () => {
                     {c.question && (
                       <div className="space-y-1">
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#6B6B6B] uppercase font-mono tracking-wider">
-                          <HelpCircle className="h-3 w-3 text-[#5B21B6]" />
+                          <HelpCircle className="h-3 w-3 text-[#1B2E79]" />
                           <span>Question</span>
                         </div>
                         <p className="text-xs text-[#1F1F1F] bg-white rounded-lg p-3 border border-[#EEEEF2] leading-relaxed">
@@ -328,11 +328,11 @@ export const TicketDetailPage: React.FC = () => {
                     {/* Answer */}
                     {c.answer && (
                       <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#5B21B6] uppercase font-mono tracking-wider">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#1B2E79] uppercase font-mono tracking-wider">
                           <MessageCircle className="h-3 w-3 text-[#10B981]" />
                           <span>Customer Response</span>
                         </div>
-                        <p className="text-xs font-semibold text-[#1F1F1F] bg-[#EDE9FE]/50 rounded-lg p-3 border border-[#DDD6FE] leading-relaxed">
+                        <p className="text-xs font-semibold text-[#1F1F1F] bg-[#EEF3FF]/50 rounded-lg p-3 border border-[#C4D9FD] leading-relaxed">
                           {c.answer}
                         </p>
                       </div>
@@ -355,7 +355,7 @@ export const TicketDetailPage: React.FC = () => {
           {/* Resolution & Remarks Card */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 sm:p-6 shadow-soft-sm space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-[#EEEEF2]">
-              <FileCheck className="h-4 w-4 text-[#5B21B6]" />
+              <FileCheck className="h-4 w-4 text-[#1B2E79]" />
               <h3 className="text-sm font-bold text-[#1F1F1F] uppercase font-mono tracking-wider">
                 Resolution & Remarks
               </h3>
@@ -398,7 +398,7 @@ export const TicketDetailPage: React.FC = () => {
           {/* Customer Information Card */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 sm:p-6 shadow-soft-sm space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-[#EEEEF2]">
-              <User className="h-4 w-4 text-[#5B21B6]" />
+              <User className="h-4 w-4 text-[#1B2E79]" />
               <h3 className="text-sm font-bold text-[#1F1F1F] uppercase font-mono tracking-wider">
                 Customer Information
               </h3>
@@ -449,12 +449,12 @@ export const TicketDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 sm:p-6 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#EEEEF2]">
               <div className="flex items-center gap-2">
-                <Paperclip className="h-4 w-4 text-[#5B21B6]" />
+                <Paperclip className="h-4 w-4 text-[#1B2E79]" />
                 <h3 className="text-sm font-bold text-[#1F1F1F] uppercase font-mono tracking-wider">
                   Attachments
                 </h3>
               </div>
-              <span className="font-mono text-xs font-bold text-[#5B21B6]">
+              <span className="font-mono text-xs font-bold text-[#1B2E79]">
                 {attachments.length} {attachments.length === 1 ? 'File' : 'Files'}
               </span>
             </div>
@@ -471,7 +471,7 @@ export const TicketDetailPage: React.FC = () => {
                         className="flex items-center justify-between rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 text-xs"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <Paperclip className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                          <Paperclip className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                           <span className="truncate font-medium text-[#1F1F1F]">{fileName}</span>
                         </div>
                         {fileUrl && (
@@ -479,7 +479,7 @@ export const TicketDetailPage: React.FC = () => {
                             href={fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[#5B21B6] hover:underline font-semibold text-xs shrink-0"
+                            className="flex items-center gap-1 text-[#1B2E79] hover:underline font-semibold text-xs shrink-0"
                           >
                             <span>Open</span>
                             <ExternalLink className="h-3 w-3" />

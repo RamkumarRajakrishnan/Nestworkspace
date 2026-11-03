@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { Assignment } from '../../types';
 import { useOperations } from '../../context/OperationsContext';
@@ -86,7 +86,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
             </button>
             <button
               onClick={handleNextStep}
-              className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
+              className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95"
             >
               Review Reassignment →
             </button>
@@ -141,14 +141,14 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
               <div className="mt-1 text-xs text-[#1F1F1F] font-semibold">{sourceBooking?.service}</div>
               <div className="text-[11px] text-[#6B6B6B]">{sourceBooking?.customer.name}</div>
               <div className="mt-2.5 text-[10px] text-[#6B6B6B] border-t border-[#EEEEF2] pt-2">
-                Zone: <span className="font-mono text-[#5B21B6] font-semibold">{sourceBooking?.areaId}</span> • Time:{' '}
+                Zone: <span className="font-mono text-[#1B2E79] font-semibold">{sourceBooking?.areaId}</span> • Time:{' '}
                 <span className="text-[#1F1F1F]">{sourceBooking?.startTime}</span>
               </div>
             </div>
 
             {/* Target Job */}
-            <div className="rounded-2xl border border-[#DDD6FE] bg-[#F5F3FF] p-4">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-[#5B21B6] font-bold">
+            <div className="rounded-2xl border border-[#C4D9FD] bg-[#F5F8FF] p-4">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-[#1B2E79] font-bold">
                 Destination Target Booking
               </div>
               <div className="mt-1">
@@ -156,7 +156,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
                   value={targetBookingId}
                   onChange={(e) => setTargetBookingId(e.target.value)}
                   aria-label="Select Target Booking"
-                  className="w-full rounded-xl border border-[#DDD6FE] bg-white p-2 text-xs font-semibold text-[#1F1F1F] focus:border-[#7C3AED] focus:outline-none"
+                  className="w-full rounded-xl border border-[#C4D9FD] bg-white p-2 text-xs font-semibold text-[#1F1F1F] focus:border-[#162766] focus:outline-none"
                 >
                   {bookings
                     .filter((b) => b.id !== sourceBooking?.id && b.status !== 'Completed')
@@ -170,7 +170,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
               {targetBooking && (
                 <div className="mt-2.5 text-xs text-[#6B6B6B] space-y-0.5">
                   <div className="text-[11px] text-[#1F1F1F] font-bold">{targetBooking.customer.name}</div>
-                  <div className="text-[10px] text-[#5B21B6] font-semibold">
+                  <div className="text-[10px] text-[#1B2E79] font-semibold">
                     Priority: <strong>{targetBooking.priority}</strong> • Status: {targetBooking.status}
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
               value={replacementWorkerId}
               onChange={(e) => setReplacementWorkerId(e.target.value)}
               aria-label="Select Replacement Expert"
-              className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2.5 text-xs text-[#1F1F1F] font-semibold focus:border-[#7C3AED] focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-2.5 text-xs text-[#1F1F1F] font-semibold focus:border-[#162766] focus:bg-white focus:outline-none"
             >
               <option value="none">⚠️ Do not replace (Mark source booking unassigned)</option>
               {availableReplacements.map((w) => (
@@ -224,7 +224,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
                   onClick={() => setReason(r)}
                   className={`rounded-xl px-3 py-1.5 text-xs font-semibold border transition-all ${
                     reason === r
-                      ? 'bg-[#EDE9FE] border-[#7C3AED] text-[#5B21B6]'
+                      ? 'bg-[#EEF3FF] border-[#162766] text-[#1B2E79]'
                       : 'bg-[#F7F5FA] border-[#EEEEF2] text-[#6B6B6B] hover:text-[#1F1F1F]'
                   }`}
                 >
@@ -239,7 +239,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
                 value={customReason}
                 onChange={(e) => setCustomReason(e.target.value)}
                 placeholder="Enter specific justification..."
-                className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] p-2.5 text-xs text-[#1F1F1F] focus:border-[#7C3AED] focus:bg-white focus:outline-none"
+                className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] p-2.5 text-xs text-[#1F1F1F] focus:border-[#162766] focus:bg-white focus:outline-none"
               />
             )}
           </div>
@@ -265,7 +265,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
             </div>
             <div className="flex justify-between text-[#1F1F1F]">
               <span className="text-[#6B6B6B]">Target Booking:</span>
-              <span className="font-bold text-[#5B21B6]">#{targetBooking?.id} ({targetBooking?.service})</span>
+              <span className="font-bold text-[#1B2E79]">#{targetBooking?.id} ({targetBooking?.service})</span>
             </div>
             <div className="flex justify-between text-[#1F1F1F]">
               <span className="text-[#6B6B6B]">Source Booking Replacement:</span>
@@ -275,7 +275,7 @@ export const ReassignWorkerModal: React.FC<ReassignWorkerModalProps> = ({
             </div>
             <div className="flex justify-between text-[#1F1F1F] border-t border-[#EEEEF2] pt-2">
               <span className="text-[#6B6B6B]">Audit Justification:</span>
-              <span className="font-mono text-[#5B21B6] font-semibold">{reason === 'Other' ? customReason : reason}</span>
+              <span className="font-mono text-[#1B2E79] font-semibold">{reason === 'Other' ? customReason : reason}</span>
             </div>
           </div>
         </div>

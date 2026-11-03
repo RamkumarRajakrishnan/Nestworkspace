@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+﻿import React, { useEffect, useRef, useState, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -15,7 +15,9 @@ import {
   Radio,
   User,
   ShieldCheck,
-  Activity
+  Activity,
+  MoreHorizontal,
+  X
 } from 'lucide-react';
 
 export interface EnrichedVendorLiveTrackItem {
@@ -65,6 +67,26 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
   const [mapReady, setMapReady] = useState(false);
   const [activeTileLayer, setActiveTileLayer] = useState<'streets' | 'light'>('streets');
   const tileLayerRef = useRef<L.TileLayer | null>(null);
+
+  // Mobile Legend Toggle State (Mobile only: hides bulky overlay by default)
+  const [isMobileLegendOpen, setIsMobileLegendOpen] = useState(false);
+  const mobileLegendRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-close mobile legend when user taps anywhere outside the card
+  useEffect(() => {
+    if (!isMobileLegendOpen) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (mobileLegendRef.current && !mobileLegendRef.current.contains(e.target as Node)) {
+        setIsMobileLegendOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isMobileLegendOpen]);
 
   // Normalize areas dynamically from props (Requirement 2 & 3: Works for 0, 1, 3, 5, 20 areas)
   const normalizedAreas: LiveAreaDetails[] = useMemo(() => {
@@ -217,8 +239,8 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
       // 1. Draw dynamic coverage circle for this specific area (Requirement 5)
       const circle = L.circle([latitude, longitude], {
         radius: coverageRadius,
-        color: '#7C3AED',
-        fillColor: '#8B5CF6',
+        color: '#162766',
+        fillColor: '#1B2E79',
         fillOpacity: 0.08,
         weight: 2,
         dashArray: '6, 6',
@@ -239,14 +261,14 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         className: 'custom-area-center-marker',
         html: `
           <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
-            <span style="position: absolute; width: 40px; height: 40px; border-radius: 9999px; background: rgba(124, 58, 237, 0.25); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
-            <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; background: linear-gradient(135deg, #6D28D9 0%, #4C1D95 100%); border: 2.5px solid #FFFFFF; box-shadow: 0 10px 15px -3px rgba(76, 29, 149, 0.4); color: white;">
+            <span style="position: absolute; width: 40px; height: 40px; border-radius: 9999px; background: rgba(27, 46, 121, 0.25); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+            <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; background: linear-gradient(135deg, #162766 0%, #13225C 100%); border: 2.5px solid #FFFFFF; box-shadow: 0 10px 15px -3px rgba(27, 46, 121, 0.4); color: white;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
             </div>
-            <div style="position: absolute; bottom: -20px; background: #4C1D95; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);">
+            <div style="position: absolute; bottom: -20px; background: #13225C; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);">
               ${areaName}
             </div>
           </div>
@@ -262,13 +284,13 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
       const areaPopupContent = `
         <div style="font-family: inherit; padding: 6px 2px; min-width: 200px;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; border-bottom: 1px solid #F3F4F6; padding-bottom: 6px;">
-            <span style="display: flex; width: 10px; height: 10px; border-radius: 9999px; background: #7C3AED;"></span>
+            <span style="display: flex; width: 10px; height: 10px; border-radius: 9999px; background: #162766;"></span>
             <h4 style="font-size: 14px; font-weight: 700; color: #1F2937; margin: 0;">${areaName}</h4>
           </div>
           <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #4B5563;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #6B7280;">Coverage Radius:</span>
-              <strong style="color: #6D28D9; font-weight: 700;">${coverageRadius} m</strong>
+              <strong style="color: #162766; font-weight: 700;">${coverageRadius} m</strong>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #6B7280;">Total Workers:</span>
@@ -464,17 +486,17 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[580px] rounded-2xl overflow-hidden border border-purple-200/80 shadow-soft-md bg-slate-100">
+    <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[580px] rounded-2xl overflow-hidden border border-blue-200/80 shadow-soft-md bg-slate-100">
       {/* Map Container */}
       <div ref={mapContainerRef} className="w-full h-full z-10" />
 
       {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-30 bg-white/70 backdrop-blur-xs flex flex-col items-center justify-center gap-3">
-          <div className="flex items-center justify-center h-12 w-12 rounded-2xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 animate-spin">
+          <div className="flex items-center justify-center h-12 w-12 rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/30 animate-spin">
             <Compass className="h-6 w-6" />
           </div>
-          <p className="text-xs font-bold text-purple-900 tracking-wide">
+          <p className="text-xs font-bold text-blue-900 tracking-wide">
             Syncing live worker coordinates & area coverage...
           </p>
         </div>
@@ -485,7 +507,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         <button
           type="button"
           onClick={() => mapInstanceRef.current?.zoomIn()}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-purple-50 hover:text-purple-700 transition-all cursor-pointer focus:outline-none"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-blue-50 hover:text-blue-700 transition-all cursor-pointer focus:outline-none"
           title="Zoom In"
           aria-label="Zoom In"
         >
@@ -495,7 +517,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         <button
           type="button"
           onClick={() => mapInstanceRef.current?.zoomOut()}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-purple-50 hover:text-purple-700 transition-all cursor-pointer focus:outline-none"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-blue-50 hover:text-blue-700 transition-all cursor-pointer focus:outline-none"
           title="Zoom Out"
           aria-label="Zoom Out"
         >
@@ -505,7 +527,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         <button
           type="button"
           onClick={handleRecenter}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-purple-50 hover:text-purple-700 transition-all cursor-pointer focus:outline-none"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-blue-50 hover:text-blue-700 transition-all cursor-pointer focus:outline-none"
           title="Recenter on Area(s)"
           aria-label="Recenter on Area(s)"
         >
@@ -515,7 +537,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         <button
           type="button"
           onClick={handleFitAll}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-purple-50 hover:text-purple-700 transition-all cursor-pointer focus:outline-none"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-blue-50 hover:text-blue-700 transition-all cursor-pointer focus:outline-none"
           title="Fit All Areas & Markers"
           aria-label="Fit All Areas & Markers"
         >
@@ -525,7 +547,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         <button
           type="button"
           onClick={toggleTileLayer}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-purple-50 hover:text-purple-700 transition-all cursor-pointer focus:outline-none"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/95 text-slate-700 shadow-soft-sm border border-slate-200/80 hover:bg-blue-50 hover:text-blue-700 transition-all cursor-pointer focus:outline-none"
           title={`Switch to ${activeTileLayer === 'streets' ? 'Light Carto' : 'OpenStreetMap'}`}
           aria-label="Toggle Tile Map Style"
         >
@@ -535,8 +557,8 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
 
       {/* Floating Active Area Info Badge Top-Left */}
       {normalizedAreas.length > 0 && (
-        <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2.5 rounded-xl bg-white/95 px-3 py-2 shadow-soft-md border border-purple-200/80 backdrop-blur-sm pointer-events-auto max-w-[calc(100%-4.5rem)]">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-100 text-purple-700 shrink-0">
+        <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2.5 rounded-xl bg-white/95 px-3 py-2 shadow-soft-md border border-blue-200/80 backdrop-blur-sm pointer-events-auto max-w-[calc(100%-4.5rem)]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-700 shrink-0">
             <MapPin className="h-4 w-4 stroke-[2.5]" />
           </div>
           <div className="flex flex-col min-w-0">
@@ -546,7 +568,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
               </span>
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             </div>
-            <span className="text-[10px] text-purple-700 font-semibold truncate max-w-[200px]">
+            <span className="text-[10px] text-blue-700 font-semibold truncate max-w-[200px]">
               {normalizedAreas.length === 1
                 ? `Radius: ${normalizedAreas[0].coverageRadius}m`
                 : normalizedAreas.map((a) => a.areaName).join(', ')}
@@ -555,22 +577,65 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
         </div>
       )}
 
-      {/* Floating Map Legend Bottom-Left (Requirement 10 & 24) */}
-      <div className="absolute bottom-3.5 left-3.5 z-20 rounded-xl bg-white/95 px-3.5 py-2.5 shadow-soft-md border border-slate-200/80 backdrop-blur-sm pointer-events-auto max-w-[calc(100%-1.75rem)] sm:max-w-[340px]">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <Activity className="h-3 w-3 text-purple-600" />
-            <span>Map Legend</span>
+      {/* Mobile 3-Dot / Hamburger Trigger Button (Visible ONLY on mobile when legend is closed) */}
+      {!isMobileLegendOpen && (
+        <button
+          type="button"
+          onClick={() => setIsMobileLegendOpen(true)}
+          className="sm:hidden absolute bottom-3.5 left-3.5 z-20 flex items-center gap-2 rounded-xl bg-white/95 px-3 py-2 shadow-soft-md border border-slate-200/80 backdrop-blur-sm text-xs font-bold text-slate-700 hover:text-blue-700 hover:border-blue-300 active:scale-95 transition-all cursor-pointer pointer-events-auto"
+          aria-label="Open Map Legend"
+          title="Open Map Legend & Quick Focus"
+        >
+          <div className="flex items-center justify-center h-5 w-5 rounded-lg bg-blue-50 text-blue-600">
+            <MoreHorizontal className="h-4 w-4" />
           </div>
+          <span>Map Legend</span>
           {normalizedAreas.length > 1 && (
-            <span className="text-purple-600 font-semibold lowercase">
-              {normalizedAreas.length} areas
+            <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">
+              {normalizedAreas.length}
             </span>
           )}
+        </button>
+      )}
+
+      {/* Map Legend:
+          - Tablet & Desktop (sm and above): Always visible at bottom-3.5 left-3.5, max-w-[340px] (STRICTLY UNTOUCHED)
+          - Mobile (< sm): Hidden by default, opens cleanly via 3-dot hamburger button with close (X) button
+      */}
+      <div
+        ref={mobileLegendRef}
+        className={`
+          sm:block sm:absolute sm:bottom-3.5 sm:left-3.5 sm:z-20 sm:max-w-[340px]
+          ${isMobileLegendOpen ? 'block absolute bottom-3.5 left-3.5 z-30 max-w-[calc(100%-1.75rem)] animate-in fade-in zoom-in-95 duration-150' : 'hidden'}
+          rounded-xl bg-white/95 px-3.5 py-2.5 shadow-soft-md border border-slate-200/80 backdrop-blur-sm pointer-events-auto
+        `}
+      >
+        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Activity className="h-3 w-3 text-blue-600" />
+            <span>Map Legend</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {normalizedAreas.length > 1 && (
+              <span className="text-blue-600 font-semibold lowercase">
+                {normalizedAreas.length} areas
+              </span>
+            )}
+            {/* Mobile Close Button (sm:hidden) */}
+            <button
+              type="button"
+              onClick={() => setIsMobileLegendOpen(false)}
+              className="sm:hidden -mr-1 p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              aria-label="Close Map Legend"
+              title="Close"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#5B21B6] border border-white shadow-xs shrink-0" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#1B2E79] border border-white shadow-xs shrink-0" />
             <span>Area Center</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -582,7 +647,7 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
             <span>Offline Worker</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 border-b-2 border-dashed border-purple-600 shrink-0" />
+            <span className="w-3 border-b-2 border-dashed border-blue-600 shrink-0" />
             <span>Radius Circle</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -613,10 +678,10 @@ export const LiveOperationsMap: React.FC<LiveOperationsMapProps> = ({
                   onClick={() => {
                     mapInstanceRef.current?.setView([a.latitude, a.longitude], 15, { animate: true });
                   }}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors border border-purple-200/50 cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors border border-blue-200/50 cursor-pointer"
                   title={`Focus ${a.areaName} (${a.coverageRadius}m)`}
                 >
-                  <MapPin className="h-2.5 w-2.5 text-purple-600" />
+                  <MapPin className="h-2.5 w-2.5 text-blue-600" />
                   <span>{a.areaName}</span>
                 </button>
               ))}

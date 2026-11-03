@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { RawApiExpert, getNestWorkers, getActiveAreas, formatImageUrl, ActiveAreaItem } from '../../../services/api';
 import { DataTable, Column } from '../../../components/common/DataTable';
+import { Pagination } from '../../../components/common/Pagination';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { SearchInput } from '../../../components/common/SearchInput';
 import { ExpertDetailDrawer } from '../../../components/workforce/ExpertDetailDrawer';
@@ -31,7 +32,7 @@ const PAGE_SIZE = 20; // Strictly 20 profiles per page
 const STATIC_EXPERT_STATUSES = [
   { id: 'All Status', label: 'All Status', dotColor: 'bg-gray-400' },
   { id: 'Active', label: 'Active', dotColor: 'bg-emerald-500' },
-  { id: 'Inactive', label: 'Inactive', dotColor: 'bg-[#7C3AED]' },
+  { id: 'Inactive', label: 'Inactive', dotColor: 'bg-[#162766]' },
   { id: 'Suspended', label: 'Suspended', dotColor: 'bg-rose-500' },
 ] as const;
 
@@ -296,9 +297,9 @@ export const WorkersPage: React.FC = () => {
 
         return (
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="h-8 w-8 shrink-0 rounded-full overflow-hidden border border-[#EEEEF2] bg-[#EDE9FE] flex items-center justify-center relative shadow-soft-xs">
-              <span className="font-bold text-xs text-[#5B21B6] select-none">
-                {name ? name.charAt(0).toUpperCase() : <User className="h-3.5 w-3.5 text-[#5B21B6]" />}
+            <div className="h-8 w-8 shrink-0 rounded-full overflow-hidden border border-[#EEEEF2] bg-[#EEF3FF] flex items-center justify-center relative shadow-soft-xs">
+              <span className="font-bold text-xs text-[#1B2E79] select-none">
+                {name ? name.charAt(0).toUpperCase() : <User className="h-3.5 w-3.5 text-[#1B2E79]" />}
               </span>
               {imgSrc ? (
                 <img
@@ -313,7 +314,7 @@ export const WorkersPage: React.FC = () => {
             </div>
             <div className="min-w-0 text-left">
               <div 
-                className="font-semibold text-xs text-[#1F1F1F] hover:text-[#5B21B6] transition-colors truncate max-w-[120px]" 
+                className="font-semibold text-xs text-[#1F1F1F] hover:text-[#1B2E79] transition-colors truncate max-w-[120px]" 
                 title={name}
               >
                 {name}
@@ -349,10 +350,10 @@ export const WorkersPage: React.FC = () => {
       render: (w) => (
         <div className="flex justify-center">
           <span 
-            className="inline-flex items-center gap-1 font-mono text-[#5B21B6] font-semibold text-[11px] bg-[#EDE9FE] px-1.5 py-0.5 rounded-lg max-w-[110px] truncate"
+            className="inline-flex items-center gap-1 font-mono text-[#1B2E79] font-semibold text-[11px] bg-[#EEF3FF] px-1.5 py-0.5 rounded-lg max-w-[110px] truncate"
             title={w.areaName || '—'}
           >
-            <MapPin className="h-2.5 w-2.5 text-[#5B21B6] shrink-0" />
+            <MapPin className="h-2.5 w-2.5 text-[#1B2E79] shrink-0" />
             <span className="truncate">{w.areaName || '—'}</span>
           </span>
         </div>
@@ -479,7 +480,7 @@ export const WorkersPage: React.FC = () => {
         <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setInspectExpert(w)}
-            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-xs cursor-pointer"
+            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-xs cursor-pointer"
             title="Inspect Expert (Quick Drawer)"
           >
             <Eye className="h-3.5 w-3.5" />
@@ -491,7 +492,7 @@ export const WorkersPage: React.FC = () => {
                 state: { tableId: w.tableId, edit: true },
               });
             }}
-            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-xs cursor-pointer"
+            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-xs cursor-pointer"
             title="Edit Expert"
           >
             <Pencil className="h-3.5 w-3.5" />
@@ -522,7 +523,7 @@ export const WorkersPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAddExpertModalOpen(true)}
-          className="flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer shrink-0"
+          className="flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer shrink-0"
         >
           <Plus className="h-4 w-4" />
           <span>New Expert</span>
@@ -548,10 +549,10 @@ export const WorkersPage: React.FC = () => {
             <button
               onClick={() => fetchExperts()}
               disabled={isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50"
               title="Refresh Experts list"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
@@ -566,16 +567,16 @@ export const WorkersPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -592,11 +593,11 @@ export const WorkersPage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Experts</h3>
                   </div>
                   <button
@@ -619,13 +620,13 @@ export const WorkersPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Partner Status</span>
                         {draftStatuses.length > 0 && !draftStatuses.includes('All Status') && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatuses.length === 1 ? draftStatuses[0] : `${draftStatuses.length} selected`}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -652,7 +653,7 @@ export const WorkersPage: React.FC = () => {
                               }}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
@@ -660,7 +661,7 @@ export const WorkersPage: React.FC = () => {
                                 <span className={`h-2 w-2 rounded-full ${st.dotColor}`} />
                                 <span>{st.label}</span>
                               </div>
-                              {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           );
                         })}
@@ -676,16 +677,16 @@ export const WorkersPage: React.FC = () => {
                       className="w-full flex items-center justify-between p-3.5 text-xs font-bold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                         <span>Area</span>
                         {draftMarkets.length > 0 && !draftMarkets.includes('All Areas') && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftMarkets.length === 1 ? draftMarkets[0] : `${draftMarkets.length} selected`}
                           </span>
                         )}
                       </div>
                       {expandedSections.market ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -695,7 +696,7 @@ export const WorkersPage: React.FC = () => {
                       <div className="px-3.5 pb-3.5 pt-1 border-t border-[#EEEEF2] space-y-1.5 max-h-48 overflow-y-auto">
                         {isLoadingAreas ? (
                           <div className="flex items-center gap-2 py-2 px-2 text-xs text-[#6B6B6B]">
-                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#5B21B6]" />
+                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#1B2E79]" />
                             <span>Loading areas from API...</span>
                           </div>
                         ) : (
@@ -708,7 +709,7 @@ export const WorkersPage: React.FC = () => {
                               }}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 draftMarkets.length === 0 || draftMarkets.includes('ALL') || draftMarkets.includes('All Areas')
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
@@ -717,7 +718,7 @@ export const WorkersPage: React.FC = () => {
                                 <span>All Areas</span>
                               </div>
                               {(draftMarkets.length === 0 || draftMarkets.includes('ALL') || draftMarkets.includes('All Areas')) && (
-                                <Check className="h-3.5 w-3.5 text-[#5B21B6]" />
+                                <Check className="h-3.5 w-3.5 text-[#1B2E79]" />
                               )}
                             </button>
 
@@ -733,15 +734,15 @@ export const WorkersPage: React.FC = () => {
                                   }}
                                   className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                     isSelected
-                                      ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                      ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                       : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                                   }`}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <MapPin className="h-3 w-3 text-[#5B21B6]" />
+                                    <MapPin className="h-3 w-3 text-[#1B2E79]" />
                                     <span>{area}</span>
                                   </div>
-                                  {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                                  {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                                 </button>
                               );
                             })}
@@ -766,7 +767,7 @@ export const WorkersPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all cursor-pointer"
                   >
                     Apply Filters
                   </button>
@@ -783,7 +784,7 @@ export const WorkersPage: React.FC = () => {
 
             {/* Status chips */}
             {selectedStatuses.filter((s) => s !== 'All Status' && s !== 'ALL').map((st) => (
-              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {st}
                 <button 
                   onClick={() => setSelectedStatuses(selectedStatuses.filter((x) => x !== st))} 
@@ -796,7 +797,7 @@ export const WorkersPage: React.FC = () => {
 
             {/* Area chips */}
             {selectedMarkets.filter((m) => m !== 'All Areas' && m !== 'ALL').map((mId) => (
-              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Area: {mId}
                 <button 
                   onClick={() => setSelectedMarkets(selectedMarkets.filter((x) => x !== mId))} 
@@ -863,14 +864,14 @@ export const WorkersPage: React.FC = () => {
             return (
               <div
                 key={w.tableId || w.workerId}
-                className="rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-3.5 shadow-soft-sm hover:border-[#5B21B6]/30 transition-all space-y-2 w-full max-w-full overflow-hidden"
+                className="rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-3.5 shadow-soft-sm hover:border-[#1B2E79]/30 transition-all space-y-2 w-full max-w-full overflow-hidden"
               >
                 {/* Card Header: Profile & Status */}
                 <div className="flex items-center justify-between gap-2.5 border-b border-[#EEEEF2] pb-1.5">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-9 w-9 shrink-0 rounded-full overflow-hidden border border-[#EEEEF2] bg-[#EDE9FE] flex items-center justify-center relative">
-                      <span className="font-bold text-xs text-[#5B21B6] select-none">
-                        {name ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#5B21B6]" />}
+                    <div className="h-9 w-9 shrink-0 rounded-full overflow-hidden border border-[#EEEEF2] bg-[#EEF3FF] flex items-center justify-center relative">
+                      <span className="font-bold text-xs text-[#1B2E79] select-none">
+                        {name ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#1B2E79]" />}
                       </span>
                       {imgSrc ? (
                         <img
@@ -887,7 +888,7 @@ export const WorkersPage: React.FC = () => {
                       <h3 className="text-sm font-bold text-[#1F1F1F] truncate" title={name}>{name}</h3>
                       <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                         <span className="font-mono text-[11px] text-[#6B6B6B] font-semibold">{w.workerId}</span>
-                        <span className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-1.5 py-0.5 rounded-md truncate max-w-[120px]">
+                        <span className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-1.5 py-0.5 rounded-md truncate max-w-[120px]">
                           <MapPin className="h-2.5 w-2.5 shrink-0" />
                           <span className="truncate">{w.areaName || '—'}</span>
                         </span>
@@ -922,7 +923,7 @@ export const WorkersPage: React.FC = () => {
                     }}
                     className="flex items-center gap-1 rounded-xl border border-[#EEEEF2] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-all cursor-pointer"
                   >
-                    <Pencil className="h-3.5 w-3.5 text-[#5B21B6]" />
+                    <Pencil className="h-3.5 w-3.5 text-[#1B2E79]" />
                     <span>Edit</span>
                   </button>
                   <button
@@ -930,7 +931,7 @@ export const WorkersPage: React.FC = () => {
                     onClick={() => setInspectExpert(w)}
                     title="Inspect Details"
                     aria-label="Inspect Details"
-                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white shadow-soft-sm transition-all cursor-pointer shrink-0"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white shadow-soft-sm transition-all cursor-pointer shrink-0"
                   >
                     <Eye className="h-4 w-4" />
                   </button>
@@ -943,67 +944,20 @@ export const WorkersPage: React.FC = () => {
 
       {/* Pagination Controls - Strictly 20 profiles per page */}
       {pagination.totalRecords > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#EEEEF2] bg-white px-4 py-3 rounded-2xl shadow-soft-sm w-full">
-          <div className="text-xs text-[#6B6B6B]">
-            Showing <strong className="text-[#1F1F1F] font-semibold">{startRecord}</strong> to{' '}
-            <strong className="text-[#1F1F1F] font-semibold">{endRecord}</strong> of{' '}
-            <strong className="text-[#1F1F1F] font-semibold">{pagination.totalRecords}</strong> experts (20 per page)
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Previous Button */}
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || isLoading}
-              className="flex items-center gap-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              <span>Previous</span>
-            </button>
-
-            {/* Page number buttons */}
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => {
-              // Only show nearby pages if total pages > 7
-              if (
-                pagination.totalPages > 7 &&
-                pageNum !== 1 &&
-                pageNum !== pagination.totalPages &&
-                Math.abs(pageNum - page) > 1
-              ) {
-                if (pageNum === 2 || pageNum === pagination.totalPages - 1) {
-                  return <span key={pageNum} className="px-1 text-xs text-[#6B6B6B]">...</span>;
-                }
-                return null;
-              }
-
-              const isActive = pageNum === page;
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setPage(pageNum)}
-                  disabled={isLoading}
-                  className={`h-8 w-8 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#5B21B6] text-white shadow-soft-xs'
-                      : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-
-            {/* Next Button */}
-            <button
-              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-              disabled={page >= pagination.totalPages || isLoading}
-              className="flex items-center gap-1 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={page}
+          totalPages={pagination.totalPages}
+          totalRecords={pagination.totalRecords}
+          pageSize={PAGE_SIZE}
+          startRecord={startRecord}
+          endRecord={endRecord}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading}
+          recordLabel="experts"
+        />
       )}
 
       {/* Eye Sidebar Quick Drawer */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Market, Booking } from '../../types';
 import { useOperations } from '../../context/OperationsContext';
 import { 
@@ -139,7 +139,7 @@ export const CapacityCrunchPanel: React.FC<CapacityCrunchPanelProps> = ({ market
         </div>
         <div className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-3.5">
           <div className="text-[10px] uppercase font-mono text-[#6B6B6B] font-semibold">Busy Experts</div>
-          <div className="text-2xl font-bold font-mono text-[#5B21B6] mt-1">{market.busyWorkers}</div>
+          <div className="text-2xl font-bold font-mono text-[#1B2E79] mt-1">{market.busyWorkers}</div>
           <div className="text-[10px] text-[#6B6B6B]">100% active on jobs</div>
         </div>
         <div className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-3.5">
@@ -170,7 +170,7 @@ export const CapacityCrunchPanel: React.FC<CapacityCrunchPanelProps> = ({ market
                 key={stg.stage}
                 className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-4 transition-all shadow-soft-sm ${
                   isCurrent
-                    ? 'border-[#DDD6FE] bg-[#F5F3FF]'
+                    ? 'border-[#C4D9FD] bg-[#F5F8FF]'
                     : isCompleted
                     ? 'border-[#EEEEF2] bg-white'
                     : 'border-[#EEEEF2] bg-[#FAF9FC] opacity-60'
@@ -182,7 +182,7 @@ export const CapacityCrunchPanel: React.FC<CapacityCrunchPanelProps> = ({ market
                       isCompleted
                         ? 'bg-[#10B981] text-white'
                         : isCurrent
-                        ? 'bg-[#5B21B6] text-white'
+                        ? 'bg-[#1B2E79] text-white'
                         : 'bg-[#EEEEF2] text-[#6B6B6B]'
                     }`}
                   >
@@ -201,7 +201,7 @@ export const CapacityCrunchPanel: React.FC<CapacityCrunchPanelProps> = ({ market
                   {stg.nextRadius && isCurrent && (
                     <button
                       onClick={() => handleEscalate(stg.nextRadius)}
-                      className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
+                      className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95"
                     >
                       {stg.action} →
                     </button>
@@ -210,7 +210,7 @@ export const CapacityCrunchPanel: React.FC<CapacityCrunchPanelProps> = ({ market
                   {stg.stage === 3 && isCurrent && primaryTargetBooking && (
                     <button
                       onClick={() => setSelectedBookingForAssign(primaryTargetBooking)}
-                      className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95 flex items-center gap-1.5"
+                      className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95 flex items-center gap-1.5"
                     >
                       <Users className="h-3.5 w-3.5" />
                       View & Assign Candidates
@@ -232,7 +232,7 @@ export const CapacityCrunchPanel: React.FC<CapacityCrunchPanelProps> = ({ market
           </div>
           <button
             onClick={() => setSelectedBookingForAssign(primaryTargetBooking)}
-            className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white hover:bg-[#4C1D95] transition-colors shadow-soft-sm"
+            className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white hover:bg-[#13225C] transition-colors shadow-soft-sm"
           >
             Assign Candidate Now →
           </button>

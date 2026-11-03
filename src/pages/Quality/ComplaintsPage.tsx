@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { CustomerTicketItem } from '../../types';
 import { DataTable, Column } from '../../components/common/DataTable';
+import { Pagination } from '../../components/common/Pagination';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { SearchInput } from '../../components/common/SearchInput';
 import { CustomerTicketDetailDrawer } from '../../components/quality/CustomerTicketDetailDrawer';
@@ -298,7 +299,7 @@ export const ComplaintsPage: React.FC = () => {
       header: 'Category',
       render: (t) => (
         <div className="py-1">
-          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-md">
+          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-md">
             <Tag className="h-2.5 w-2.5" />
             <span>{t.category || '—'}</span>
           </span>
@@ -323,7 +324,7 @@ export const ComplaintsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => handleViewTicket(t)}
-            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-xs cursor-pointer"
+            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-xs cursor-pointer"
             title="View Ticket Summary"
             aria-label="View Ticket Summary"
           >
@@ -334,7 +335,7 @@ export const ComplaintsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => handleEditTicket(t)}
-            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-xs cursor-pointer"
+            className="rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-xs cursor-pointer"
             title="Edit Ticket Status"
             aria-label="Edit Ticket Status"
           >
@@ -354,7 +355,7 @@ export const ComplaintsPage: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F1F1F]">
               Complaints & Customer Tickets
             </h1>
-            <span className="rounded-full bg-[#EDE9FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+            <span className="rounded-full bg-[#EEF3FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
               Quality
             </span>
           </div>
@@ -387,10 +388,10 @@ export const ComplaintsPage: React.FC = () => {
               type="button"
               onClick={() => fetchTickets(true)}
               disabled={isLoading || isRefreshing}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               title="Refresh tickets"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span>Refresh</span>
             </button>
 
@@ -406,16 +407,16 @@ export const ComplaintsPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -432,11 +433,11 @@ export const ComplaintsPage: React.FC = () => {
 
             {/* Floating Filter Popover */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Customer Tickets</h3>
                   </div>
                   <button
@@ -460,13 +461,13 @@ export const ComplaintsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Ticket Status</span>
                         {draftStatus && draftStatus !== 'ALL' && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatus}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -479,13 +480,13 @@ export const ComplaintsPage: React.FC = () => {
                           onClick={() => setDraftStatus('ALL')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                             draftStatus === 'ALL' || draftStatus === ''
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                           }`}
                         >
                           <span>All Statuses</span>
                           {(draftStatus === 'ALL' || draftStatus === '') && (
-                            <Check className="h-3.5 w-3.5 text-[#5B21B6]" />
+                            <Check className="h-3.5 w-3.5 text-[#1B2E79]" />
                           )}
                         </button>
                         {availableStatuses.map((st) => {
@@ -497,12 +498,12 @@ export const ComplaintsPage: React.FC = () => {
                               onClick={() => setDraftStatus(st)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
                               <span>{st}</span>
-                              {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           );
                         })}
@@ -518,16 +519,16 @@ export const ComplaintsPage: React.FC = () => {
                       className="w-full flex items-center justify-between p-3.5 text-xs font-bold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <Tag className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <Tag className="h-3.5 w-3.5 text-[#1B2E79]" />
                         <span>Ticket Category</span>
                         {draftCategory && draftCategory !== 'ALL' && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftCategory}
                           </span>
                         )}
                       </div>
                       {expandedSections.category ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -540,13 +541,13 @@ export const ComplaintsPage: React.FC = () => {
                           onClick={() => setDraftCategory('ALL')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                             draftCategory === 'ALL' || draftCategory === ''
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                           }`}
                         >
                           <span>All Categories</span>
                           {(draftCategory === 'ALL' || draftCategory === '') && (
-                            <Check className="h-3.5 w-3.5 text-[#5B21B6]" />
+                            <Check className="h-3.5 w-3.5 text-[#1B2E79]" />
                           )}
                         </button>
                         {availableCategories.map((cat) => {
@@ -558,12 +559,12 @@ export const ComplaintsPage: React.FC = () => {
                               onClick={() => setDraftCategory(cat)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
                               <span>{cat}</span>
-                              {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           );
                         })}
@@ -584,7 +585,7 @@ export const ComplaintsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilters}
-                    className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
+                    className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
                   >
                     Apply Filters
                   </button>
@@ -600,7 +601,7 @@ export const ComplaintsPage: React.FC = () => {
             <span className="text-[11px] font-semibold text-[#6B6B6B]">Applied:</span>
 
             {selectedStatus && selectedStatus !== 'ALL' && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {selectedStatus}
                 <button
                   type="button"
@@ -616,7 +617,7 @@ export const ComplaintsPage: React.FC = () => {
             )}
 
             {selectedCategory && selectedCategory !== 'ALL' && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Category: {selectedCategory}
                 <button
                   type="button"
@@ -638,7 +639,7 @@ export const ComplaintsPage: React.FC = () => {
       {isLoading && (
         <div className="space-y-3">
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-6 shadow-soft-sm space-y-4">
-            <div className="h-5 w-48 bg-[#EDE9FE] animate-pulse rounded-lg" />
+            <div className="h-5 w-48 bg-[#EEF3FF] animate-pulse rounded-lg" />
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((idx) => (
                 <div key={idx} className="h-12 w-full bg-[#FAF9FC] animate-pulse rounded-xl" />
@@ -706,11 +707,11 @@ export const ComplaintsPage: React.FC = () => {
                 <div
                   key={t.tableId}
                   onClick={() => handleViewTicket(t)}
-                  className="rounded-2xl border border-[#EEEEF2] bg-white p-3.5 shadow-soft-sm hover:border-[#DDD6FE] transition-all space-y-2.5 cursor-pointer"
+                  className="rounded-2xl border border-[#EEEEF2] bg-white p-3.5 shadow-soft-sm hover:border-[#C4D9FD] transition-all space-y-2.5 cursor-pointer"
                 >
                   {/* Card Header: Category + Status */}
                   <div className="flex items-center justify-between gap-2 border-b border-[#EEEEF2] pb-2">
-                    <span className="font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-lg truncate">
+                    <span className="font-mono text-[11px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-lg truncate">
                       {t.category || 'Nest Booking'}
                     </span>
                     <StatusBadge status={t.status || 'Open'} size="sm" />
@@ -748,7 +749,7 @@ export const ComplaintsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleViewTicket(t)}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       <span>View</span>
@@ -756,7 +757,7 @@ export const ComplaintsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleEditTicket(t)}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       <span>Edit</span>
@@ -770,40 +771,19 @@ export const ComplaintsPage: React.FC = () => {
       )}
 
       {/* Pagination Controls */}
-      {!isLoading && !error && filteredTickets.length > PAGE_SIZE && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-4 shadow-soft-sm">
-          <div className="text-xs text-[#6B6B6B]">
-            Showing <strong className="text-[#1F1F1F] font-mono">{(page - 1) * PAGE_SIZE + 1}</strong> to{' '}
-            <strong className="text-[#1F1F1F] font-mono">
-              {Math.min(page * PAGE_SIZE, filteredTickets.length)}
-            </strong>{' '}
-            of <strong className="text-[#1F1F1F] font-mono">{filteredTickets.length}</strong> tickets
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#EEEEF2] bg-white text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Previous Page"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="px-2 text-xs font-mono font-semibold text-[#1F1F1F]">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#EEEEF2] bg-white text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Next Page"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+      {!isLoading && !error && filteredTickets.length > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalRecords={filteredTickets.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading || isRefreshing}
+          recordLabel="tickets"
+        />
       )}
 
       {/* 1. Summary Drawer (Eye Action) */}

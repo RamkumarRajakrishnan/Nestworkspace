@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Drawer } from '../common/Drawer';
 import { WorkerPayout } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
@@ -52,7 +52,7 @@ export const PayoutLedgerDrawer: React.FC<PayoutLedgerDrawerProps> = ({
           <div className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4.5 space-y-3.5 shadow-soft-sm">
             <div className="flex items-center justify-between text-xs text-[#6B6B6B]">
               <span>Completed Jobs: <strong className="text-[#1F1F1F]">{payout.jobsCompleted}</strong></span>
-              <span className="font-mono text-[#5B21B6] font-semibold">Settlement: Daily T+0</span>
+              <span className="font-mono text-[#1B2E79] font-semibold">Settlement: Daily T+0</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5 border-t border-[#EEEEF2] pt-3 text-center">
@@ -66,9 +66,9 @@ export const PayoutLedgerDrawer: React.FC<PayoutLedgerDrawerProps> = ({
                   -₹{payout.deductions}
                 </div>
               </div>
-              <div className="rounded-xl bg-[#EDE9FE] border border-[#DDD6FE] p-2.5 shadow-soft-sm">
-                <span className="text-[10px] text-[#5B21B6] uppercase font-mono font-bold">Net Payable</span>
-                <div className="text-base font-bold font-mono text-[#5B21B6] mt-0.5">
+              <div className="rounded-xl bg-[#EEF3FF] border border-[#C4D9FD] p-2.5 shadow-soft-sm">
+                <span className="text-[10px] text-[#1B2E79] uppercase font-mono font-bold">Net Payable</span>
+                <div className="text-base font-bold font-mono text-[#1B2E79] mt-0.5">
                   ₹{payout.netPayable}
                 </div>
               </div>
@@ -81,14 +81,14 @@ export const PayoutLedgerDrawer: React.FC<PayoutLedgerDrawerProps> = ({
               onClick={() => setShowAdjustmentModal(true)}
               className="flex-1 rounded-xl border border-[#EEEEF2] bg-white px-4 py-2.5 text-xs font-bold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors flex items-center justify-center gap-1.5 shadow-soft-sm"
             >
-              <PlusCircle className="h-3.5 w-3.5 text-[#5B21B6]" />
+              <PlusCircle className="h-3.5 w-3.5 text-[#1B2E79]" />
               Add Ledger Adjustment
             </button>
 
             {!isApproved ? (
               <button
                 onClick={() => setShowApproveConfirm(true)}
-                className="flex-1 rounded-xl bg-[#5B21B6] px-4 py-2.5 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-colors flex items-center justify-center gap-1.5 active:scale-95"
+                className="flex-1 rounded-xl bg-[#1B2E79] px-4 py-2.5 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-colors flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Approve Daily Payout
@@ -104,7 +104,7 @@ export const PayoutLedgerDrawer: React.FC<PayoutLedgerDrawerProps> = ({
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4.5 space-y-3 shadow-soft-sm">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-xs text-[#1F1F1F] uppercase tracking-wider flex items-center gap-1.5">
-                <Receipt className="h-3.5 w-3.5 text-[#5B21B6]" />
+                <Receipt className="h-3.5 w-3.5 text-[#1B2E79]" />
                 Itemized Line-Item Ledger
               </h4>
               <span className="text-[11px] text-[#6B6B6B] font-mono">
@@ -120,7 +120,7 @@ export const PayoutLedgerDrawer: React.FC<PayoutLedgerDrawerProps> = ({
                     <div>
                       <div className="font-bold text-[#1F1F1F]">{item.reason}</div>
                       <div className="mt-0.5 flex items-center gap-2 text-[10px] text-[#6B6B6B] font-mono">
-                        <span className="rounded-full bg-[#F5F3FF] border border-[#DDD6FE] px-2 py-0.5 text-[#5B21B6] font-semibold">
+                        <span className="rounded-full bg-[#F5F8FF] border border-[#C4D9FD] px-2 py-0.5 text-[#1B2E79] font-semibold">
                           {item.type}
                         </span>
                         <span>Ref: {item.reference}</span>

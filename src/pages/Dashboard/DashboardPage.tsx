@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useOperations } from '../../context/OperationsContext';
 import { KpiCard } from '../../components/common/KpiCard';
 import { StatusBadge } from '../../components/common/StatusBadge';
@@ -120,7 +120,7 @@ export const DashboardPage: React.FC = () => {
 
           <button
             onClick={() => navigate('/live-operations')}
-            className="flex items-center gap-2 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95"
+            className="flex items-center gap-2 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95"
           >
             <MapPin className="h-4 w-4" />
             <span>Open Tactical Map</span>
@@ -129,32 +129,32 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Special Purple Highlight Card (Section 8: Inspired by the worker app's hero earnings card) */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#5B21B6] via-[#6D28D9] to-[#7C3AED] p-5 sm:p-6 text-white shadow-soft-md">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1B2E79] via-[#162766] to-[#162766] p-5 sm:p-6 text-white shadow-soft-md">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-white/20 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-purple-100">
+              <span className="rounded-full bg-white/20 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-100">
                 Live Operations Overview
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-purple-200">
+              <span className="flex items-center gap-1.5 text-xs text-blue-200">
                 <span className="h-2 w-2 rounded-full bg-[#10B981]" /> Operations Running Stable
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               {activeOrdersCount} Active Bookings • {workersAvailableCount} Experts Available
             </h2>
-            <p className="text-xs text-purple-200 max-w-xl">
+            <p className="text-xs text-blue-200 max-w-xl">
               Cluster load is balanced across 6 Bangalore nano-markets. Koramangala (KOR-03) requires capacity expansion buffer.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-4">
             <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 px-3.5 sm:px-4 py-2.5 sm:py-3 text-center">
-              <span className="text-[10px] uppercase font-mono text-purple-200">Dispatch Speed</span>
+              <span className="text-[10px] uppercase font-mono text-blue-200">Dispatch Speed</span>
               <div className="text-lg sm:text-xl font-bold font-mono text-white mt-0.5">21 sec</div>
             </div>
             <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 px-3.5 sm:px-4 py-2.5 sm:py-3 text-center">
-              <span className="text-[10px] uppercase font-mono text-purple-200">Fulfillment</span>
+              <span className="text-[10px] uppercase font-mono text-blue-200">Fulfillment</span>
               <div className="text-lg sm:text-xl font-bold font-mono text-white mt-0.5">97.8%</div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <button
               onClick={() => navigate('/area')}
-              className="text-xs text-[#5B21B6] hover:text-[#4C1D95] font-bold flex items-center gap-1 shrink-0"
+              className="text-xs text-[#1B2E79] hover:text-[#13225C] font-bold flex items-center gap-1 shrink-0"
             >
               All Markets <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -287,7 +287,7 @@ export const DashboardPage: React.FC = () => {
                                 ? 'bg-[#E11D48]'
                                 : m.capacity >= 70
                                 ? 'bg-[#F59E0B]'
-                                : 'bg-[#5B21B6]'
+                                : 'bg-[#1B2E79]'
                             }`}
                             style={{ width: `${Math.min(100, m.capacity)}%` }}
                           />
@@ -324,7 +324,7 @@ export const DashboardPage: React.FC = () => {
             {liveExceptions.map((exc) => (
               <div
                 key={exc.id}
-                className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2 hover:border-[#DDD6FE] transition-all shadow-soft-sm"
+                className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2 hover:border-[#C4D9FD] transition-all shadow-soft-sm"
               >
                 <div className="flex items-start justify-between gap-2">
                   <h4 className="text-xs font-bold text-[#1F1F1F]">{exc.title}</h4>
@@ -334,7 +334,7 @@ export const DashboardPage: React.FC = () => {
                 <div className="flex justify-end pt-1">
                   <button
                     onClick={exc.onAction}
-                    className="rounded-xl bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#5B21B6] px-3 py-1.5 text-[11px] font-bold transition-colors flex items-center gap-1"
+                    className="rounded-xl bg-[#EEF3FF] hover:bg-[#C4D9FD] text-[#1B2E79] px-3 py-1.5 text-[11px] font-bold transition-colors flex items-center gap-1"
                   >
                     {exc.actionLabel} →
                   </button>
@@ -364,8 +364,8 @@ export const DashboardPage: React.FC = () => {
               <AreaChart data={mockHourlyDemand} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="orderGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#5B21B6" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#5B21B6" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#1B2E79" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#1B2E79" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="workerGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.35} />
@@ -376,9 +376,9 @@ export const DashboardPage: React.FC = () => {
                 <XAxis dataKey="hour" stroke="#9CA3AF" fontSize={11} />
                 <YAxis stroke="#9CA3AF" fontSize={11} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EEEEF2', borderRadius: '12px', fontSize: '12px', boxShadow: '0 4px 16px rgba(91, 33, 182, 0.08)' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EEEEF2', borderRadius: '12px', fontSize: '12px', boxShadow: '0 4px 16px rgba(27, 46, 121, 0.08)' }}
                 />
-                <Area type="monotone" dataKey="orders" name="Orders Demand" stroke="#5B21B6" fillOpacity={1} fill="url(#orderGrad)" strokeWidth={2.5} />
+                <Area type="monotone" dataKey="orders" name="Orders Demand" stroke="#1B2E79" fillOpacity={1} fill="url(#orderGrad)" strokeWidth={2.5} />
                 <Area type="monotone" dataKey="availableWorkers" name="Available Experts" stroke="#10B981" fillOpacity={1} fill="url(#workerGrad)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
@@ -394,7 +394,7 @@ export const DashboardPage: React.FC = () => {
               </h3>
               <p className="text-xs text-[#6B6B6B] mt-0.5">Utilization index highlighting critical bottlenecks</p>
             </div>
-            <span className="text-xs font-mono text-[#5B21B6] font-bold">Target &lt; 80%</span>
+            <span className="text-xs font-mono text-[#1B2E79] font-bold">Target &lt; 80%</span>
           </div>
 
           <div className="h-64 w-full">
@@ -404,13 +404,13 @@ export const DashboardPage: React.FC = () => {
                 <XAxis dataKey="market" stroke="#9CA3AF" fontSize={11} />
                 <YAxis domain={[0, 100]} stroke="#9CA3AF" fontSize={11} unit="%" />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EEEEF2', borderRadius: '12px', fontSize: '12px', boxShadow: '0 4px 16px rgba(91, 33, 182, 0.08)' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EEEEF2', borderRadius: '12px', fontSize: '12px', boxShadow: '0 4px 16px rgba(27, 46, 121, 0.08)' }}
                 />
                 <Bar dataKey="capacity" name="Capacity Saturation %" radius={[8, 8, 0, 0]}>
                   {mockMarketCapacityChart.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={entry.capacity >= 90 ? '#E11D48' : entry.capacity >= 70 ? '#F59E0B' : '#5B21B6'} 
+                      fill={entry.capacity >= 90 ? '#E11D48' : entry.capacity >= 70 ? '#F59E0B' : '#1B2E79'} 
                     />
                   ))}
                 </Bar>
@@ -433,7 +433,7 @@ export const DashboardPage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate('/bookings')}
-            className="text-xs text-[#5B21B6] hover:text-[#4C1D95] font-bold flex items-center gap-1"
+            className="text-xs text-[#1B2E79] hover:text-[#13225C] font-bold flex items-center gap-1"
           >
             View All Bookings <ChevronRight className="h-3.5 w-3.5" />
           </button>
@@ -459,13 +459,13 @@ export const DashboardPage: React.FC = () => {
                   onClick={() => navigate(`/bookings/${b.id}`)}
                   className="hover:bg-[#F9F8FD] cursor-pointer transition-colors"
                 >
-                  <td className="py-3.5 px-3.5 font-mono font-bold text-[#5B21B6]">#{b.id}</td>
+                  <td className="py-3.5 px-3.5 font-mono font-bold text-[#1B2E79]">#{b.id}</td>
                   <td className="py-3.5 px-3.5">
                     <div className="font-bold text-[#1F1F1F]">{b.customer.name}</div>
                     <div className="text-[10px] text-[#6B6B6B] font-mono">{b.customer.phone}</div>
                   </td>
                   <td className="py-3.5 px-3.5 text-[#1F1F1F] font-medium">{b.service}</td>
-                  <td className="py-3.5 px-3.5 font-mono text-[#5B21B6] font-semibold">{b.areaId}</td>
+                  <td className="py-3.5 px-3.5 font-mono text-[#1B2E79] font-semibold">{b.areaId}</td>
                   <td className="py-3.5 px-3.5 font-mono text-[#1F1F1F]">{b.startTime}</td>
                   <td className="py-3.5 px-3.5 text-center font-mono font-bold">
                     <span className={b.assignedWorkerIds.length >= b.requiredWorkers ? 'text-[#027A48]' : 'text-[#B42318]'}>

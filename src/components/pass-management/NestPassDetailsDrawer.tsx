@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Drawer } from '../common/Drawer';
 import { 
   Ticket, 
@@ -106,7 +106,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
       <div className="space-y-4 w-full max-w-full overflow-hidden">
         {/* Loading Indicator banner if fetching data */}
         {isLoading && (
-          <div className="flex items-center gap-2 rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-2.5 text-xs text-[#5B21B6]">
+          <div className="flex items-center gap-2 rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-2.5 text-xs text-[#1B2E79]">
             <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
             <span className="font-medium">Fetching complete pass details...</span>
           </div>
@@ -139,17 +139,17 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
         {details && (
           <>
             {/* Header Hero Pass Card */}
-            <div className="relative overflow-hidden rounded-2xl border border-[#DDD6FE] bg-gradient-to-br from-[#FAF5FF] via-white to-[#F5F3FF] p-4.5 sm:p-5 shadow-soft-sm">
+            <div className="relative overflow-hidden rounded-2xl border border-[#C4D9FD] bg-gradient-to-br from-[#FAF5FF] via-white to-[#F5F8FF] p-4.5 sm:p-5 shadow-soft-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-1 rounded-lg inline-block">
+                  <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-1 rounded-lg inline-block">
                     {details.packId || '—'}
                   </span>
                   <h3 className="text-xl font-extrabold text-[#1F1F1F] mt-2">
                     {formatPrice(details.price)}
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs text-[#6B6B6B] mt-1">
-                    <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                    <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                     <span className="font-semibold text-[#1F1F1F]">{details.areaName || '—'}</span>
                   </div>
                 </div>
@@ -169,9 +169,9 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => onEdit(passId)}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#EEEEF2] bg-white hover:bg-[#FAF9FC] hover:border-[#5B21B6]/30 text-[#1F1F1F] hover:text-[#5B21B6] px-4 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#EEEEF2] bg-white hover:bg-[#FAF9FC] hover:border-[#1B2E79]/30 text-[#1F1F1F] hover:text-[#1B2E79] px-4 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer"
                 >
-                  <Pencil className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                  <Pencil className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                   <span>Edit Pass</span>
                 </button>
               </div>
@@ -181,7 +181,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1">
                   <span className="text-[11px] text-[#6B6B6B] flex items-center gap-1">
-                    <Layers className="h-3 w-3 text-[#5B21B6]" />
+                    <Layers className="h-3 w-3 text-[#1B2E79]" />
                     Pack Type
                   </span>
                   <p className="font-bold text-[#1F1F1F] text-sm">{details.packType || 'Visits'}</p>
@@ -189,7 +189,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
 
                 <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1">
                   <span className="text-[11px] text-[#6B6B6B] flex items-center gap-1">
-                    <ShieldCheck className="h-3 w-3 text-[#5B21B6]" />
+                    <ShieldCheck className="h-3 w-3 text-[#1B2E79]" />
                     Visits Included
                   </span>
                   <p className="font-bold text-[#1F1F1F] text-sm">{details.visits ?? '—'} Visits</p>
@@ -197,7 +197,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
 
                 <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1">
                   <span className="text-[11px] text-[#6B6B6B] flex items-center gap-1">
-                    <Calendar className="h-3 w-3 text-[#5B21B6]" />
+                    <Calendar className="h-3 w-3 text-[#1B2E79]" />
                     Validity Period
                   </span>
                   <p className="font-bold text-[#1F1F1F] text-sm">
@@ -207,7 +207,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
 
                 <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 space-y-1">
                   <span className="text-[11px] text-[#6B6B6B] flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-[#5B21B6]" />
+                    <Clock className="h-3 w-3 text-[#1B2E79]" />
                     Service Duration
                   </span>
                   <p className="font-bold text-[#1F1F1F] text-sm">
@@ -225,7 +225,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                 <div className="flex items-center justify-between border-b border-[#F3F2F7] pb-2">
                   <span className="text-[#6B6B6B]">Offer Expiry</span>
                   <span className="font-semibold text-[#1F1F1F] flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5 text-[#5B21B6]" />
+                    <Calendar className="h-3.5 w-3.5 text-[#1B2E79]" />
                     {formatDate(details.offerexpire)}
                   </span>
                 </div>
@@ -247,7 +247,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
 
                 <div className="flex items-center justify-between">
                   <span className="text-[#6B6B6B]">Pass UUID</span>
-                  <span className="font-mono text-[11px] text-[#5B21B6] select-all truncate max-w-[200px]" title={passId || ''}>
+                  <span className="font-mono text-[11px] text-[#1B2E79] select-all truncate max-w-[200px]" title={passId || ''}>
                     {passId}
                   </span>
                 </div>
@@ -263,7 +263,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                 <div className="rounded-xl border border-[#EEEEF2] bg-white p-3 space-y-2 shadow-soft-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-[#1F1F1F] flex items-center gap-1.5">
-                      <ImageIcon className="h-3.5 w-3.5 text-[#5B21B6]" />
+                      <ImageIcon className="h-3.5 w-3.5 text-[#1B2E79]" />
                       Dashboard Banner
                     </span>
                     {dashboardBannerUrl && (
@@ -271,7 +271,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                         href={dashboardBannerUrl} 
                         target="_blank" 
                         rel="noreferrer" 
-                        className="text-[11px] text-[#5B21B6] hover:underline flex items-center gap-1 font-semibold"
+                        className="text-[11px] text-[#1B2E79] hover:underline flex items-center gap-1 font-semibold"
                       >
                         View Full <ExternalLink className="h-2.5 w-2.5" />
                       </a>
@@ -290,7 +290,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                       />
                     </div>
                   ) : (
-                    <div className="h-24 rounded-lg bg-[#FAF9FC] border border-dashed border-[#DDD6FE] flex items-center justify-center text-xs text-[#6B6B6B]">
+                    <div className="h-24 rounded-lg bg-[#FAF9FC] border border-dashed border-[#C4D9FD] flex items-center justify-center text-xs text-[#6B6B6B]">
                       No dashboard banner available
                     </div>
                   )}
@@ -300,7 +300,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                 <div className="rounded-xl border border-[#EEEEF2] bg-white p-3 space-y-2 shadow-soft-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-[#1F1F1F] flex items-center gap-1.5">
-                      <ImageIcon className="h-3.5 w-3.5 text-[#5B21B6]" />
+                      <ImageIcon className="h-3.5 w-3.5 text-[#1B2E79]" />
                       Popup Banner
                     </span>
                     {popupBannerUrl && (
@@ -308,7 +308,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                         href={popupBannerUrl} 
                         target="_blank" 
                         rel="noreferrer" 
-                        className="text-[11px] text-[#5B21B6] hover:underline flex items-center gap-1 font-semibold"
+                        className="text-[11px] text-[#1B2E79] hover:underline flex items-center gap-1 font-semibold"
                       >
                         View Full <ExternalLink className="h-2.5 w-2.5" />
                       </a>
@@ -327,7 +327,7 @@ export const NestPassDetailsDrawer: React.FC<NestPassDetailsDrawerProps> = ({
                       />
                     </div>
                   ) : (
-                    <div className="h-24 rounded-lg bg-[#FAF9FC] border border-dashed border-[#DDD6FE] flex items-center justify-center text-xs text-[#6B6B6B]">
+                    <div className="h-24 rounded-lg bg-[#FAF9FC] border border-dashed border-[#C4D9FD] flex items-center justify-center text-xs text-[#6B6B6B]">
                       No popup banner available
                     </div>
                   )}

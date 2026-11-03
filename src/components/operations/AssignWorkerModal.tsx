@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Booking } from '../../types';
 import { useOperations } from '../../context/OperationsContext';
@@ -152,7 +152,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
               )}
             </div>
             <div className="text-[11px] text-[#6B6B6B] flex items-center gap-1 mt-0.5">
-              <MapPin className="h-3 w-3 shrink-0 text-[#5B21B6]" />
+              <MapPin className="h-3 w-3 shrink-0 text-[#1B2E79]" />
               <span className="truncate max-w-sm sm:max-w-md">{booking.address}</span>
             </div>
           </div>
@@ -170,7 +170,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
                 type="button"
                 onClick={() => fetchExperts(booking.tableId!)}
                 disabled={loading}
-                className="flex items-center gap-1.5 text-xs font-semibold text-[#5B21B6] hover:text-[#4C1D95] transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs font-semibold text-[#1B2E79] hover:text-[#13225C] transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh Experts</span>
@@ -183,7 +183,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
             <div className="space-y-2.5 py-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-16 w-full animate-pulse rounded-2xl bg-[#FAF9FC] border border-[#EEEEF2] flex items-center p-3 gap-3">
-                  <div className="h-10 w-10 rounded-full bg-[#EDE9FE] animate-pulse" />
+                  <div className="h-10 w-10 rounded-full bg-[#EEF3FF] animate-pulse" />
                   <div className="space-y-2 flex-1">
                     <div className="h-3 w-1/3 rounded bg-slate-200" />
                     <div className="h-2.5 w-1/4 rounded bg-slate-100" />
@@ -212,7 +212,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
 
           {/* Empty State */}
           {!loading && !error && experts.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-[#DDD6FE] bg-[#FAF9FC] p-8 text-center text-xs text-[#6B6B6B] space-y-1.5">
+            <div className="rounded-2xl border border-dashed border-[#C4D9FD] bg-[#FAF9FC] p-8 text-center text-xs text-[#6B6B6B] space-y-1.5">
               <UserCheck className="h-7 w-7 mx-auto text-[#6B6B6B]" />
               <p className="font-semibold text-[#1F1F1F]">No available experts found</p>
               <p className="text-[11px] text-[#6B6B6B]">
@@ -234,10 +234,10 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
                     onClick={() => setSelectedExpertId(exp.workerId)}
                     className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer shadow-soft-sm ${
                       isSelected
-                        ? 'border-[#5B21B6] bg-[#EDE9FE]/40 ring-2 ring-[#5B21B6]/20'
+                        ? 'border-[#1B2E79] bg-[#EEF3FF]/40 ring-2 ring-[#1B2E79]/20'
                         : isCurrentlyAssigned
                         ? 'border-emerald-300 bg-[#ECFDF3]/40'
-                        : 'border-[#EEEEF2] bg-white hover:border-[#DDD6FE] hover:bg-[#FAF9FC]'
+                        : 'border-[#EEEEF2] bg-white hover:border-[#C4D9FD] hover:bg-[#FAF9FC]'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
@@ -256,7 +256,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
                         />
                       ) : null}
                       <div
-                        className={`h-11 w-11 rounded-full bg-[#EDE9FE] text-[#5B21B6] font-bold text-xs flex items-center justify-center border border-[#DDD6FE] shadow-soft-xs ${
+                        className={`h-11 w-11 rounded-full bg-[#EEF3FF] text-[#1B2E79] font-bold text-xs flex items-center justify-center border border-[#C4D9FD] shadow-soft-xs ${
                           exp.profileImage ? 'hidden' : 'flex'
                         }`}
                       >
@@ -283,7 +283,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
                           )}
                         </div>
                         <div className="text-[11px] font-mono text-[#6B6B6B] mt-0.5">
-                          Expert ID: <span className="font-semibold text-[#5B21B6]">{exp.workerId}</span>
+                          Expert ID: <span className="font-semibold text-[#1B2E79]">{exp.workerId}</span>
                         </div>
                       </div>
                     </div>
@@ -291,9 +291,9 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
                     {/* Radio / Selection Indicator */}
                     <div className="flex items-center shrink-0">
                       {isSelected ? (
-                        <CheckCircle2 className="h-5 w-5 text-[#5B21B6]" />
+                        <CheckCircle2 className="h-5 w-5 text-[#1B2E79]" />
                       ) : (
-                        <div className="h-5 w-5 rounded-full border-2 border-[#D1D5DB] hover:border-[#5B21B6] transition-colors" />
+                        <div className="h-5 w-5 rounded-full border-2 border-[#D1D5DB] hover:border-[#1B2E79] transition-colors" />
                       )}
                     </div>
                   </div>
@@ -308,7 +308,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
           <div className="text-[11px] text-[#6B6B6B]">
             {selectedExpertId ? (
               <span>
-                Expert ID: <strong className="font-mono text-[#5B21B6]">{selectedExpertId}</strong>
+                Expert ID: <strong className="font-mono text-[#1B2E79]">{selectedExpertId}</strong>
               </span>
             ) : (
               <span>Select an expert from the list above</span>
@@ -328,7 +328,7 @@ export const AssignWorkerModal: React.FC<AssignWorkerModalProps> = ({
               type="button"
               onClick={handleAssignClick}
               disabled={!selectedExpertId || isAssigning}
-              className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+              className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
               title={
                 !selectedExpertId
                   ? 'Please select an available expert first'

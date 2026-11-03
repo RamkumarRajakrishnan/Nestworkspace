@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Drawer } from '../common/Drawer';
 import { StatusBadge } from '../common/StatusBadge';
@@ -96,7 +96,7 @@ export const CustomerTicketDetailDrawer: React.FC<CustomerTicketDetailDrawerProp
         <button
           type="button"
           onClick={handleOpenFullDetails}
-          className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#F5F3FF] transition-colors shadow-soft-sm active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#F5F8FF] transition-colors shadow-soft-sm active:scale-95 cursor-pointer"
           title="Open Full Ticket Details Page"
         >
           <span>Ticket Details</span>
@@ -109,11 +109,11 @@ export const CustomerTicketDetailDrawer: React.FC<CustomerTicketDetailDrawerProp
         {isLoading && !details && (
           <div className="space-y-3">
             <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 space-y-3 shadow-soft-sm">
-              <div className="h-5 w-3/4 bg-[#EDE9FE] animate-pulse rounded-lg" />
+              <div className="h-5 w-3/4 bg-[#EEF3FF] animate-pulse rounded-lg" />
               <div className="h-4 w-1/2 bg-[#FAF9FC] animate-pulse rounded-md" />
             </div>
             <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 space-y-2.5 shadow-soft-sm">
-              <div className="h-4 w-1/3 bg-[#EDE9FE] animate-pulse rounded-md" />
+              <div className="h-4 w-1/3 bg-[#EEF3FF] animate-pulse rounded-md" />
               <div className="h-8 w-full bg-[#FAF9FC] animate-pulse rounded-xl" />
             </div>
           </div>
@@ -145,7 +145,7 @@ export const CustomerTicketDetailDrawer: React.FC<CustomerTicketDetailDrawerProp
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full">
+                    <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full">
                       {category}
                     </span>
                     {ticketId && (
@@ -172,7 +172,7 @@ export const CustomerTicketDetailDrawer: React.FC<CustomerTicketDetailDrawerProp
             {/* Customer Information (Clean Summary) */}
             <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 sm:p-5 shadow-soft-sm space-y-2.5">
               <div className="flex items-center gap-2">
-                <User className="h-3.5 w-3.5 text-[#5B21B6]" />
+                <User className="h-3.5 w-3.5 text-[#1B2E79]" />
                 <h4 className="font-bold text-[#6B6B6B] uppercase font-mono text-[10px] tracking-wider">
                   Customer Details
                 </h4>
@@ -203,7 +203,7 @@ export const CustomerTicketDetailDrawer: React.FC<CustomerTicketDetailDrawerProp
             {/* Ticket Overview (Clean Summary) */}
             <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 sm:p-5 shadow-soft-sm space-y-2.5">
               <div className="flex items-center gap-2">
-                <Tag className="h-3.5 w-3.5 text-[#5B21B6]" />
+                <Tag className="h-3.5 w-3.5 text-[#1B2E79]" />
                 <h4 className="font-bold text-[#6B6B6B] uppercase font-mono text-[10px] tracking-wider">
                   Ticket Summary
                 </h4>

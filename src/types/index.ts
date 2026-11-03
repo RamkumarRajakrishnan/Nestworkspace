@@ -118,12 +118,16 @@ export interface Booking {
   customerPhone?: string;
   bookingType?: string;
   areaName?: string;
+  createdTime?: string;
   requestedTime?: string;
+  assignedTime?: string;
   startedTime?: string;
   completedTime?: string;
   bookingStatus?: string;
   slaTimer?: string;
   slaAlert?: string;
+  rawMessage?: Record<string, any>;
+  [key: string]: any;
 }
 
 export type MarketStatus = 'Healthy' | 'Normal' | 'Tight' | 'Critical';

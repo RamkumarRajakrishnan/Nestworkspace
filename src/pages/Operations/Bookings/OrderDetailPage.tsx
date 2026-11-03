@@ -6,7 +6,8 @@ import { AssignWorkerModal } from '../../../components/operations/AssignWorkerMo
 import { ReassignWorkerModal } from '../../../components/operations/ReassignWorkerModal';
 import { ConfirmDialog } from '../../../components/common/ConfirmDialog';
 import { getOrderDetails, cancelBooking } from '../../../services/api';
-import { mapApiBookingToBooking, formatDurationInHours } from '../../../services/bookingService';
+import { mapApiBookingToBooking, formatDurationInHours, getBookingTimelineStages } from '../../../services/bookingService';
+import { DynamicKeyValueRenderer } from '../../../components/operations/DynamicKeyValueRenderer';
 import { Booking } from '../../../types';
 import { 
   ArrowLeft, 
@@ -20,9 +21,9 @@ import {
   Share2, 
   AlertTriangle, 
   Compass, 
-  Eye,
-  Ban,
-  Loader2
+  Eye, 
+  Ban, 
+  Loader2 
 } from 'lucide-react';
 
 export const OrderDetailPage: React.FC = () => {
@@ -39,55 +40,94 @@ export const OrderDetailPage: React.FC = () => {
 
   // Local fetched booking state initialized with route state if available to avoid blank screen
   const [fetchedBooking, setFetchedBooking] = useState<Booking | null>(routeBooking || null);
+  const [rawApiMessage, setRawApiMessage] = useState<Record<string, any> | null>(
+    (routeBooking as any)?.rawMessage || null
+  );
   const [loadingDirect, setLoadingDirect] = useState<boolean>(!routeBooking && !bookings.some((b) => b.tableId === id));
   const [errorDirect, setErrorDirect] = useState<string | null>(null);
 
   const contextBooking = bookings.find((b) => b.tableId === id);
   const booking = fetchedBooking || contextBooking;
 
+  const fetchOrderData = (showSpinner = false) => {
+    if (!id) return;
+    if (showSpinner) setLoadingDirect(true);
+    setErrorDirect(null);
+
+    getOrderDetails(id)
+      .then((res) => {
+        if (res.success && res.data) {
+          const raw = (res as any).rawMessage || res.data;
+          setRawApiMessage(raw);
+          setFetchedBooking(mapApiBookingToBooking(raw));
+        } else {
+          if (!booking) {
+            setErrorDirect(res.error || 'Unable to load order details.');
+          }
+        }
+      })
+      .catch((e) => {
+        console.error('Error fetching order details directly:', e);
+        if (!booking) {
+          setErrorDirect('Unable to load order details. Please check your connection.');
+        }
+      })
+      .finally(() => {
+        setLoadingDirect(false);
+      });
+  };
+
   useEffect(() => {
     // If tableId is present, fetch latest order details from nestBookingDetails?tableId=<TABLE_ID>
     if (id) {
-      if (!booking) setLoadingDirect(true);
-      setErrorDirect(null);
-      getOrderDetails(id)
-        .then((res) => {
-          if (res.success && res.data) {
-            setFetchedBooking(mapApiBookingToBooking(res.data));
-          } else {
-            if (!booking) {
-              setErrorDirect(res.error || 'Unable to load order details.');
-            }
-          }
-        })
-        .catch((e) => {
-          console.error('Error fetching order details directly:', e);
-          if (!booking) {
-            setErrorDirect('Unable to load order details. Please check your connection.');
-          }
-        })
-        .finally(() => setLoadingDirect(false));
+      fetchOrderData(!booking);
     }
   }, [id]);
 
-  if (loadingDirect) {
+  if (loadingDirect && !booking) {
     return (
-      <div className="py-24 text-center space-y-3">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#5B21B6]" />
+      <div className="py-24 text-center space-y-3 max-w-md mx-auto">
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#1B2E79]" />
         <h2 className="text-sm font-semibold text-[#1F1F1F]">Loading Order Details...</h2>
         <p className="text-xs text-[#6B6B6B]">Retrieving booking record #{id} from dispatch engine</p>
       </div>
     );
   }
 
+  if (errorDirect && !booking) {
+    return (
+      <div className="py-16 text-center space-y-3 max-w-md mx-auto">
+        <div className="h-12 w-12 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto text-rose-600 shadow-soft-sm">
+          <AlertTriangle className="h-6 w-6 text-rose-600" />
+        </div>
+        <h2 className="text-base font-bold text-[#1F1F1F]">Unable to Load Booking #{id}</h2>
+        <p className="text-xs text-[#6B6B6B]">{errorDirect}</p>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <button
+            onClick={() => fetchOrderData(true)}
+            className="rounded-xl border border-[#EEEEF2] bg-white px-4 py-2 text-xs font-semibold text-[#1F1F1F] hover:bg-[#FAF9FC] shadow-soft-sm transition-all cursor-pointer"
+          >
+            Retry Fetch
+          </button>
+          <button
+            onClick={() => navigate('/bookings')}
+            className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white hover:bg-[#13225C] transition-all shadow-soft-sm cursor-pointer"
+          >
+            Return to Bookings
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!booking) {
     return (
-      <div className="py-16 text-center space-y-3">
+      <div className="py-16 text-center space-y-3 max-w-md mx-auto">
         <h2 className="text-base font-bold text-[#1F1F1F]">Booking #{id} Not Found</h2>
         <p className="text-xs text-[#6B6B6B]">The requested order could not be located in the dispatch records.</p>
         <button
           onClick={() => navigate('/bookings')}
-          className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D95] transition-all shadow-soft-sm cursor-pointer"
+          className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white hover:bg-[#13225C] transition-all shadow-soft-sm cursor-pointer"
         >
           Return to Bookings
         </button>
@@ -103,7 +143,6 @@ export const OrderDetailPage: React.FC = () => {
   const statusLower = String(booking.bookingStatus || booking.status || '').trim().toLowerCase();
   const isCompleted = statusLower === 'completed' || statusLower === 'cancelled';
   const showAssignExpert = statusLower === 'booked' || statusLower === 'assigned';
-
   const isAssigned = (booking.bookingStatus || booking.status) === 'Assigned' || Boolean(booking.vendorId || booking.vendorName);
 
   const handleCancelBooking = async (reason?: string) => {
@@ -135,11 +174,12 @@ export const OrderDetailPage: React.FC = () => {
   const areaDisplay = booking.areaName || booking.areaId || 'Neo_Town';
   const customerName = booking.customerName || booking.customer?.name || '—';
   const customerPhone = booking.customerPhone || booking.customer?.phone || '—';
+  const customerNotesDisplay = booking.notes || rawApiMessage?.customerNotes || rawApiMessage?.notes;
   const amountDisplay = booking.totalAmount !== undefined && booking.totalAmount !== '' 
     ? booking.totalAmount 
     : (booking.amount || '—');
-  // Requirement: in eye icon page and order details page convert duration from min to hours
   const durationDisplay = formatDurationInHours(booking.duration || booking.durationMinutes);
+  const timelineStages = getBookingTimelineStages(booking);
 
   // Format scheduled time safely
   let scheduledDisplay = `${booking.date} at ${booking.startTime}`;
@@ -161,14 +201,41 @@ export const OrderDetailPage: React.FC = () => {
     }
   }
 
+  // Dynamic API data dictionary containing returned API fields
+  const displayApiData: Record<string, any> = rawApiMessage || (booking as any)?.rawMessage || {
+    tableId: booking.tableId,
+    bookingId: booking.bookingId || booking.id,
+    bookingStatus: booking.bookingStatus || booking.status,
+    bookingType: booking.bookingType,
+    customerName: booking.customerName || booking.customer?.name,
+    customerPhone: booking.customerPhone || booking.customer?.phone,
+    customerEmail: booking.customerEmail || booking.customer?.email,
+    customerNotes: booking.notes,
+    vendorId: booking.vendorId,
+    vendorName: booking.vendorName,
+    vendorPhoto: booking.vendorPhoto,
+    address: booking.address,
+    areaName: areaDisplay,
+    createdTime: booking.createdTime,
+    requestedTime: booking.requestedTime,
+    assignedTime: booking.assignedTime,
+    startedTime: booking.startedTime,
+    completedTime: booking.completedTime,
+    duration: booking.duration || booking.durationMinutes,
+    totalAmount: booking.totalAmount || booking.amount,
+    paymentStatus: booking.paymentStatus,
+    slaTimer: booking.slaTimer,
+    slaAlert: booking.slaAlert,
+  };
+
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Back button & Title */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/bookings')}
-            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors cursor-pointer"
+            className="rounded-xl border border-[#EEEEF2] bg-white p-2 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -191,7 +258,7 @@ export const OrderDetailPage: React.FC = () => {
               {showAssignExpert && (
                 <button
                   onClick={() => setShowAssignModal(true)}
-                  className="rounded-xl bg-[#5B21B6] px-3.5 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95 cursor-pointer"
+                  className="rounded-xl bg-[#1B2E79] px-3.5 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95 cursor-pointer"
                 >
                   {isAssigned ? 'Reassign Expert' : 'Assign Expert'}
                 </button>
@@ -209,13 +276,13 @@ export const OrderDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Grid: Booking Info + Assignment Details */}
+      {/* Main Grid: Booking Info + Assignment Details + Timeline (First Image) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Booking Details (2 Cols) */}
         <div className="md:col-span-2 space-y-6">
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
             <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider border-b border-[#EEEEF2] pb-3">
-              Booking Information
+              Booking Overview
             </h2>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
@@ -225,7 +292,7 @@ export const OrderDetailPage: React.FC = () => {
               </div>
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">PHONE NUMBER</span>
-                <div className="font-mono text-[#5B21B6] font-semibold mt-0.5">{customerPhone}</div>
+                <div className="font-mono text-[#1B2E79] font-semibold mt-0.5">{customerPhone}</div>
               </div>
               <div className="col-span-2">
                 <span className="text-[#6B6B6B] font-mono text-[10px]">SERVICE ADDRESS</span>
@@ -233,7 +300,7 @@ export const OrderDetailPage: React.FC = () => {
               </div>
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">NANO-MARKET ZONE</span>
-                <div className="font-mono text-[#5B21B6] font-semibold mt-0.5">{areaDisplay}</div>
+                <div className="font-mono text-[#1B2E79] font-semibold mt-0.5">{areaDisplay}</div>
               </div>
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">SCHEDULED DATE & TIME</span>
@@ -245,7 +312,7 @@ export const OrderDetailPage: React.FC = () => {
               </div>
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">ORDER VALUE</span>
-                <div className="text-base font-bold font-mono text-[#5B21B6] mt-0.5">₹{amountDisplay}</div>
+                <div className="text-base font-bold font-mono text-[#1B2E79] mt-0.5">₹{amountDisplay}</div>
               </div>
               <div>
                 <span className="text-[#6B6B6B] font-mono text-[10px]">PAYMENT STATUS</span>
@@ -259,10 +326,10 @@ export const OrderDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {booking.notes && (
+            {customerNotesDisplay && (
               <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3 text-xs text-[#1F1F1F]">
                 <span className="text-[#6B6B6B] font-semibold block text-[10px] uppercase font-mono">Customer Special Notes</span>
-                <p className="mt-1">{booking.notes}</p>
+                <p className="mt-1">{customerNotesDisplay}</p>
               </div>
             )}
           </div>
@@ -294,7 +361,7 @@ export const OrderDetailPage: React.FC = () => {
                           className="h-10 w-10 rounded-full object-cover border border-[#EEEEF2]"
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-[#EDE9FE] text-[#5B21B6] font-bold text-xs flex items-center justify-center border border-[#DDD6FE]">
+                        <div className="h-10 w-10 rounded-full bg-[#EEF3FF] text-[#1B2E79] font-bold text-xs flex items-center justify-center border border-[#C4D9FD]">
                           {booking.vendorName ? booking.vendorName.slice(0, 2).toUpperCase() : 'EX'}
                         </div>
                       )}
@@ -353,9 +420,9 @@ export const OrderDetailPage: React.FC = () => {
 
                     <button
                       onClick={() => navigate(`/workers/${w.id}`)}
-                      className="w-full rounded-xl border border-[#EEEEF2] bg-white py-1.5 text-[11px] font-semibold text-[#1F1F1F] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-colors flex items-center justify-center gap-1.5"
+                      className="w-full rounded-xl border border-[#EEEEF2] bg-white py-1.5 text-[11px] font-semibold text-[#1F1F1F] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <Eye className="h-3.5 w-3.5 text-[#5B21B6]" /> View Profile
+                      <Eye className="h-3.5 w-3.5 text-[#1B2E79]" /> View Profile
                     </button>
                   </div>
                 ))}
@@ -364,41 +431,64 @@ export const OrderDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dispatch Timeline (1 Col) */}
+        {/* Dispatch & Fulfillment Timeline (1 Col) */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
           <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider border-b border-[#EEEEF2] pb-3">
-            Dispatch Audit Timeline
+            Dispatch & Fulfillment Timeline
           </h2>
 
-          <div className="relative border-l border-[#EEEEF2] ml-2 space-y-5 pl-4 text-xs">
-            {booking.timeline && booking.timeline.length > 0 ? (
-              booking.timeline.map((event, idx) => (
-                <div key={idx} className="relative">
-                  <div className="absolute -left-[21px] top-0.5 h-2.5 w-2.5 rounded-full bg-[#5B21B6] ring-4 ring-[#EDE9FE]" />
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] text-[#6B6B6B]">{event.time}</span>
-                    <span className="font-semibold text-[#1F1F1F]">{event.title}</span>
+          <div className="pt-1">
+            {timelineStages.map((stage, idx) => {
+              const isLast = idx === timelineStages.length - 1;
+              const isStageCompleted = stage.isCompleted;
+              return (
+                <div key={stage.key} className="flex gap-3 text-xs">
+                  {/* Timeline dot and connecting line */}
+                  <div className="flex flex-col items-center shrink-0">
+                    <div
+                      className={`h-3 w-3 rounded-full shrink-0 mt-0.5 ${
+                        isStageCompleted
+                          ? 'bg-[#1B2E79] ring-4 ring-[#EEF3FF]'
+                          : 'bg-[#D1D5DB] ring-4 ring-[#F3F4F6]'
+                      }`}
+                    />
+                    {!isLast && (
+                      <div
+                        className={`w-0.5 grow min-h-[30px] my-1 ${
+                          isStageCompleted ? 'bg-[#1B2E79]' : 'bg-[#E5E7EB]'
+                        }`}
+                      />
+                    )}
                   </div>
-                  <p className="mt-1 text-[11px] text-[#6B6B6B] leading-relaxed">
-                    {event.description}
-                  </p>
+
+                  {/* Content */}
+                  <div className={`flex-1 ${!isLast ? 'pb-4' : 'pb-0'}`}>
+                    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
+                      <span className="font-bold text-xs text-[#1F1F1F]">{stage.title}</span>
+                      <span
+                        className={`font-mono text-[11px] ${
+                          isStageCompleted ? 'text-[#1B2E79] font-semibold' : 'text-[#9CA3AF] italic'
+                        }`}
+                      >
+                        {stage.timeDisplay}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-[#6B6B6B] leading-relaxed break-words">
+                      {stage.description}
+                    </p>
+                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="relative">
-                <div className="absolute -left-[21px] top-0.5 h-2.5 w-2.5 rounded-full bg-[#5B21B6] ring-4 ring-[#EDE9FE]" />
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] text-[#6B6B6B]">Live Status</span>
-                  <span className="font-semibold text-[#1F1F1F]">{booking.bookingStatus || 'Active'}</span>
-                </div>
-                <p className="mt-1 text-[11px] text-[#6B6B6B] leading-relaxed">
-                  SLA Timer: {booking.slaTimer} ({booking.slaAlert})
-                </p>
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
       </div>
+
+      {/* Dynamic API Response Fields (Only fields NOT already shown above) */}
+      <DynamicKeyValueRenderer
+        data={displayApiData}
+        excludeAlreadyDisplayed={true}
+      />
 
       {/* Modals */}
       <AssignWorkerModal

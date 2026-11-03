@@ -52,10 +52,21 @@ export interface RawApiBooking {
   slaAlert?: string;
 }
 
+export interface BookingsPagination {
+  page: number;
+  limit: number;
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export interface GetBookingsResult {
   success: boolean;
   data: RawApiBooking[];
   total?: number;
+  pagination?: BookingsPagination;
+  message?: string;
   error?: string;
 }
 
@@ -128,6 +139,8 @@ export interface GetBookingsFilterOptions {
   bookingType?: string;
   bookingId?: string;
   duration?: string | number;
+  fromDate?: string;
+  toDate?: string;
   page?: number;
   limit?: number;
 }

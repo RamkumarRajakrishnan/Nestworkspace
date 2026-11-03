@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import clsx from 'clsx';
 import { WorkerStatus, BookingStatus, MarketStatus, ComplianceOverallStatus, DocStatus, PayoutStatus } from '../../types';
 
@@ -30,7 +30,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', p
       // Inactive (Soft Purple / Blue - Brand Theme)
       case 'Inactive':
       case 'inactive':
-        return 'bg-[#F5F3FF] text-[#6D28D9] border-[#DDD6FE]';
+        return 'bg-[#F5F8FF] text-[#162766] border-[#C4D9FD]';
 
       // Busy / Assigned / Adjusted / Ongoing (Soft Purple - Brand Theme)
       case 'Busy':
@@ -42,7 +42,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', p
       case 'ongoing':
       case 'Adjusted':
       case 'Normal':
-        return 'bg-[#F3E8FF] text-[#6B21A8] border-[#E9D5FF]';
+        return 'bg-[#EEF3FF] text-[#1B2E79] border-[#C4D9FD]';
 
       // Traveling / Pending / Under Review / Tight / Open (Soft Orange / Amber)
       case 'Traveling':

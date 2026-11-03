@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { AlertTriangle, Info } from 'lucide-react';
 
@@ -51,9 +51,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       case 'warning':
         return 'bg-[#FFF7ED] text-[#C2410C] border border-[#FED7AA] hover:bg-[#FFEDD5]';
       case 'info':
-        return 'bg-[#5B21B6] hover:bg-[#4C1D95] text-white shadow-soft-sm';
+        return 'bg-[#1B2E79] hover:bg-[#13225C] text-white shadow-soft-sm';
       default:
-        return 'bg-[#5B21B6] hover:bg-[#4C1D95] text-white shadow-soft-sm';
+        return 'bg-[#1B2E79] hover:bg-[#13225C] text-white shadow-soft-sm';
     }
   };
 
@@ -106,7 +106,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                     }}
                     className={`rounded-lg px-2.5 py-1 text-[11px] font-medium border transition-colors ${
                       selectedPreset === opt 
-                        ? 'bg-[#EDE9FE] border-[#7C3AED] text-[#5B21B6]' 
+                        ? 'bg-[#EEF3FF] border-[#162766] text-[#1B2E79]' 
                         : 'bg-[#F7F5FA] border-[#EEEEF2] text-[#6B6B6B] hover:text-[#1F1F1F]'
                     }`}
                   >
@@ -125,7 +125,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 setError('');
               }}
               placeholder={reasonPlaceholder}
-              className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] p-2.5 text-xs text-[#1F1F1F] placeholder-[#9CA3AF] focus:border-[#7C3AED] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20"
+              className="w-full rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] p-2.5 text-xs text-[#1F1F1F] placeholder-[#9CA3AF] focus:border-[#162766] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#162766]/20"
             />
 
             {error && <p className="text-xs text-[#B42318] font-medium">{error}</p>}

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import clsx from 'clsx';
 import { EmptyState } from './EmptyState';
 
@@ -37,7 +37,7 @@ export function DataTable<T>({
     return (
       <div className="w-full rounded-2xl border border-[#EEEEF2] bg-white p-6 space-y-3 shadow-soft-sm">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-10 w-full animate-pulse rounded-xl bg-[#F5F3FF]" />
+          <div key={i} className="h-10 w-full animate-pulse rounded-xl bg-[#F5F8FF]" />
         ))}
       </div>
     );

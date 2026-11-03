@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { getExpertsLeaveRequest, getActiveAreas } from '../../../services/api';
 import { RawLeaveRecord, LeavePagination } from '../../../types';
 import { DataTable, Column } from '../../../components/common/DataTable';
+import { Pagination } from '../../../components/common/Pagination';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { SearchInput } from '../../../components/common/SearchInput';
 import { LeaveDetailDrawer } from '../../../components/workforce/LeaveDetailDrawer';
@@ -302,45 +303,8 @@ export const LeavePage: React.FC = () => {
   // Server-side pagination bounds
   const totalRecords = pagination?.totalRecords ?? leaveRecords.length;
   const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalRecords / pageSize));
-  const hasNextPage = pagination?.hasNextPage ?? (currentPage < totalPages);
-  const hasPreviousPage = pagination?.hasPreviousPage ?? (currentPage > 1);
   const startRecord = totalRecords > 0 ? (currentPage - 1) * pageSize + 1 : 0;
   const endRecord = Math.min(currentPage * pageSize, totalRecords);
-
-  // Windowed pagination calculation:
-  // When totalPages <= 5: display all pages [1, ..., totalPages]
-  // When totalPages > 5: display window of 3 pages [windowStart, windowStart+1, windowStart+2]
-  //   Initial state: Previous 1 2 3 ... Next
-  //   Next window:   Previous 4 5 6 ... Next
-  //   Next window:   Previous 7 8 9 ... Next
-  const WINDOW_SIZE = 3;
-  const isWindowed = totalPages > 5;
-  const windowStart = isWindowed
-    ? Math.floor((currentPage - 1) / WINDOW_SIZE) * WINDOW_SIZE + 1
-    : 1;
-  const windowEnd = isWindowed
-    ? Math.min(windowStart + WINDOW_SIZE - 1, totalPages)
-    : totalPages;
-
-  const visiblePages = useMemo(() => {
-    const pages: number[] = [];
-    for (let p = windowStart; p <= windowEnd; p++) {
-      pages.push(p);
-    }
-    return pages;
-  }, [windowStart, windowEnd]);
-
-  const hasMoreAfter = isWindowed && windowEnd < totalPages;
-
-  const handleNext = () => {
-    if (isLoading || !hasNextPage) return;
-    setCurrentPage((p) => Math.min(totalPages, p + 1));
-  };
-
-  const handlePrevious = () => {
-    if (isLoading || !hasPreviousPage) return;
-    setCurrentPage((p) => Math.max(1, p - 1));
-  };
 
   // Drawer Open Handler
   const handleViewRecord = (record: RawLeaveRecord) => {
@@ -371,9 +335,9 @@ export const LeavePage: React.FC = () => {
         const name = safeVal(r.workerName);
         return (
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0 overflow-hidden">
-              <span className="font-bold text-xs text-[#5B21B6] select-none">
-                {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#5B21B6]" />}
+            <div className="h-8 w-8 rounded-xl bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0 overflow-hidden">
+              <span className="font-bold text-xs text-[#1B2E79] select-none">
+                {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#1B2E79]" />}
               </span>
             </div>
             <div className="min-w-0">
@@ -396,7 +360,7 @@ export const LeavePage: React.FC = () => {
       align: 'center',
       className: 'w-[10%] min-w-[90px]',
       render: (r) => (
-        <span className="font-mono text-[#5B21B6] text-xs font-semibold">
+        <span className="font-mono text-[#1B2E79] text-xs font-semibold">
           {safeVal(r.workerId)}
         </span>
       ),
@@ -417,7 +381,7 @@ export const LeavePage: React.FC = () => {
             className="inline-flex items-center gap-1 rounded-full bg-[#FAF9FC] border border-[#EEEEF2] px-2.5 py-0.5 text-[11px] font-medium text-[#1F1F1F] max-w-[130px] truncate"
             title={safeVal(r.areaName)}
           >
-            <MapPin className="h-3 w-3 text-[#5B21B6] shrink-0" />
+            <MapPin className="h-3 w-3 text-[#1B2E79] shrink-0" />
             <span className="truncate">{safeVal(r.areaName)}</span>
           </span>
         </div>
@@ -453,8 +417,8 @@ export const LeavePage: React.FC = () => {
         const type = safeVal(r.leaveType);
         return (
           <div className="flex justify-center">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6] whitespace-nowrap">
-              <CalendarDays className="h-3 w-3 text-[#5B21B6] shrink-0" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79] whitespace-nowrap">
+              <CalendarDays className="h-3 w-3 text-[#1B2E79] shrink-0" />
               <span>{type}</span>
             </span>
           </div>
@@ -514,7 +478,7 @@ export const LeavePage: React.FC = () => {
               e.stopPropagation();
               handleViewRecord(r);
             }}
-            className="p-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
             title="View Leave Details"
             aria-label="View Leave Details"
           >
@@ -559,10 +523,10 @@ export const LeavePage: React.FC = () => {
               type="button"
               onClick={handleRefresh}
               disabled={isLoading || isRefreshing}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
               title="Refresh leave records"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
@@ -583,16 +547,16 @@ export const LeavePage: React.FC = () => {
                 }}
                 className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                   isFilterOpen || selectedArea !== initialArea
-                    ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                    : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                    ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                    : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
                 }`}
                 aria-expanded={isFilterOpen}
                 aria-label="Toggle Leave Filters"
               >
-                <Filter className="h-4 w-4 text-[#5B21B6]" />
+                <Filter className="h-4 w-4 text-[#1B2E79]" />
                 <span>Filter</span>
                 {selectedArea !== initialArea && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                     1
                   </span>
                 )}
@@ -601,11 +565,11 @@ export const LeavePage: React.FC = () => {
 
               {/* Floating Filter Popover */}
               {isFilterOpen && (
-                <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                   {/* Popover Header */}
                   <div className="flex items-center justify-between border-b border-[#EEEEF2] px-4 py-3 bg-white">
                     <div className="flex items-center gap-2.5">
-                      <div className="h-7 w-7 rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center text-[#5B21B6]">
+                      <div className="h-7 w-7 rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center text-[#1B2E79]">
                         <Filter className="h-3.5 w-3.5" />
                       </div>
                       <div>
@@ -632,10 +596,10 @@ export const LeavePage: React.FC = () => {
                     <div className="rounded-2xl border border-[#EEEEF2] bg-white p-3.5 sm:p-4 shadow-soft-xs space-y-3">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
-                          <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                          <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                           Area / Zone
                         </label>
-                        <span className="text-[10px] font-mono font-semibold text-[#5B21B6] bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 rounded-full truncate max-w-[140px]">
+                        <span className="text-[10px] font-mono font-semibold text-[#1B2E79] bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 rounded-full truncate max-w-[140px]">
                           {draftArea}
                         </span>
                       </div>
@@ -647,19 +611,19 @@ export const LeavePage: React.FC = () => {
                           onClick={() => setIsAreaSelectOpen((prev) => !prev)}
                           className={`w-full flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-all shadow-soft-xs cursor-pointer ${
                             isAreaSelectOpen
-                              ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#1F1F1F]'
-                              : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-white hover:border-[#DDD6FE]'
+                              ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1F1F1F]'
+                              : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-white hover:border-[#C4D9FD]'
                           }`}
                         >
                           <div className="flex items-center gap-2 truncate">
-                            <div className="h-6 w-6 rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0">
-                              <MapPin className="h-3 w-3 text-[#5B21B6]" />
+                            <div className="h-6 w-6 rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0">
+                              <MapPin className="h-3 w-3 text-[#1B2E79]" />
                             </div>
                             <span className="truncate font-semibold text-[#1F1F1F]">{draftArea || 'Select Area'}</span>
                           </div>
                           <ChevronDown
                             className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
-                              isAreaSelectOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                              isAreaSelectOpen ? 'rotate-180 text-[#1B2E79]' : ''
                             }`}
                           />
                         </button>
@@ -675,7 +639,7 @@ export const LeavePage: React.FC = () => {
                                   value={areaSearchQuery}
                                   onChange={(e) => setAreaSearchQuery(e.target.value)}
                                   placeholder="Search area..."
-                                  className="w-full rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] px-2.5 py-1.5 text-xs text-[#1F1F1F] placeholder-[#8C8C8C] focus:border-[#5B21B6] focus:bg-white focus:outline-none"
+                                  className="w-full rounded-lg border border-[#EEEEF2] bg-[#FAF9FC] px-2.5 py-1.5 text-xs text-[#1F1F1F] placeholder-[#8C8C8C] focus:border-[#1B2E79] focus:bg-white focus:outline-none"
                                   onClick={(e) => e.stopPropagation()}
                                 />
                               </div>
@@ -696,17 +660,17 @@ export const LeavePage: React.FC = () => {
                                     }}
                                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
                                       isSelected
-                                        ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold border border-[#DDD6FE]/80'
+                                        ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold border border-[#C4D9FD]/80'
                                         : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                                     }`}
                                   >
                                     <div className="flex items-center gap-2 truncate">
-                                      <div className={`h-5 w-5 rounded-md flex items-center justify-center shrink-0 ${isSelected ? 'bg-white text-[#5B21B6]' : 'bg-[#FAF9FC] text-[#8C8C8C]'}`}>
+                                      <div className={`h-5 w-5 rounded-md flex items-center justify-center shrink-0 ${isSelected ? 'bg-white text-[#1B2E79]' : 'bg-[#FAF9FC] text-[#8C8C8C]'}`}>
                                         <MapPin className="h-3 w-3" />
                                       </div>
                                       <span className="truncate">{area}</span>
                                     </div>
-                                    {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />}
+                                    {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />}
                                   </button>
                                 );
                               })
@@ -729,7 +693,7 @@ export const LeavePage: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleApplyFilter}
-                      className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
+                      className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
                     >
                       Apply Filter
                     </button>
@@ -743,7 +707,7 @@ export const LeavePage: React.FC = () => {
         {/* Selected Area Pill Bar */}
         <div className="flex items-center gap-2 pt-1 border-t border-[#F3F2F7] flex-wrap text-xs">
           <span className="text-[#6B6B6B] font-medium">Selected Area:</span>
-          <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full border border-[#DDD6FE]">
+          <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full border border-[#C4D9FD]">
             <MapPin className="h-3 w-3" />
             {selectedArea}
           </span>
@@ -771,7 +735,7 @@ export const LeavePage: React.FC = () => {
       {isLoading && (
         <div className="w-full rounded-2xl border border-[#EEEEF2] bg-white p-6 shadow-soft-sm space-y-4">
           <div className="flex items-center justify-between">
-            <div className="h-5 w-40 bg-[#EDE9FE] animate-pulse rounded-lg" />
+            <div className="h-5 w-40 bg-[#EEF3FF] animate-pulse rounded-lg" />
             <div className="h-4 w-24 bg-[#FAF9FC] animate-pulse rounded-lg" />
           </div>
           <div className="space-y-3">
@@ -843,16 +807,16 @@ export const LeavePage: React.FC = () => {
                   {/* Card Header: Worker & Status */}
                   <div className="flex items-center justify-between gap-2 border-b border-[#EEEEF2] pb-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-9 w-9 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0 overflow-hidden">
-                        <span className="font-bold text-xs text-[#5B21B6]">
-                          {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#5B21B6]" />}
+                      <div className="h-9 w-9 rounded-xl bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0 overflow-hidden">
+                        <span className="font-bold text-xs text-[#1B2E79]">
+                          {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#1B2E79]" />}
                         </span>
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-bold text-xs text-[#1F1F1F] truncate" title={name}>
                           {name}
                         </h4>
-                        <span className="font-mono text-[11px] text-[#5B21B6] font-semibold">
+                        <span className="font-mono text-[11px] text-[#1B2E79] font-semibold">
                           {safeVal(r.workerId)}
                         </span>
                       </div>
@@ -871,7 +835,7 @@ export const LeavePage: React.FC = () => {
 
                     <div className="rounded-xl bg-[#FAF9FC] p-2.5 border border-[#EEEEF2]">
                       <span className="text-[10px] text-[#6B6B6B] font-mono block">LEAVE TYPE</span>
-                      <span className="font-mono text-[11px] font-semibold text-[#5B21B6] truncate block">
+                      <span className="font-mono text-[11px] font-semibold text-[#1B2E79] truncate block">
                         {safeVal(r.leaveType)}
                       </span>
                     </div>
@@ -896,7 +860,7 @@ export const LeavePage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleViewRecord(r)}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       <span>View Details</span>
@@ -911,67 +875,20 @@ export const LeavePage: React.FC = () => {
 
       {/* Server-Side Windowed Pagination Controls */}
       {!isLoading && !apiError && totalRecords > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#EEEEF2] bg-white px-4 py-3 rounded-2xl shadow-soft-sm w-full">
-          <div className="text-xs text-[#6B6B6B]">
-            Showing <strong className="text-[#1F1F1F] font-mono">{startRecord}</strong> to{' '}
-            <strong className="text-[#1F1F1F] font-mono">{endRecord}</strong> of{' '}
-            <strong className="text-[#1F1F1F] font-mono">{totalRecords}</strong> records
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Previous Button */}
-            <button
-              type="button"
-              onClick={handlePrevious}
-              disabled={!hasPreviousPage || isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Previous Page"
-            >
-              <ChevronLeft className="h-3.5 w-3.5 text-[#6B6B6B]" />
-              <span>Previous</span>
-            </button>
-
-            {/* Windowed Page Numbers */}
-            {visiblePages.map((pageNum) => {
-              const isActive = pageNum === currentPage;
-              return (
-                <button
-                  key={pageNum}
-                  type="button"
-                  onClick={() => setCurrentPage(pageNum)}
-                  disabled={isLoading}
-                  className={`h-8 w-8 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
-                    isActive
-                      ? 'bg-[#5B21B6] text-white shadow-soft-xs'
-                      : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
-                  title={`Page ${pageNum}`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-
-            {/* Trailing Ellipsis if more pages exist beyond current window */}
-            {hasMoreAfter && (
-              <span className="px-1 text-xs font-bold text-[#6B6B6B] select-none">
-                ...
-              </span>
-            )}
-
-            {/* Next Button */}
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={!hasNextPage || isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Next Page"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-3.5 w-3.5 text-[#6B6B6B]" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalRecords={totalRecords}
+          pageSize={pageSize}
+          startRecord={startRecord}
+          endRecord={endRecord}
+          onPageChange={(newPage) => {
+            setCurrentPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading}
+          recordLabel="records"
+        />
       )}
 
       {/* Leave Detail Drawer */}

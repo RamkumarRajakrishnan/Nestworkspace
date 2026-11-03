@@ -3,6 +3,7 @@ import { useOperations } from '../../../context/OperationsContext';
 import { useAuth } from '../../../context/AuthContext';
 import { Booking } from '../../../types';
 import { DataTable, Column } from '../../../components/common/DataTable';
+import { Pagination } from '../../../components/common/Pagination';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { SearchInput } from '../../../components/common/SearchInput';
 import { BookingDetailDrawer } from '../../../components/operations/BookingDetailDrawer';
@@ -21,7 +22,8 @@ import {
   Clock,
   Check,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 
 const REFRESH_INTERVAL_MS = 1 * 60 * 1000; // 1 minute (auto-refresh every 60s)
@@ -98,6 +100,86 @@ export const normalizeAreaName = (area?: string | null): string => {
   return area.trim().toLowerCase().replace(/[_\s-]+/g, '');
 };
 
+// ============================================================================
+// DATE RANGE FILTER HELPERS (Strictly user-local calendar, future dates disabled)
+// ============================================================================
+export const getIsoDateString = (d: Date): string => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const parseIsoDate = (str: string): Date => {
+  const parts = (str || '').split('-');
+  if (parts.length === 3) {
+    return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  }
+  return new Date(str || Date.now());
+};
+
+export const formatDisplayDate = (isoStr?: string): string => {
+  if (!isoStr) return '';
+  try {
+    const d = parseIsoDate(isoStr);
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch {
+    return isoStr;
+  }
+};
+
+export const getRangeDaysCount = (fromStr: string, toStr: string): number => {
+  if (!fromStr || !toStr) return 0;
+  try {
+    const f = parseIsoDate(fromStr);
+    const t = parseIsoDate(toStr);
+    const diff = Math.round((t.getTime() - f.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(1, diff + 1);
+  } catch {
+    return 0;
+  }
+};
+
+export type DatePresetKey = 'today' | 'yesterday' | '7days' | '14days' | 'thisMonth' | '30days' | 'custom';
+
+export const DATE_PRESET_OPTIONS: { id: DatePresetKey; label: string }[] = [
+  { id: 'today', label: 'Today' },
+  { id: 'yesterday', label: 'Yesterday' },
+  { id: '7days', label: 'Last 7 Days' },
+  { id: '14days', label: 'Last 14 Days' },
+  { id: 'thisMonth', label: 'This Month' },
+  { id: '30days', label: 'Last 30 Days' },
+];
+
+export const detectDatePreset = (from: string, to: string): DatePresetKey | null => {
+  if (!from || !to) return null;
+  const now = new Date();
+  const today = getIsoDateString(now);
+  if (from === today && to === today) return 'today';
+
+  const y = new Date();
+  y.setDate(y.getDate() - 1);
+  const yesterday = getIsoDateString(y);
+  if (from === yesterday && to === yesterday) return 'yesterday';
+
+  const d7 = new Date();
+  d7.setDate(d7.getDate() - 6);
+  if (from === getIsoDateString(d7) && to === today) return '7days';
+
+  const d14 = new Date();
+  d14.setDate(d14.getDate() - 13);
+  if (from === getIsoDateString(d14) && to === today) return '14days';
+
+  const d30 = new Date();
+  d30.setDate(d30.getDate() - 29);
+  if (from === getIsoDateString(d30) && to === today) return '30days';
+
+  const monthStart = getIsoDateString(new Date(now.getFullYear(), now.getMonth(), 1));
+  if (from === monthStart && to === today) return 'thisMonth';
+
+  return 'custom';
+};
+
 export const OrdersPage: React.FC = () => {
   const { markets } = useOperations();
   const { accessibleAreas, hasAllAreaAccess } = useAuth();
@@ -117,14 +199,36 @@ export const OrdersPage: React.FC = () => {
     return accessibleAreas;
   }, [hasAllAreaAccess, activeAreas, accessibleAreas]);
 
-  // Server-side filter parameters - default area is '' representing "All Areas"
-  const [selectedArea, setSelectedArea] = useState<string>('');
+  // Server-side filter parameters - default area is 'Haatza_corp'
+  const [selectedArea, setSelectedArea] = useState<string>('Haatza_corp');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedSlaAlert, setSelectedSlaAlert] = useState<string>('');
   const [selectedBookingType, setSelectedBookingType] = useState<string>('');
   const [selectedDuration, setSelectedDuration] = useState<string>('');
 
+  // Server-side Date Range filter parameters (YYYY-MM-DD format)
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
+
   const [page, setPage] = useState<number>(1);
+  const [pagination, setPagination] = useState<{
+    page: number;
+    limit: number;
+    totalCount: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }>({
+    page: 1,
+    limit: 20,
+    totalCount: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  const isFetchingRef = useRef<boolean>(false);
+  const fetchRequestIdRef = useRef<number>(0);
 
   // Orders and loading states
   const [orders, setOrders] = useState<Booking[]>([]);
@@ -142,11 +246,19 @@ export const OrdersPage: React.FC = () => {
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
   // Draft states inside the Filter Popover (committed on clicking "Apply")
-  const [draftArea, setDraftArea] = useState<string>('');
+  const [draftArea, setDraftArea] = useState<string>('Haatza_corp');
   const [draftStatus, setDraftStatus] = useState<string>('');
   const [draftSlaAlert, setDraftSlaAlert] = useState<string>('');
   const [draftBookingType, setDraftBookingType] = useState<string>('');
   const [draftDuration, setDraftDuration] = useState<string>('');
+
+  // Draft Date Range state in Filter Popover
+  const [draftFromDate, setDraftFromDate] = useState<string>('');
+  const [draftToDate, setDraftToDate] = useState<string>('');
+  const [activePreset, setActivePreset] = useState<DatePresetKey | null>(null);
+  const [calendarMonth, setCalendarMonth] = useState<Date>(() => new Date());
+  const [calendarStep, setCalendarStep] = useState<'start' | 'end'>('start');
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(true);
 
   // Accordion sections expansion state - all closed by default, mutually exclusive
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -199,7 +311,7 @@ export const OrdersPage: React.FC = () => {
       .finally(() => setIsLoadingAreas(false));
   }, []);
 
-  // Fetch orders from centralized API using the server-side query filters
+  // Fetch orders from centralized API using the server-side query filters and dynamic pagination
   const fetchOrders = useCallback(async (
     filters: {
       areaName?: string;
@@ -208,9 +320,17 @@ export const OrdersPage: React.FC = () => {
       bookingType?: string;
       bookingId?: string;
       customerPhone?: string;
+      fromDate?: string;
+      toDate?: string;
     },
+    pageNumber: number = 1,
     isSilent: boolean = false
   ) => {
+    // Prevent duplicate concurrent requests during rapid pagination clicks
+    if (isFetchingRef.current && !isSilent) return;
+    isFetchingRef.current = true;
+
+    const currentReqId = ++fetchRequestIdRef.current;
     if (!isSilent) {
       setIsLoading(true);
     } else {
@@ -220,15 +340,15 @@ export const OrdersPage: React.FC = () => {
 
     try {
       const apiFilterOpts: GetBookingsFilterOptions = {
-        limit: 100, // Fetch up to 100 bookings so client search and 20/page pagination cover all records
+        areaName: filters.areaName || 'Haatza_corp',
+        page: pageNumber,
+        limit: PAGE_SIZE, // Exactly 20 bookings per page
       };
 
       if (filters.bookingId) {
         apiFilterOpts.bookingId = filters.bookingId.replace(/^#/, '').trim();
       } else if (filters.customerPhone) {
         apiFilterOpts.customerPhone = filters.customerPhone.trim();
-      } else if (filters.areaName && filters.areaName !== 'ALL' && filters.areaName !== 'All Areas') {
-        apiFilterOpts.areaName = filters.areaName;
       }
 
       if (filters.bookingStatus && filters.bookingStatus !== 'ALL' && filters.bookingStatus !== 'All') {
@@ -240,34 +360,77 @@ export const OrdersPage: React.FC = () => {
       if (filters.bookingType && filters.bookingType !== 'ALL' && filters.bookingType !== 'All') {
         apiFilterOpts.bookingType = filters.bookingType;
       }
+
+      // Date Range Filter parameters (YYYY-MM-DD)
+      if (filters.fromDate && filters.fromDate.trim()) {
+        apiFilterOpts.fromDate = filters.fromDate.trim();
+      }
+      if (filters.toDate && filters.toDate.trim()) {
+        apiFilterOpts.toDate = filters.toDate.trim();
+      }
       // Note: duration is not sent to backend query to prevent backend 404/no-bookings bug; handled client-side
 
       const response = await getBookings(apiFilterOpts);
+
+      // Discard responses from older requests if a newer request was dispatched
+      if (currentReqId !== fetchRequestIdRef.current) {
+        return;
+      }
+
       if (response.success && Array.isArray(response.data)) {
         const mapped = response.data.map(mapApiBookingToBooking);
         setOrders(mapped);
         setLastRefreshedAt(new Date());
+
+        if (response.pagination) {
+          setPagination({
+            page: response.pagination.page,
+            limit: response.pagination.limit,
+            totalCount: response.pagination.totalCount,
+            totalPages: response.pagination.totalPages,
+            hasNextPage: response.pagination.hasNextPage,
+            hasPreviousPage: response.pagination.hasPreviousPage,
+          });
+        } else {
+          const totalRecs = response.total ?? mapped.length;
+          const totalPgs = Math.max(1, Math.ceil(totalRecs / PAGE_SIZE));
+          setPagination({
+            page: pageNumber,
+            limit: PAGE_SIZE,
+            totalCount: totalRecs,
+            totalPages: totalPgs,
+            hasNextPage: pageNumber < totalPgs,
+            hasPreviousPage: pageNumber > 1,
+          });
+        }
       } else {
         setError(response.error || 'Unable to load orders. Please try again.');
       }
     } catch (err) {
-      console.error('Failed to load orders:', err);
-      setError('Unable to load orders. Please check your internet connection.');
+      if (currentReqId === fetchRequestIdRef.current) {
+        console.error('Failed to load orders:', err);
+        setError('Unable to load orders. Please check your internet connection.');
+      }
     } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      if (currentReqId === fetchRequestIdRef.current) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        isFetchingRef.current = false;
+      }
     }
   }, []);
 
-  // Trigger load when server-side filter dependencies change (loads all on mount if selectedArea is '')
+  // Trigger load when server-side filter dependencies or page change
   useEffect(() => {
     fetchOrders({
-      areaName: selectedArea || undefined,
+      areaName: selectedArea || 'Haatza_corp',
       bookingStatus: selectedStatus || undefined,
       slaAlert: selectedSlaAlert || undefined,
       bookingType: selectedBookingType || undefined,
-    }, false);
-  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType]);
+      fromDate: fromDate || undefined,
+      toDate: toDate || undefined,
+    }, page, false);
+  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, fromDate, toDate, page]);
 
   // Track the last minute we refreshed at (initialized to the current minute on mount)
   const lastRefreshedMinuteRef = useRef<number>(new Date().getMinutes());
@@ -276,16 +439,18 @@ export const OrdersPage: React.FC = () => {
   const autoRefreshRef = useRef<() => void>(() => { });
   useEffect(() => {
     autoRefreshRef.current = () => {
-      if (!isLoading && !isRefreshing) {
+      if (!isLoading && !isRefreshing && !isFetchingRef.current) {
         fetchOrders({
-          areaName: selectedArea || undefined,
+          areaName: selectedArea || 'Haatza_corp',
           bookingStatus: selectedStatus || undefined,
           slaAlert: selectedSlaAlert || undefined,
           bookingType: selectedBookingType || undefined,
-        }, true);
+          fromDate: fromDate || undefined,
+          toDate: toDate || undefined,
+        }, page, true);
       }
     };
-  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, isLoading, isRefreshing]);
+  }, [fetchOrders, selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, fromDate, toDate, page, isLoading, isRefreshing]);
 
   // Live clock synchronized with header integrated timer and auto-refresh on the minute (:00)
   useEffect(() => {
@@ -304,6 +469,142 @@ export const OrdersPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Quick Preset Click Handler
+  const applyPreset = (presetKey: DatePresetKey) => {
+    if (presetKey === 'custom') return;
+
+    // Toggle off if already active
+    if (activePreset === presetKey) {
+      setActivePreset(null);
+      setDraftFromDate('');
+      setDraftToDate('');
+      setCalendarStep('start');
+      return;
+    }
+
+    setActivePreset(presetKey);
+    const now = new Date();
+    const today = getIsoDateString(now);
+    let from = '';
+    let to = today;
+
+    if (presetKey === 'today') {
+      from = to;
+    } else if (presetKey === 'yesterday') {
+      const y = new Date();
+      y.setDate(y.getDate() - 1);
+      from = getIsoDateString(y);
+      to = from;
+    } else if (presetKey === '7days') {
+      const d = new Date();
+      d.setDate(d.getDate() - 6);
+      from = getIsoDateString(d);
+    } else if (presetKey === '14days') {
+      const d = new Date();
+      d.setDate(d.getDate() - 13);
+      from = getIsoDateString(d);
+    } else if (presetKey === 'thisMonth') {
+      const d = new Date(now.getFullYear(), now.getMonth(), 1);
+      from = getIsoDateString(d);
+    } else if (presetKey === '30days') {
+      const d = new Date();
+      d.setDate(d.getDate() - 29);
+      from = getIsoDateString(d);
+    }
+
+    setDraftFromDate(from);
+    setDraftToDate(to);
+    setCalendarMonth(parseIsoDate(to));
+    setCalendarStep('start');
+  };
+
+  // Custom Calendar Day Click Handler (strictly enforces future dates disabled)
+  const handleCalendarDayClick = (isoStr: string) => {
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 4);
+    const maxDateIso = getIsoDateString(maxDate);
+    if (isoStr > maxDateIso) return; // Future dates beyond 4 days are non-selectable
+
+    setActivePreset('custom');
+
+    if (calendarStep === 'start' || !draftFromDate) {
+      setDraftFromDate(isoStr);
+      setDraftToDate(isoStr);
+      setCalendarStep('end');
+    } else {
+      if (isoStr >= draftFromDate) {
+        setDraftToDate(isoStr);
+        setCalendarStep('start');
+      } else {
+        setDraftFromDate(isoStr);
+        setDraftToDate(isoStr);
+        setCalendarStep('end');
+      }
+    }
+  };
+
+  // Render Calendar Month Days Grid with future dates disabled and range highlight
+  const renderCalendarDays = () => {
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
+
+    const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 4);
+    const maxDateIso = getIsoDateString(maxDate);
+
+    const days = [];
+
+    // Blank cells before first day of month
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      days.push(<div key={`blank-${i}`} className="h-8 w-8" />);
+    }
+
+    // Days of current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayDate = new Date(year, month, day);
+      const isoStr = getIsoDateString(dayDate);
+      const isFuture = isoStr > maxDateIso;
+      const isStart = isoStr === draftFromDate;
+      const isEnd = isoStr === draftToDate;
+      const isInRange = draftFromDate && draftToDate && isoStr > draftFromDate && isoStr < draftToDate;
+      const isSingleDay = isStart && isEnd;
+
+      let btnClass = 'h-8 w-8 text-xs font-semibold flex items-center justify-center transition-all ';
+
+      if (isFuture) {
+        btnClass += 'rounded-xl text-[#B0B0B0] opacity-25 cursor-not-allowed select-none';
+      } else if (isSingleDay) {
+        btnClass += 'rounded-xl bg-[#1B2E79] text-white font-bold shadow-soft-sm ring-2 ring-[#1B2E79]/30 cursor-pointer';
+      } else if (isStart) {
+        btnClass += 'rounded-l-xl bg-[#1B2E79] text-white font-bold shadow-soft-sm cursor-pointer';
+      } else if (isEnd) {
+        btnClass += 'rounded-r-xl bg-[#1B2E79] text-white font-bold shadow-soft-sm cursor-pointer';
+      } else if (isInRange) {
+        btnClass += 'bg-[#EEF3FF] text-[#1B2E79] font-semibold rounded-none cursor-pointer';
+      } else {
+        btnClass += 'rounded-xl text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#1B2E79] cursor-pointer';
+      }
+
+      days.push(
+        <button
+          key={isoStr}
+          type="button"
+          disabled={isFuture}
+          onClick={() => handleCalendarDayClick(isoStr)}
+          className={btnClass}
+          aria-label={isoStr}
+          aria-disabled={isFuture}
+        >
+          {day}
+        </button>
+      );
+    }
+
+    return days;
+  };
+
   // Open Popover and sync drafts with applied state (always closed by default)
   const handleOpenFilter = () => {
     setDraftArea(selectedArea);
@@ -311,6 +612,12 @@ export const OrdersPage: React.FC = () => {
     setDraftSlaAlert(selectedSlaAlert);
     setDraftBookingType(selectedBookingType);
     setDraftDuration(selectedDuration);
+    setDraftFromDate(fromDate);
+    setDraftToDate(toDate);
+    setCalendarMonth(fromDate || toDate ? parseIsoDate(toDate || fromDate) : new Date());
+    setCalendarStep('start');
+    setActivePreset(fromDate && toDate ? detectDatePreset(fromDate, toDate) : null);
+    setIsCalendarOpen(true);
     setExpandedSections({
       area: false,
       status: false,
@@ -328,58 +635,73 @@ export const OrdersPage: React.FC = () => {
     setSelectedSlaAlert(draftSlaAlert);
     setSelectedBookingType(draftBookingType);
     setSelectedDuration(draftDuration);
+    setFromDate(draftFromDate);
+    setToDate(draftToDate);
     setPage(1);
     setIsFilterOpen(false);
   };
 
-  // Clear all static filters (resets area to All Areas, duration, status, search)
+  // Clear all static filters (resets area to default Haatza_corp, duration, status, date range, search)
   const handleRemoveFilters = () => {
-    setSelectedArea('');
+    setSelectedArea('Haatza_corp');
     setSelectedStatus('');
     setSelectedSlaAlert('');
     setSelectedBookingType('');
     setSelectedDuration('');
-    setDraftArea('');
+    setFromDate('');
+    setToDate('');
+    setDraftArea('Haatza_corp');
     setDraftStatus('');
     setDraftSlaAlert('');
     setDraftBookingType('');
     setDraftDuration('');
+    setDraftFromDate('');
+    setDraftToDate('');
+    setActivePreset(null);
+    setCalendarStep('start');
     setSearch('');
     setPage(1);
   };
 
   // Clear all filters from within the popover
   const handleClearAllPopoverFilters = () => {
-    setSelectedArea('');
+    setSelectedArea('Haatza_corp');
     setSelectedStatus('');
     setSelectedSlaAlert('');
     setSelectedBookingType('');
     setSelectedDuration('');
-    setDraftArea('');
+    setFromDate('');
+    setToDate('');
+    setDraftArea('Haatza_corp');
     setDraftStatus('');
     setDraftSlaAlert('');
     setDraftBookingType('');
     setDraftDuration('');
+    setDraftFromDate('');
+    setDraftToDate('');
+    setActivePreset(null);
+    setCalendarStep('start');
     setPage(1);
     setIsFilterOpen(false);
   };
 
-  // Count active filters (including area when filtered, duration, status, etc., excluding search)
+  // Count active filters (including area when customized from Haatza_corp, date range, duration, status, etc., excluding search)
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (selectedArea && selectedArea !== 'ALL' && selectedArea !== 'All Areas' && selectedArea !== '') count++;
+    if (selectedArea && selectedArea !== 'ALL' && selectedArea !== 'All Areas' && selectedArea !== 'Haatza_corp') count++;
     if (selectedStatus && selectedStatus !== 'ALL' && selectedStatus !== '') count++;
     if (selectedSlaAlert && selectedSlaAlert !== 'ALL' && selectedSlaAlert !== '') count++;
     if (selectedBookingType && selectedBookingType !== 'ALL' && selectedBookingType !== '') count++;
     if (selectedDuration && selectedDuration !== 'ALL' && selectedDuration !== '') count++;
+    if (fromDate && toDate) count++;
     return count;
-  }, [selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, selectedDuration]);
+  }, [selectedArea, selectedStatus, selectedSlaAlert, selectedBookingType, selectedDuration, fromDate, toDate]);
 
   // Combined AND filtering: Area + Duration + Status + Booking Type + SLA Alert + Search
   const filteredBookings = useMemo(() => {
     return orders.filter((b) => {
-      // 1. Operating Area filter (matches normalized area)
-      if (selectedArea && selectedArea !== 'ALL' && selectedArea !== 'All Areas') {
+      // 1. Operating Area filter (only if user explicitly filtered by a specific area other than Haatza_corp / All)
+      if (selectedArea && selectedArea !== 'ALL' && selectedArea !== 'All Areas' && selectedArea.toLowerCase() !== 'haatza_corp') {
         const bArea = b.areaName || b.areaId || '';
         const matchesArea =
           bArea.toLowerCase() === selectedArea.toLowerCase() ||
@@ -481,14 +803,8 @@ export const OrdersPage: React.FC = () => {
     });
   }, [orders, selectedArea, selectedDuration, selectedStatus, selectedBookingType, selectedSlaAlert, search]);
 
-  // Pagination for 20 bookings only per page
-  const totalPages = Math.ceil(filteredBookings.length / PAGE_SIZE) || 1;
-  const safePage = Math.min(Math.max(1, page), totalPages);
-
-  const paginatedBookings = useMemo(() => {
-    const startIndex = (safePage - 1) * PAGE_SIZE;
-    return filteredBookings.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [filteredBookings, safePage]);
+  // Server-side paginated bookings directly from API (no client-side slicing)
+  const paginatedBookings = filteredBookings;
 
   // Formatter for scheduled time: Date on top line, Time strictly below Date
   const formatScheduledDateTime = (isoTime?: string, fallbackDate?: string, fallbackTime?: string) => {
@@ -535,7 +851,7 @@ export const OrdersPage: React.FC = () => {
 
     return {
       rowClass: 'bg-white hover:bg-[#FAF9FC]',
-      cardClass: 'bg-white border-[#EEEEF2] hover:border-[#5B21B6]/30',
+      cardClass: 'bg-white border-[#EEEEF2] hover:border-[#1B2E79]/30',
     };
   };
 
@@ -587,7 +903,7 @@ export const OrdersPage: React.FC = () => {
           <div className="text-left">
             <span
               className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold border ${isInstant
-                  ? 'bg-[#EDE9FE] text-[#5B21B6] border-[#DDD6FE]'
+                  ? 'bg-[#EEF3FF] text-[#1B2E79] border-[#C4D9FD]'
                   : 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]'
                 }`}
             >
@@ -602,8 +918,8 @@ export const OrdersPage: React.FC = () => {
       align: 'left',
       render: (b) => (
         <div className="text-left">
-          <span className="inline-flex items-center gap-1 font-mono text-[#5B21B6] font-semibold text-xs bg-[#EDE9FE] px-2 py-0.5 rounded-lg">
-            <MapPin className="h-3 w-3 text-[#5B21B6]" />
+          <span className="inline-flex items-center gap-1 font-mono text-[#1B2E79] font-semibold text-xs bg-[#EEF3FF] px-2 py-0.5 rounded-lg">
+            <MapPin className="h-3 w-3 text-[#1B2E79]" />
             {b.areaName || b.areaId || selectedArea}
           </span>
         </div>
@@ -648,7 +964,7 @@ export const OrdersPage: React.FC = () => {
         const status = b.paymentStatus || 'Success';
         return (
           <div className="text-xs text-left">
-            <span className="font-mono font-bold text-[#5B21B6] block">
+            <span className="font-mono font-bold text-[#1B2E79] block">
               {amt && amt !== '—' ? `₹${amt}` : '—'}
             </span>
             <span className="text-[10px] text-emerald-700 block font-medium mt-0.5">
@@ -715,7 +1031,7 @@ export const OrdersPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAssignBooking(b)}
-                className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-2.5 py-1 text-[11px] font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
+                className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-2.5 py-1 text-[11px] font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
               >
                 {isAssigned ? 'Reassign Expert' : 'Assign Expert'}
               </button>
@@ -723,7 +1039,7 @@ export const OrdersPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setInspectBooking(b)}
-              className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-sm cursor-pointer"
+              className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-sm cursor-pointer"
               title="Inspect Order Details (Slide-in Drawer)"
             >
               <Eye className="h-3.5 w-3.5" />
@@ -787,16 +1103,18 @@ export const OrdersPage: React.FC = () => {
             <button
               type="button"
               onClick={() => fetchOrders({
-                areaName: selectedArea || undefined,
+                areaName: selectedArea || 'Haatza_corp',
                 bookingStatus: selectedStatus || undefined,
                 slaAlert: selectedSlaAlert || undefined,
                 bookingType: selectedBookingType || undefined,
-              }, false)}
+                fromDate: fromDate || undefined,
+                toDate: toDate || undefined,
+              }, page, false)}
               disabled={isLoading || isRefreshing}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#5B21B6] hover:bg-[#EDE9FE] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#1F1F1F] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               title="Refresh Orders manually"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span>Refresh</span>
             </button>
 
@@ -811,16 +1129,16 @@ export const OrdersPage: React.FC = () => {
                 }
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
                 }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -837,11 +1155,11 @@ export const OrdersPage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[430px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[420px] md:w-[440px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Orders</h3>
                   </div>
                   <button
@@ -853,8 +1171,184 @@ export const OrdersPage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Popover Scrollable Body: Expandable Accordion Cards */}
+                {/* Popover Scrollable Body: Expandable Accordion Cards & Date Picker */}
                 <div className="max-h-[55vh] overflow-y-auto p-4 space-y-3 bg-[#FAF9FC]/50">
+                  {/* DATE RANGE FILTER (Matches Reference Screenshot) */}
+                  <div className="rounded-xl border border-[#EEEEF2] bg-white p-3.5 shadow-soft-xs space-y-3">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
+                        <Calendar className="h-4 w-4 text-[#1B2E79]" />
+                        Date Range
+                      </label>
+                      {draftFromDate && draftToDate ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono text-[#1B2E79] font-semibold bg-[#EEF3FF] px-2 py-0.5 rounded-full">
+                            {draftFromDate === draftToDate
+                              ? formatDisplayDate(draftFromDate)
+                              : `${getRangeDaysCount(draftFromDate, draftToDate)} days selected`}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDraftFromDate('');
+                              setDraftToDate('');
+                              setActivePreset(null);
+                              setCalendarStep('start');
+                            }}
+                            className="text-[10px] font-semibold text-[#6B6B6B] hover:text-[#B42318] underline transition-colors cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-medium text-[#6B6B6B] bg-[#FAF9FC] border border-[#EEEEF2] px-2 py-0.5 rounded-full">
+                          All Dates (No filter)
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Quick Range Presets (3 columns, 6 buttons) */}
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {DATE_PRESET_OPTIONS.map((p) => {
+                        const isSelected = activePreset === p.id;
+                        return (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => applyPreset(p.id)}
+                            className={`rounded-xl py-2 px-2 text-[11px] font-semibold border transition-all text-center cursor-pointer flex items-center justify-center gap-1 active:scale-95 ${
+                              isSelected
+                                ? 'bg-[#1B2E79] text-white border-[#1B2E79] shadow-soft-xs ring-2 ring-[#1B2E79]/25 font-bold'
+                                : 'bg-[#FAF9FC] text-[#4B5563] border-[#EEEEF2] hover:bg-[#EEF3FF] hover:text-[#1B2E79] hover:border-[#C4D9FD]'
+                            }`}
+                          >
+                            {isSelected && <Check className="h-3 w-3 text-white shrink-0" />}
+                            <span>{p.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Date Selection Area */}
+                    {draftFromDate && draftToDate ? (
+                      <div
+                        onClick={() => setIsCalendarOpen((prev) => !prev)}
+                        className="flex items-center justify-between rounded-xl bg-[#FAF9FC] p-2.5 border border-[#EEEEF2] text-xs cursor-pointer hover:border-[#C4D9FD] transition-colors"
+                        title="Click to toggle calendar"
+                      >
+                        <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                          <span className="font-bold text-[#1F1F1F]">{formatDisplayDate(draftFromDate)}</span>
+                          <span className="text-[#8C8C8C] font-sans">to</span>
+                          <span className="font-bold text-[#1F1F1F]">{formatDisplayDate(draftToDate)}</span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full capitalize">
+                          {activePreset && activePreset !== 'custom'
+                            ? DATE_PRESET_OPTIONS.find((p) => p.id === activePreset)?.label || 'Preset'
+                            : `${getRangeDaysCount(draftFromDate, draftToDate)} days selected`}
+                        </span>
+                      </div>
+                    ) : draftFromDate && !draftToDate ? (
+                      <div
+                        onClick={() => setIsCalendarOpen(true)}
+                        className="flex items-center justify-between rounded-xl bg-[#EEF3FF]/50 p-2.5 border border-[#C4D9FD] text-xs cursor-pointer"
+                      >
+                        <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                          <span className="font-bold text-[#1B2E79]">{formatDisplayDate(draftFromDate)}</span>
+                          <span className="text-[#6B6B6B] font-sans">→ Select end date on calendar</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDraftFromDate('');
+                            setDraftToDate('');
+                            setActivePreset(null);
+                            setCalendarStep('start');
+                          }}
+                          className="text-[10px] font-semibold text-[#6B6B6B] hover:text-[#B42318] underline transition-colors cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => setIsCalendarOpen((prev) => !prev)}
+                        className="flex items-center justify-between rounded-xl bg-[#FAF9FC] p-2.5 border border-dashed border-[#C4D9FD] text-xs text-[#6B6B6B] cursor-pointer hover:border-[#1B2E79] transition-colors"
+                        title="Click to open calendar"
+                      >
+                        <span className="text-[11px]">No date range selected (shows all dates)</span>
+                        <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
+                          Optional
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Custom Calendar Month Widget */}
+                    {isCalendarOpen && (
+                      <div className="rounded-xl border border-[#EEEEF2] bg-white p-3 space-y-2.5 animate-in fade-in duration-150">
+                        {/* Month Navigation */}
+                        <div className="flex items-center justify-between">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1));
+                            }}
+                            className="p-1 rounded-lg hover:bg-[#FAF9FC] text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors cursor-pointer"
+                            title="Previous Month"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <span className="text-xs font-bold text-[#1F1F1F]">
+                            {calendarMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+                          </span>
+                          {(() => {
+                            const maxDate = new Date();
+                            maxDate.setDate(maxDate.getDate() + 4);
+                            const isCurrentMonthOrFuture =
+                              calendarMonth.getFullYear() > maxDate.getFullYear() ||
+                              (calendarMonth.getFullYear() === maxDate.getFullYear() && calendarMonth.getMonth() >= maxDate.getMonth());
+                            return (
+                              <button
+                                type="button"
+                                disabled={isCurrentMonthOrFuture}
+                                onClick={() => {
+                                  if (!isCurrentMonthOrFuture) {
+                                    setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1));
+                                  }
+                                }}
+                                className={`p-1 rounded-lg transition-colors ${
+                                  isCurrentMonthOrFuture
+                                    ? 'text-[#C0C0C0] opacity-30 cursor-not-allowed'
+                                    : 'hover:bg-[#FAF9FC] text-[#6B6B6B] hover:text-[#1F1F1F] cursor-pointer'
+                                }`}
+                                title={isCurrentMonthOrFuture ? 'Future dates beyond 4 days are disabled' : 'Next Month'}
+                              >
+                                <ChevronRight className="h-4 w-4" />
+                              </button>
+                            );
+                          })()}
+                        </div>
+
+                        {/* Weekday headers matching reference screenshot */}
+                        <div className="grid grid-cols-7 text-center text-[10px] font-bold text-[#8C8C8C] uppercase">
+                          <div>SU</div>
+                          <div>MO</div>
+                          <div>TU</div>
+                          <div>WE</div>
+                          <div>TH</div>
+                          <div>FR</div>
+                          <div>SA</div>
+                        </div>
+
+                        {/* Month Days Grid with future dates disabled */}
+                        <div className="grid grid-cols-7 gap-y-1 justify-items-center">
+                          {renderCalendarDays()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {/* 1. Operating Area (areaName) */}
                   <div className="rounded-xl border border-[#EEEEF2] bg-white overflow-hidden shadow-soft-xs">
                     <button
@@ -863,16 +1357,16 @@ export const OrdersPage: React.FC = () => {
                       className="w-full flex items-center justify-between p-3.5 text-xs font-bold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                         <span>Operating Area</span>
                         {draftArea && draftArea !== 'ALL' && draftArea !== 'All Areas' && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftArea}
                           </span>
                         )}
                       </div>
                       {expandedSections.area ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -880,22 +1374,22 @@ export const OrdersPage: React.FC = () => {
 
                     {expandedSections.area && (
                       <div className="px-3.5 pb-3.5 pt-1 border-t border-[#EEEEF2] space-y-1.5">
-                        {/* "All Areas" option */}
+                        {/* "Haatza_corp" (Default / All Areas) option */}
                         <button
                           type="button"
-                          onClick={() => setDraftArea('')}
+                          onClick={() => setDraftArea('Haatza_corp')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
-                            !draftArea || draftArea === 'ALL' || draftArea === 'All Areas'
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                            !draftArea || draftArea === 'Haatza_corp' || draftArea === 'ALL' || draftArea === 'All Areas'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                           }`}
                         >
                           <div className="flex items-center gap-1.5">
-                            <span className="h-2 w-2 rounded-full bg-purple-400" />
-                            <span>All Areas</span>
+                            <span className="h-2 w-2 rounded-full bg-blue-500" />
+                            <span>Haatza Corp (All Areas)</span>
                           </div>
-                          {(!draftArea || draftArea === 'ALL' || draftArea === 'All Areas') && (
-                            <Check className="h-3.5 w-3.5 text-[#5B21B6]" />
+                          {(!draftArea || draftArea === 'Haatza_corp' || draftArea === 'ALL' || draftArea === 'All Areas') && (
+                            <Check className="h-3.5 w-3.5 text-[#1B2E79]" />
                           )}
                         </button>
 
@@ -911,15 +1405,15 @@ export const OrdersPage: React.FC = () => {
                               onClick={() => setDraftArea(areaName)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                 draftArea === areaName
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                             >
                               <div className="flex items-center gap-1.5">
-                                <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                                <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                                 <span>{areaName}</span>
                               </div>
-                              {draftArea === areaName && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {draftArea === areaName && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           ))
                         )}
@@ -937,13 +1431,13 @@ export const OrdersPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Booking Status</span>
                         {draftStatus && draftStatus !== 'ALL' && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatus}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -955,12 +1449,12 @@ export const OrdersPage: React.FC = () => {
                           type="button"
                           onClick={() => setDraftStatus('ALL')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftStatus === 'ALL' || draftStatus === ''
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                             }`}
                         >
                           <span>All Statuses</span>
-                          {(draftStatus === 'ALL' || draftStatus === '') && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                          {(draftStatus === 'ALL' || draftStatus === '') && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                         </button>
                         {STATIC_BOOKING_STATUSES.map((st) => {
                           const isSelected =
@@ -972,12 +1466,12 @@ export const OrdersPage: React.FC = () => {
                               type="button"
                               onClick={() => setDraftStatus(st.id)}
                               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${isSelected
-                                  ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                  ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                   : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                                 }`}
                             >
                               <span>{st.label}</span>
-                              {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                             </button>
                           );
                         })}
@@ -995,13 +1489,13 @@ export const OrdersPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Service / Booking Type</span>
                         {draftBookingType && draftBookingType !== 'ALL' && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full capitalize">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full capitalize">
                             {draftBookingType === 'scheduled' ? 'Schedule' : draftBookingType}
                           </span>
                         )}
                       </div>
                       {expandedSections.bookingType ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -1013,12 +1507,12 @@ export const OrdersPage: React.FC = () => {
                           type="button"
                           onClick={() => setDraftBookingType('ALL')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftBookingType === 'ALL' || draftBookingType === ''
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                             }`}
                         >
                           <span>All Types</span>
-                          {(draftBookingType === 'ALL' || draftBookingType === '') && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                          {(draftBookingType === 'ALL' || draftBookingType === '') && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                         </button>
                         {STATIC_BOOKING_TYPES.map((type) => (
                           <button
@@ -1026,12 +1520,12 @@ export const OrdersPage: React.FC = () => {
                             type="button"
                             onClick={() => setDraftBookingType(type.id)}
                             className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftBookingType.toLowerCase() === type.id.toLowerCase()
-                                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                 : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                           >
                             <span>{type.label}</span>
-                            {draftBookingType.toLowerCase() === type.id.toLowerCase() && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                            {draftBookingType.toLowerCase() === type.id.toLowerCase() && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                           </button>
                         ))}
                       </div>
@@ -1055,7 +1549,7 @@ export const OrdersPage: React.FC = () => {
                         )}
                       </div>
                       {expandedSections.sla ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -1067,12 +1561,12 @@ export const OrdersPage: React.FC = () => {
                           type="button"
                           onClick={() => setDraftSlaAlert('ALL')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftSlaAlert === 'ALL' || draftSlaAlert === ''
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                             }`}
                         >
                           <span>All Delivery Alerts</span>
-                          {(draftSlaAlert === 'ALL' || draftSlaAlert === '') && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                          {(draftSlaAlert === 'ALL' || draftSlaAlert === '') && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                         </button>
                         {STATIC_SLA_ALERTS.map((item) => (
                           <button
@@ -1080,12 +1574,12 @@ export const OrdersPage: React.FC = () => {
                             type="button"
                             onClick={() => setDraftSlaAlert(item.id)}
                             className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftSlaAlert === item.id
-                                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                 : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                           >
                             <span>{item.label}</span>
-                            {draftSlaAlert === item.id && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                            {draftSlaAlert === item.id && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                           </button>
                         ))}
                       </div>
@@ -1100,16 +1594,16 @@ export const OrdersPage: React.FC = () => {
                       className="w-full flex items-center justify-between p-3.5 text-xs font-bold text-[#1F1F1F] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <Clock className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <Clock className="h-3.5 w-3.5 text-[#1B2E79]" />
                         <span>Duration</span>
                         {draftDuration && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {formatDurationInHours(draftDuration)}
                           </span>
                         )}
                       </div>
                       {expandedSections.duration ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -1121,12 +1615,12 @@ export const OrdersPage: React.FC = () => {
                           type="button"
                           onClick={() => setDraftDuration('')}
                           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${!draftDuration
-                              ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                              ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                               : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                             }`}
                         >
                           <span>All Durations</span>
-                          {!draftDuration && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                          {!draftDuration && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                         </button>
                         {STATIC_DURATIONS.map((d) => (
                           <button
@@ -1134,12 +1628,12 @@ export const OrdersPage: React.FC = () => {
                             type="button"
                             onClick={() => setDraftDuration(d.val)}
                             className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors cursor-pointer ${draftDuration === d.val
-                                ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                 : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                               }`}
                           >
                             <span>{d.label}</span>
-                            {draftDuration === d.val && <Check className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                            {draftDuration === d.val && <Check className="h-3.5 w-3.5 text-[#1B2E79]" />}
                           </button>
                         ))}
                       </div>
@@ -1162,7 +1656,7 @@ export const OrdersPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all cursor-pointer"
                   >
                     Apply Filters
                   </button>
@@ -1177,25 +1671,41 @@ export const OrdersPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#EEEEF2]">
             <span className="text-[11px] font-semibold text-[#6B6B6B]">Applied:</span>
 
-            {/* Operating Area indicator (Active scope from area API) */}
-            {selectedArea && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+            {/* Operating Area indicator if customized from default Haatza_corp */}
+            {selectedArea && selectedArea !== 'Haatza_corp' && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 <MapPin className="h-3 w-3" />
                 Area: {selectedArea}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedArea('Haatza_corp');
+                    setDraftArea('Haatza_corp');
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Reset to default area"
+                  aria-label="Reset to default area"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </span>
             )}
 
             {/* Status chip */}
             {selectedStatus && selectedStatus !== 'ALL' && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {selectedStatus === 'In Progress' ? 'Ongoing' : selectedStatus}
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedStatus('');
                     setDraftStatus('');
+                    setPage(1);
                   }}
-                  className="hover:text-rose-600 transition-colors"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Status filter"
+                  aria-label="Remove Status filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -1204,15 +1714,18 @@ export const OrdersPage: React.FC = () => {
 
             {/* Booking Type chip */}
             {selectedBookingType && selectedBookingType !== 'ALL' && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Type: {selectedBookingType === 'scheduled' ? 'Schedule' : selectedBookingType}
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedBookingType('');
                     setDraftBookingType('');
+                    setPage(1);
                   }}
-                  className="hover:text-rose-600 transition-colors"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Type filter"
+                  aria-label="Remove Type filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -1228,8 +1741,40 @@ export const OrdersPage: React.FC = () => {
                   onClick={() => {
                     setSelectedSlaAlert('');
                     setDraftSlaAlert('');
+                    setPage(1);
                   }}
-                  className="hover:text-rose-800 transition-colors"
+                  className="hover:text-rose-800 transition-colors cursor-pointer"
+                  title="Remove SLA filter"
+                  aria-label="Remove SLA filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+
+            {/* Date Range chip */}
+            {fromDate && toDate && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
+                <Calendar className="h-3 w-3 text-[#1B2E79]" />
+                <span>
+                  {fromDate === toDate
+                    ? formatDisplayDate(fromDate)
+                    : `${formatDisplayDate(fromDate)} → ${formatDisplayDate(toDate)}`}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFromDate('');
+                    setToDate('');
+                    setDraftFromDate('');
+                    setDraftToDate('');
+                    setActivePreset(null);
+                    setCalendarStep('start');
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Date filter"
+                  aria-label="Remove Date filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -1238,15 +1783,18 @@ export const OrdersPage: React.FC = () => {
 
             {/* Duration chip */}
             {selectedDuration && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Duration: {formatDurationInHours(selectedDuration)}
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedDuration('');
                     setDraftDuration('');
+                    setPage(1);
                   }}
-                  className="hover:text-rose-600 transition-colors"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Duration filter"
+                  aria-label="Remove Duration filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -1260,7 +1808,7 @@ export const OrdersPage: React.FC = () => {
       {isLoading && (
         <div className="space-y-3">
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-6 shadow-soft-sm space-y-4">
-            <div className="h-5 w-48 bg-[#EDE9FE] animate-pulse rounded-lg" />
+            <div className="h-5 w-48 bg-[#EEF3FF] animate-pulse rounded-lg" />
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((idx) => (
                 <div key={idx} className="h-12 w-full bg-[#FAF9FC] animate-pulse rounded-xl" />
@@ -1281,11 +1829,13 @@ export const OrdersPage: React.FC = () => {
           <button
             type="button"
             onClick={() => fetchOrders({
-              areaName: selectedArea || undefined,
+              areaName: selectedArea || 'Haatza_corp',
               bookingStatus: selectedStatus || undefined,
               slaAlert: selectedSlaAlert || undefined,
               bookingType: selectedBookingType || undefined,
-            }, false)}
+              fromDate: fromDate || undefined,
+              toDate: toDate || undefined,
+            }, page, false)}
             className="rounded-xl bg-[#B42318] hover:bg-rose-800 text-white px-5 py-2 text-xs font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
           >
             Retry Loading Orders
@@ -1351,7 +1901,7 @@ export const OrdersPage: React.FC = () => {
                       <span className="font-mono text-sm font-bold text-[#1F1F1F] shrink-0">
                         #{b.bookingId || b.id}
                       </span>
-                      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-lg truncate">
+                      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-lg truncate">
                         <MapPin className="h-3 w-3 shrink-0" />
                         <span className="truncate">{b.areaName || b.areaId || selectedArea}</span>
                       </span>
@@ -1364,8 +1914,8 @@ export const OrdersPage: React.FC = () => {
                   {/* Service & Customer Info */}
                   <div className="space-y-0.5">
                     <div className="text-sm font-semibold text-[#1F1F1F] flex items-center justify-between">
-                      <span className="font-bold text-[#5B21B6]">{displayType}</span>
-                      <span className="font-mono text-xs font-bold text-[#5B21B6]">
+                      <span className="font-bold text-[#1B2E79]">{displayType}</span>
+                      <span className="font-mono text-xs font-bold text-[#1B2E79]">
                         {amountVal && amountVal !== '—' ? `₹${amountVal}` : '—'}
                       </span>
                     </div>
@@ -1410,7 +1960,7 @@ export const OrdersPage: React.FC = () => {
                       onClick={() => setInspectBooking(b)}
                       title="Inspect Details"
                       aria-label="Inspect Details"
-                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer shrink-0"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer shrink-0"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
@@ -1419,7 +1969,7 @@ export const OrdersPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setAssignBooking(b)}
-                        className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-3 py-1.5 text-xs font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
+                        className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-3 py-1.5 text-xs font-semibold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
                       >
                         {((b.bookingStatus || b.status) === 'Assigned' || Boolean(b.vendorId || b.vendorName))
                           ? 'Reassign Expert'
@@ -1434,71 +1984,23 @@ export const OrdersPage: React.FC = () => {
         </div>
       )}
 
-      {/* Pagination Controls (20 bookings per page) */}
-      {!isLoading && !error && filteredBookings.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-[#EEEEF2] bg-white p-4 shadow-soft-sm text-xs text-[#6B6B6B]">
-          <div className="flex items-center gap-2">
-            <span>
-              Showing <strong className="text-[#1F1F1F] font-semibold">{(safePage - 1) * PAGE_SIZE + 1}</strong> to{' '}
-              <strong className="text-[#1F1F1F] font-semibold">
-                {Math.min(safePage * PAGE_SIZE, filteredBookings.length)}
-              </strong>{' '}
-              of <strong className="text-[#1F1F1F] font-semibold">{filteredBookings.length}</strong> bookings (Page{' '}
-              <strong className="text-[#5B21B6] font-semibold">{safePage}</strong> of{' '}
-              <strong className="text-[#5B21B6] font-semibold">{totalPages}</strong>)
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                setPage((prev) => Math.max(1, prev - 1));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              disabled={safePage <= 1 || isLoading || isRefreshing}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Previous</span>
-            </button>
-
-            {/* Page number buttons */}
-            {Array.from({ length: totalPages }).map((_, idx) => {
-              const p = idx + 1;
-              if (p < safePage - 2 || p > safePage + 2) return null;
-              return (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => {
-                    setPage(p);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className={`h-8 w-8 rounded-xl font-bold transition-all cursor-pointer ${safePage === p
-                      ? 'bg-[#5B21B6] text-white shadow-soft-xs'
-                      : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                    }`}
-                >
-                  {p}
-                </button>
-              );
-            })}
-
-            <button
-              type="button"
-              onClick={() => {
-                setPage((prev) => Math.min(totalPages, prev + 1));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              disabled={safePage >= totalPages || isLoading || isRefreshing}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+      {/* Dynamic Server-Side Pagination Controls (20 bookings per page) */}
+      {!isLoading && !error && pagination.totalCount > 0 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalRecords={pagination.totalCount}
+          pageSize={PAGE_SIZE}
+          hasNextPage={pagination.hasNextPage}
+          hasPreviousPage={pagination.hasPreviousPage}
+          onPageChange={(newPage) => {
+            if (isLoading || isRefreshing || isFetchingRef.current || newPage === pagination.page) return;
+            setPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading || isRefreshing}
+          recordLabel="bookings"
+        />
       )}
 
       {/* Inspect Drawer (Opens on eye icon) */}
@@ -1518,11 +2020,13 @@ export const OrdersPage: React.FC = () => {
             setInspectBooking((prev) => prev ? { ...prev, bookingStatus: 'Cancelled', status: 'Cancelled' } : null);
           }
           fetchOrders({
-            areaName: selectedArea || undefined,
+            areaName: selectedArea || 'Haatza_corp',
             bookingStatus: selectedStatus || undefined,
             slaAlert: selectedSlaAlert || undefined,
             bookingType: selectedBookingType || undefined,
-          }, false);
+            fromDate: fromDate || undefined,
+            toDate: toDate || undefined,
+          }, page, false);
         }}
       />
 

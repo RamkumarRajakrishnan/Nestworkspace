@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
 import { Worker, Booking } from '../../../types';
 import { SearchInput } from '../../../components/common/SearchInput';
@@ -175,7 +175,7 @@ export const SchedulePage: React.FC = () => {
             <button
               onClick={() => setViewMode('day')}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                viewMode === 'day' ? 'bg-[#5B21B6] text-white shadow-soft-sm' : 'text-[#6B6B6B] hover:text-[#1F1F1F]'
+                viewMode === 'day' ? 'bg-[#1B2E79] text-white shadow-soft-sm' : 'text-[#6B6B6B] hover:text-[#1F1F1F]'
               }`}
             >
               Day View (Hourly)
@@ -183,7 +183,7 @@ export const SchedulePage: React.FC = () => {
             <button
               onClick={() => setViewMode('week')}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                viewMode === 'week' ? 'bg-[#5B21B6] text-white shadow-soft-sm' : 'text-[#6B6B6B] hover:text-[#1F1F1F]'
+                viewMode === 'week' ? 'bg-[#1B2E79] text-white shadow-soft-sm' : 'text-[#6B6B6B] hover:text-[#1F1F1F]'
               }`}
             >
               Week View
@@ -230,16 +230,16 @@ export const SchedulePage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -256,11 +256,11 @@ export const SchedulePage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Schedule</h3>
                   </div>
                   <button
@@ -283,13 +283,13 @@ export const SchedulePage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Nano-Market Zone</span>
                         {draftMarkets.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftMarkets.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.market ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -307,7 +307,7 @@ export const SchedulePage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftMarkets.includes(m.id)}
                                 onChange={() => toggleItem(draftMarkets, setDraftMarkets, m.id)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {m.id} — {m.name}
@@ -332,13 +332,13 @@ export const SchedulePage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Expert Status</span>
                         {draftStatuses.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatuses.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -356,7 +356,7 @@ export const SchedulePage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftStatuses.includes(st)}
                                 onChange={() => toggleItem(draftStatuses, setDraftStatuses, st)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {st}
@@ -387,7 +387,7 @@ export const SchedulePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
                   >
                     Apply ({draftMatchingCount} partners)
                   </button>
@@ -404,7 +404,7 @@ export const SchedulePage: React.FC = () => {
 
             {/* Market chips */}
             {selectedMarkets.map((mId) => (
-              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Market: {mId}
                 <button 
                   onClick={() => setSelectedMarkets(selectedMarkets.filter((x) => x !== mId))} 
@@ -417,7 +417,7 @@ export const SchedulePage: React.FC = () => {
 
             {/* Status chips */}
             {selectedStatuses.map((st) => (
-              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {st}
                 <button 
                   onClick={() => setSelectedStatuses(selectedStatuses.filter((x) => x !== st))} 
@@ -479,11 +479,11 @@ export const SchedulePage: React.FC = () => {
                     const getSlotStyle = () => {
                       switch (slot.status) {
                         case 'busy':
-                          return 'bg-[#F3E8FF] border-[#DDD6FE] text-[#5B21B6] font-semibold hover:bg-[#EDE9FE]';
+                          return 'bg-[#F5F8FF] border-[#C4D9FD] text-[#1B2E79] font-semibold hover:bg-[#EEF3FF]';
                         case 'completed':
                           return 'bg-[#ECFDF3] border-[#A6F4C5] text-[#027A48] font-semibold';
                         case 'available':
-                          return 'bg-[#F5F3FF] border-[#EDE9FE] text-[#7C3AED] font-medium';
+                          return 'bg-[#F5F8FF] border-[#EEF3FF] text-[#162766] font-medium';
                         default:
                           return 'bg-[#FAF9FC] border-[#EEEEF2] text-[#6B6B6B]';
                       }

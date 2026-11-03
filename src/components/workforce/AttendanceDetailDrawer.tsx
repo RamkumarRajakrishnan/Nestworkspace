@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Drawer } from '../common/Drawer';
 import { StatusBadge } from '../common/StatusBadge';
 import { RawWorkerAttendanceRecord } from '../../types';
@@ -110,7 +110,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
       <div className="space-y-4 w-full max-w-full overflow-hidden">
         {/* Top Header Card: Worker Overview */}
         <div className="flex items-center gap-3.5 sm:gap-4 rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-4.5 w-full overflow-hidden">
-          <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EDE9FE] flex items-center justify-center relative">
+          <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EEF3FF] flex items-center justify-center relative">
             {record.checkInPhoto ? (
               <img
                 src={record.checkInPhoto}
@@ -121,8 +121,8 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
                 }}
               />
             ) : (
-              <span className="font-bold text-xl text-[#5B21B6] select-none">
-                {workerName !== '—' ? workerName.charAt(0).toUpperCase() : <User className="h-7 w-7 text-[#5B21B6]" />}
+              <span className="font-bold text-xl text-[#1B2E79] select-none">
+                {workerName !== '—' ? workerName.charAt(0).toUpperCase() : <User className="h-7 w-7 text-[#1B2E79]" />}
               </span>
             )}
           </div>
@@ -134,7 +134,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
               <StatusBadge status={status} size="sm" pulse={status === 'Checked-In'} />
             </div>
             <div className="mt-1 flex items-center gap-2.5 text-xs text-[#6B6B6B] flex-wrap">
-              <span className="font-mono text-[11px] font-semibold text-[#5B21B6]">
+              <span className="font-mono text-[11px] font-semibold text-[#1B2E79]">
                 ID: {workerId}
               </span>
               <span className="flex items-center gap-1 font-mono text-[11px] text-[#6B6B6B]">
@@ -143,8 +143,8 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
               </span>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#5B21B6] font-semibold truncate max-w-[180px]">
-                <MapPin className="h-3 w-3 text-[#5B21B6] shrink-0" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#1B2E79] font-semibold truncate max-w-[180px]">
+                <MapPin className="h-3 w-3 text-[#1B2E79] shrink-0" />
                 <span className="truncate">{areaName}</span>
               </span>
               {isVerified ? (
@@ -165,7 +165,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
         {/* 1. Employee Information Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <User className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Employee Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -177,7 +177,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">EMPLOYEE ID</span>
-              <div className="font-mono text-[#5B21B6] font-bold mt-0.5 truncate">{workerId}</div>
+              <div className="font-mono text-[#1B2E79] font-bold mt-0.5 truncate">{workerId}</div>
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">ASSIGNED AREA</span>
@@ -193,7 +193,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
         {/* 2. Attendance Information Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Clock className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Attendance Metrics
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -252,7 +252,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
         {/* 3. Location Telemetry Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <Compass className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Compass className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Location Telemetry
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -287,7 +287,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
         {/* 4. Photos Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <ImageIcon className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <ImageIcon className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Attendance Photos
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -303,7 +303,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
                     href={record.checkInPhoto}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[10px] font-semibold text-[#5B21B6] hover:underline flex items-center gap-0.5"
+                    className="text-[10px] font-semibold text-[#1B2E79] hover:underline flex items-center gap-0.5"
                   >
                     <span>View Full</span>
                     <ExternalLink className="h-2.5 w-2.5" />
@@ -342,7 +342,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
                     href={record.checkOutPhoto}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[10px] font-semibold text-[#5B21B6] hover:underline flex items-center gap-0.5"
+                    className="text-[10px] font-semibold text-[#1B2E79] hover:underline flex items-center gap-0.5"
                   >
                     <span>View Full</span>
                     <ExternalLink className="h-2.5 w-2.5" />
@@ -374,7 +374,7 @@ export const AttendanceDetailDrawer: React.FC<AttendanceDetailDrawerProps> = ({
         {/* 5. Device & Telemetry Information Section */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <Smartphone className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Smartphone className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Device & Telemetry Details
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">

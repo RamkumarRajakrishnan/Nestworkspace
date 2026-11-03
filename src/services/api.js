@@ -232,30 +232,51 @@ export const registerExpert = registerEmployee;
 // ============================================================================
 
 /**
- * Fetches bookings/orders with server-side query filters.
+ * Fetches bookings/orders with server-side query filters and dynamic pagination.
+ * Endpoint: GET https://www.haatza.com/_functions/nestBookings?areaName={areaName}&page={page}&limit={limit}
+ * 
  * Supported query parameters:
- * - areaName (e.g. 'Pulikari', 'Haatza_corp', 'Neo_Town')
- * - bookingStatus (e.g. 'Assigned', 'Booked', 'Completed')
+ * - areaName (default 'Haatza_corp')
+ * - page (default 1)
+ * - limit (default 30)
+ * - bookingStatus (e.g. 'Assigned', 'Booked', 'Completed', 'In Progress')
  * - slaAlert (e.g. 'SLA Risk', 'On Time')
  * - customerPhone (e.g. '9876543210')
- * - bookingType (e.g. 'instant', 'scheduled', 'Regular')
+ * - bookingType (e.g. 'instant', 'scheduled')
+ * - bookingId (e.g. 'HN-1034')
  * - duration (e.g. '60', '240')
- * - page (default 1)
- * - limit (default 20)
  * 
- * @param {string|Object} [filtersOrArea='Neo_Town'] - Filter object or areaName string
+ * @param {string|Object} [filtersOrArea='Haatza_corp'] - Filter object or areaName string
  * @param {number} [page=1] - Page number for pagination
- * @param {number} [limit=20] - Number of orders per page
- * @returns {Promise<{ success: boolean, data: Array, total?: number, message?: string, error?: string }>}
+ * @param {number} [limit=30] - Number of orders per page
+ * @returns {Promise<{
+ *   success: boolean,
+ *   data: Array,
+ *   total?: number,
+ *   pagination?: {
+ *     page: number,
+ *     limit: number,
+ *     totalCount: number,
+ *     totalPages: number,
+ *     hasNextPage: boolean,
+ *     hasPreviousPage: boolean
+ *   },
+ *   message?: string,
+ *   error?: string
+ * }>}
  */
-export const getBookings = async (filtersOrArea = 'Neo_Town', page, limit) => {
+export const getBookings = async (filtersOrArea = 'Haatza_corp', page = 1, limit = 20) => {
   try {
     const params = new URLSearchParams();
 
+    let areaVal = 'Haatza_corp';
+    let pageNum = 1;
+    let limitNum = 20;
+
     if (typeof filtersOrArea === 'object' && filtersOrArea !== null) {
       const opts = filtersOrArea;
-      if (opts.areaName && opts.areaName !== 'ALL' && opts.areaName !== 'All') {
-        params.append('areaName', opts.areaName);
+      if (opts.areaName && opts.areaName !== 'ALL' && opts.areaName !== 'All' && opts.areaName !== 'All Areas') {
+        areaVal = String(opts.areaName).trim();
       }
       if (opts.bookingStatus && opts.bookingStatus !== 'ALL' && opts.bookingStatus !== 'All') {
         params.append('bookingStatus', opts.bookingStatus);
@@ -275,24 +296,37 @@ export const getBookings = async (filtersOrArea = 'Neo_Town', page, limit) => {
       if (opts.duration) {
         params.append('duration', String(opts.duration));
       }
-      const pageNum = opts.page !== undefined ? opts.page : page;
-      if (pageNum !== undefined && pageNum !== null) {
-        params.append('page', String(pageNum));
+      // Date Range Filter parameters (YYYY-MM-DD)
+      if (opts.fromDate && String(opts.fromDate).trim()) {
+        params.append('fromDate', String(opts.fromDate).trim());
       }
-      const limitNum = opts.limit !== undefined ? opts.limit : limit;
-      if (limitNum !== undefined && limitNum !== null) {
-        params.append('limit', String(limitNum));
+      if (opts.toDate && String(opts.toDate).trim()) {
+        params.append('toDate', String(opts.toDate).trim());
+      }
+      if (opts.page !== undefined && opts.page !== null && String(opts.page).trim() !== '') {
+        pageNum = Number(opts.page) || 1;
+      } else if (page !== undefined && page !== null) {
+        pageNum = Number(page) || 1;
+      }
+      if (opts.limit !== undefined && opts.limit !== null && String(opts.limit).trim() !== '') {
+        limitNum = Number(opts.limit) || 20;
+      } else if (limit !== undefined && limit !== null) {
+        limitNum = Number(limit) || 20;
       }
     } else {
-      if (filtersOrArea && filtersOrArea !== 'ALL' && filtersOrArea !== 'All') {
-        params.append('areaName', filtersOrArea);
+      if (typeof filtersOrArea === 'string' && filtersOrArea.trim() && filtersOrArea !== 'ALL' && filtersOrArea !== 'All' && filtersOrArea !== 'All Areas') {
+        areaVal = filtersOrArea.trim();
       }
-      if (page !== undefined && page !== null) params.append('page', String(page));
-      if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+      if (page !== undefined && page !== null) pageNum = Number(page) || 1;
+      if (limit !== undefined && limit !== null) limitNum = Number(limit) || 20;
     }
 
+    params.set('areaName', areaVal);
+    params.set('page', String(pageNum));
+    params.set('limit', String(limitNum));
+
     const queryString = params.toString().replace(/\+/g, '%20');
-    const url = `${API_BASE_URL}/nestBookings${queryString ? `?${queryString}` : ''}`;
+    const url = `${API_BASE_URL}/nestBookings?${queryString}`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -312,10 +346,37 @@ export const getBookings = async (filtersOrArea = 'Neo_Town', page, limit) => {
       const orders = Array.isArray(data.message)
         ? data.message
         : (Array.isArray(data.data) ? data.data : []);
+
+      const rawPag = data.pagination;
+      const parsedPage = Number(rawPag?.page || rawPag?.currentPage || pageNum) || 1;
+      const parsedLimit = Number(rawPag?.limit || limitNum) || 20;
+      const parsedTotalCount = typeof rawPag?.totalCount === 'number'
+        ? rawPag.totalCount
+        : (typeof rawPag?.totalRecords === 'number'
+            ? rawPag.totalRecords
+            : (typeof data.count === 'number' ? data.count : orders.length));
+      const parsedTotalPages = Number(rawPag?.totalPages) || Math.max(1, Math.ceil(parsedTotalCount / parsedLimit));
+
+      const hasNext = typeof rawPag?.hasNextPage === 'boolean'
+        ? rawPag.hasNextPage
+        : (parsedPage < parsedTotalPages);
+      const hasPrev = typeof rawPag?.hasPreviousPage === 'boolean'
+        ? rawPag.hasPreviousPage
+        : (parsedPage > 1);
+
       return {
         success: true,
         data: orders,
-        total: orders.length,
+        total: parsedTotalCount,
+        pagination: {
+          page: parsedPage,
+          limit: parsedLimit,
+          totalCount: parsedTotalCount,
+          totalPages: parsedTotalPages,
+          hasNextPage: hasNext,
+          hasPreviousPage: hasPrev,
+        },
+        message: data.message,
       };
     }
 
@@ -330,6 +391,14 @@ export const getBookings = async (filtersOrArea = 'Neo_Town', page, limit) => {
         success: true,
         data: [],
         total: 0,
+        pagination: {
+          page: Number(pageNum) || 1,
+          limit: Number(limitNum) || 20,
+          totalCount: 0,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
         message: data.message,
       };
     }
@@ -1922,10 +1991,15 @@ export const getOrderDetails = async (tableId) => {
     const data = await response.json().catch(() => null);
     console.log(`Nest Booking Details Response for tableId ${tableId}:`, data);
 
-    if (response.ok && data && (data.status === 'success' || data.message)) {
+    if (response.ok && data && (data.status === 'success' || (data.message && typeof data.message === 'object') || data.data)) {
+      const messageObj = (data.message && typeof data.message === 'object' && !Array.isArray(data.message))
+        ? data.message
+        : (data.data && typeof data.data === 'object' && !Array.isArray(data.data) ? data.data : data);
+
       return {
         success: true,
-        data: data.message || data.data,
+        data: messageObj,
+        rawMessage: messageObj,
       };
     }
 

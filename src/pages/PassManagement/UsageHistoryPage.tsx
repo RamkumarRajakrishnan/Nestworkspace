@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   History,
   Search,
@@ -18,6 +18,7 @@ import {
 import { getUserNestPass } from '../../services/api';
 import { RawUserNestPassRecord, UserNestPassPagination } from '../../types';
 import { DataTable, Column } from '../../components/common/DataTable';
+import { Pagination } from '../../components/common/Pagination';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { PassUsageDetailDrawer } from '../../components/pass-management/PassUsageDetailDrawer';
 
@@ -248,42 +249,8 @@ export const UsageHistoryPage: React.FC = () => {
   // Server-side pagination bounds
   const totalRecords = pagination?.totalRecords ?? records.length;
   const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
-  const hasNextPage = pagination?.hasNextPage ?? (currentPage < totalPages);
-  const hasPreviousPage = pagination?.hasPreviousPage ?? (currentPage > 1);
   const startRecord = totalRecords > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0;
   const endRecord = Math.min(currentPage * PAGE_SIZE, totalRecords);
-
-  // Windowed pagination calculation:
-  // When totalPages <= 5: display all pages [1, ..., totalPages]
-  // When totalPages > 5: display window of 3 pages
-  const WINDOW_SIZE = 3;
-  const isWindowed = totalPages > 5;
-  const windowStart = isWindowed
-    ? Math.floor((currentPage - 1) / WINDOW_SIZE) * WINDOW_SIZE + 1
-    : 1;
-  const windowEnd = isWindowed
-    ? Math.min(windowStart + WINDOW_SIZE - 1, totalPages)
-    : totalPages;
-
-  const visiblePages = useMemo(() => {
-    const pages: number[] = [];
-    for (let p = windowStart; p <= windowEnd; p++) {
-      pages.push(p);
-    }
-    return pages;
-  }, [windowStart, windowEnd]);
-
-  const hasMoreAfter = isWindowed && windowEnd < totalPages;
-
-  const handleNext = () => {
-    if (isLoading || !hasNextPage) return;
-    setCurrentPage((p) => Math.min(totalPages, p + 1));
-  };
-
-  const handlePrevious = () => {
-    if (isLoading || !hasPreviousPage) return;
-    setCurrentPage((p) => Math.max(1, p - 1));
-  };
 
   // Drawer Open Handler
   const handleViewRecord = (record: RawUserNestPassRecord) => {
@@ -312,8 +279,8 @@ export const UsageHistoryPage: React.FC = () => {
         const id = safeVal(r.userId);
         return (
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0">
-              <User className="h-4 w-4 text-[#5B21B6]" />
+            <div className="h-8 w-8 rounded-xl bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0">
+              <User className="h-4 w-4 text-[#1B2E79]" />
             </div>
             <div className="min-w-0">
               <span className="font-semibold text-xs text-[#1F1F1F] block truncate" title={id}>
@@ -336,7 +303,7 @@ export const UsageHistoryPage: React.FC = () => {
       className: 'w-[16%] min-w-[130px]',
       render: (r) => (
         <span
-          className="font-mono text-xs text-[#5B21B6] font-semibold truncate block max-w-[150px] mx-auto select-all"
+          className="font-mono text-xs text-[#1B2E79] font-semibold truncate block max-w-[150px] mx-auto select-all"
           title={safeVal(r.bookingId)}
         >
           {safeVal(r.bookingId)}
@@ -355,7 +322,7 @@ export const UsageHistoryPage: React.FC = () => {
       className: 'w-[10%] min-w-[85px]',
       render: (r) => (
         <div className="flex justify-center">
-          <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full border border-[#DDD6FE]">
+          <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-0.5 rounded-full border border-[#C4D9FD]">
             <Ticket className="h-3 w-3" />
             {safeVal(r.packId)}
           </span>
@@ -401,7 +368,7 @@ export const UsageHistoryPage: React.FC = () => {
             <span className="font-mono text-xs font-bold text-[#1F1F1F]">
               {completed} <span className="text-[#8C8C8C] font-normal">/</span> {total}
             </span>
-            <span className="text-[10px] font-mono text-[#5B21B6] font-medium mt-0.5">
+            <span className="text-[10px] font-mono text-[#1B2E79] font-medium mt-0.5">
               {remaining} remaining
             </span>
           </div>
@@ -473,7 +440,7 @@ export const UsageHistoryPage: React.FC = () => {
               e.stopPropagation();
               handleViewRecord(r);
             }}
-            className="p-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
             title="View Usage Details"
             aria-label="View Usage Details"
           >
@@ -490,7 +457,7 @@ export const UsageHistoryPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 w-full">
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F1F1F] flex items-center gap-2 truncate">
-            <History className="h-6 w-6 text-[#5B21B6]" />
+            <History className="h-6 w-6 text-[#1B2E79]" />
             Pass Usage History
           </h1>
           <p className="text-xs sm:text-sm text-[#6B6B6B] mt-0.5 truncate">
@@ -512,7 +479,7 @@ export const UsageHistoryPage: React.FC = () => {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by Email or Phone Number"
-              className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] pl-9 pr-9 py-2 text-xs text-[#1F1F1F] placeholder-[#8C8C8C] focus:border-[#5B21B6] focus:bg-white focus:outline-none transition-colors"
+              className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] pl-9 pr-9 py-2 text-xs text-[#1F1F1F] placeholder-[#8C8C8C] focus:border-[#1B2E79] focus:bg-white focus:outline-none transition-colors"
             />
             {searchInput && (
               <button
@@ -535,18 +502,18 @@ export const UsageHistoryPage: React.FC = () => {
                 onClick={() => setIsStatusDropdownOpen((prev) => !prev)}
                 className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                   selectedStatus !== 'All Statuses'
-                    ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                    : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                    ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                    : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
                 }`}
                 title="Filter by Pass Status"
                 aria-expanded={isStatusDropdownOpen}
               >
-                <Filter className="h-3.5 w-3.5 text-[#5B21B6]" />
+                <Filter className="h-3.5 w-3.5 text-[#1B2E79]" />
                 <span className="text-[#6B6B6B]">Status:</span>
-                <span className="font-bold text-[#5B21B6]">{selectedStatus}</span>
+                <span className="font-bold text-[#1B2E79]">{selectedStatus}</span>
                 <ChevronDown
                   className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                    isStatusDropdownOpen ? 'rotate-180 text-[#5B21B6]' : 'text-[#6B6B6B]'
+                    isStatusDropdownOpen ? 'rotate-180 text-[#1B2E79]' : 'text-[#6B6B6B]'
                   }`}
                 />
               </button>
@@ -565,12 +532,12 @@ export const UsageHistoryPage: React.FC = () => {
                         onClick={() => handleStatusChange(st)}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                            ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                             : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                         }`}
                       >
                         <span>{st}</span>
-                        {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />}
+                        {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />}
                       </button>
                     );
                   })}
@@ -583,10 +550,10 @@ export const UsageHistoryPage: React.FC = () => {
               type="button"
               onClick={handleRefresh}
               disabled={isLoading || isRefreshing}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               title="Refresh usage history"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
@@ -597,7 +564,7 @@ export const UsageHistoryPage: React.FC = () => {
           <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#F3F2F7] flex-wrap text-xs">
             <div className="flex items-center gap-2 flex-wrap">
               {detectedParam?.userId && (
-                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#1B2E79] bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 rounded-full">
                   <User className="h-3 w-3" />
                   <span className="font-bold">userId:</span>
                   <span>{detectedParam.userId}</span>
@@ -611,7 +578,7 @@ export const UsageHistoryPage: React.FC = () => {
                 </span>
               )}
               {detectedParam?.phonenumber && (
-                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#5B21B6] bg-[#EDE9FE] border border-[#DDD6FE] px-2.5 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#1B2E79] bg-[#EEF3FF] border border-[#C4D9FD] px-2.5 py-0.5 rounded-full">
                   <Phone className="h-3 w-3" />
                   <span className="font-bold">phonenumber:</span>
                   <span>{detectedParam.phonenumber}</span>
@@ -650,7 +617,7 @@ export const UsageHistoryPage: React.FC = () => {
       {isLoading && (
         <div className="w-full rounded-2xl border border-[#EEEEF2] bg-white p-6 shadow-soft-sm space-y-4">
           <div className="flex items-center justify-between">
-            <div className="h-5 w-48 bg-[#EDE9FE] animate-pulse rounded-lg" />
+            <div className="h-5 w-48 bg-[#EEF3FF] animate-pulse rounded-lg" />
             <div className="h-4 w-24 bg-[#FAF9FC] animate-pulse rounded-lg" />
           </div>
           <div className="space-y-3">
@@ -726,14 +693,14 @@ export const UsageHistoryPage: React.FC = () => {
                   {/* Card Header */}
                   <div className="flex items-center justify-between gap-2 border-b border-[#EEEEF2] pb-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-9 w-9 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0">
-                        <Ticket className="h-4 w-4 text-[#5B21B6]" />
+                      <div className="h-9 w-9 rounded-xl bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0">
+                        <Ticket className="h-4 w-4 text-[#1B2E79]" />
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-bold text-xs text-[#1F1F1F] truncate" title={safeVal(r.packId)}>
                           Package {safeVal(r.packId)}
                         </h4>
-                        <span className="font-mono text-[11px] text-[#5B21B6] font-semibold truncate block">
+                        <span className="font-mono text-[11px] text-[#1B2E79] font-semibold truncate block">
                           {safeVal(r.userId)}
                         </span>
                       </div>
@@ -745,7 +712,7 @@ export const UsageHistoryPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="rounded-xl bg-[#FAF9FC] p-2.5 border border-[#EEEEF2]">
                       <span className="text-[10px] text-[#6B6B6B] font-mono block">BOOKING REF</span>
-                      <span className="font-mono text-[11px] font-semibold text-[#5B21B6] truncate block select-all">
+                      <span className="font-mono text-[11px] font-semibold text-[#1B2E79] truncate block select-all">
                         {safeVal(r.bookingId)}
                       </span>
                     </div>
@@ -784,7 +751,7 @@ export const UsageHistoryPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleViewRecord(r)}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       <span>View Details</span>
@@ -799,67 +766,20 @@ export const UsageHistoryPage: React.FC = () => {
 
       {/* Server-Side Windowed Pagination Controls */}
       {!isLoading && !apiError && totalRecords > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#EEEEF2] bg-white px-4 py-3 rounded-2xl shadow-soft-sm w-full">
-          <div className="text-xs text-[#6B6B6B]">
-            Showing <strong className="text-[#1F1F1F] font-mono">{startRecord}</strong> to{' '}
-            <strong className="text-[#1F1F1F] font-mono">{endRecord}</strong> of{' '}
-            <strong className="text-[#1F1F1F] font-mono">{totalRecords}</strong> records
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Previous Button */}
-            <button
-              type="button"
-              onClick={handlePrevious}
-              disabled={!hasPreviousPage || isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Previous Page"
-            >
-              <ChevronLeft className="h-3.5 w-3.5 text-[#6B6B6B]" />
-              <span>Previous</span>
-            </button>
-
-            {/* Windowed Page Numbers */}
-            {visiblePages.map((pageNum) => {
-              const isActive = pageNum === currentPage;
-              return (
-                <button
-                  key={pageNum}
-                  type="button"
-                  onClick={() => setCurrentPage(pageNum)}
-                  disabled={isLoading}
-                  className={`h-8 w-8 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
-                    isActive
-                      ? 'bg-[#5B21B6] text-white shadow-soft-xs'
-                      : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
-                  title={`Page ${pageNum}`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-
-            {/* Trailing Ellipsis */}
-            {hasMoreAfter && (
-              <span className="px-1 text-xs font-bold text-[#6B6B6B] select-none">
-                ...
-              </span>
-            )}
-
-            {/* Next Button */}
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={!hasNextPage || isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Next Page"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-3.5 w-3.5 text-[#6B6B6B]" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalRecords={totalRecords}
+          pageSize={PAGE_SIZE}
+          startRecord={startRecord}
+          endRecord={endRecord}
+          onPageChange={(newPage) => {
+            setCurrentPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading}
+          recordLabel="records"
+        />
       )}
 
       {/* Usage Detail Drawer */}

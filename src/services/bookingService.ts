@@ -17,6 +17,117 @@ export const formatDurationInHours = (durationMinutes?: string | number): string
   return `${parseFloat(hrs.toFixed(1))} hrs`;
 };
 
+export interface DynamicTimelineStage {
+  key: 'created' | 'requested' | 'assigned' | 'started' | 'completed';
+  title: 'Created' | 'Requested' | 'Assigned' | 'Started' | 'Completed';
+  rawTime: string | null | undefined;
+  timeDisplay: string;
+  isCompleted: boolean;
+  description: string;
+}
+
+export const formatTimelineTimestamp = (rawTime?: string | number | null): { formatted: string; isValid: boolean } => {
+  if (!rawTime || rawTime === 'null' || rawTime === 'undefined') {
+    return { formatted: 'Pending', isValid: false };
+  }
+
+  try {
+    let d: Date;
+    if (typeof rawTime === 'number') {
+      d = new Date(rawTime);
+    } else {
+      const trimmed = String(rawTime).trim();
+      if (!trimmed || trimmed === '—') return { formatted: 'Pending', isValid: false };
+      if (/^\d+$/.test(trimmed)) {
+        d = new Date(parseInt(trimmed, 10));
+      } else {
+        d = new Date(trimmed);
+      }
+    }
+
+    if (isNaN(d.getTime())) {
+      return { formatted: 'Pending', isValid: false };
+    }
+
+    const datePart = d.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+    const timePart = d.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    return { formatted: `${datePart}, ${timePart}`, isValid: true };
+  } catch {
+    return { formatted: 'Pending', isValid: false };
+  }
+};
+
+export const getBookingTimelineStages = (booking: Partial<Booking> | any): DynamicTimelineStage[] => {
+  if (!booking) return [];
+
+  const createdTime = booking.createdTime || booking.createdAt || null;
+  const requestedTime = booking.requestedTime || null;
+  const assignedTime = booking.assignedTime || null;
+  const startedTime = booking.startedTime || null;
+  const completedTime = booking.completedTime || null;
+
+  const createdInfo = formatTimelineTimestamp(createdTime);
+  const requestedInfo = formatTimelineTimestamp(requestedTime);
+  const assignedInfo = formatTimelineTimestamp(assignedTime);
+  const startedInfo = formatTimelineTimestamp(startedTime);
+  const completedInfo = formatTimelineTimestamp(completedTime);
+
+  const vendorDisplay = booking.vendorName || booking.vendorId ? `Expert ${booking.vendorName || booking.vendorId}` : 'Expert';
+  const serviceDisplay = booking.service || 'Service';
+
+  return [
+    {
+      key: 'created',
+      title: 'Created',
+      rawTime: createdTime,
+      timeDisplay: createdInfo.formatted,
+      isCompleted: createdInfo.isValid,
+      description: createdInfo.isValid ? 'Booking successfully created in system' : 'Pending creation',
+    },
+    {
+      key: 'requested',
+      title: 'Requested',
+      rawTime: requestedTime,
+      timeDisplay: requestedInfo.formatted,
+      isCompleted: requestedInfo.isValid,
+      description: requestedInfo.isValid ? `Customer requested ${serviceDisplay} booking` : 'Pending request confirmation',
+    },
+    {
+      key: 'assigned',
+      title: 'Assigned',
+      rawTime: assignedTime,
+      timeDisplay: assignedInfo.formatted,
+      isCompleted: assignedInfo.isValid,
+      description: assignedInfo.isValid ? `${vendorDisplay} assigned to booking` : 'Awaiting expert assignment',
+    },
+    {
+      key: 'started',
+      title: 'Started',
+      rawTime: startedTime,
+      timeDisplay: startedInfo.formatted,
+      isCompleted: startedInfo.isValid,
+      description: startedInfo.isValid ? `Service job commenced by ${vendorDisplay}` : 'Service not yet started',
+    },
+    {
+      key: 'completed',
+      title: 'Completed',
+      rawTime: completedTime,
+      timeDisplay: completedInfo.formatted,
+      isCompleted: completedInfo.isValid,
+      description: completedInfo.isValid ? 'Order fulfillment completed successfully' : 'Pending completion',
+    },
+  ];
+};
+
 export const mapApiBookingToBooking = (item: any): Booking => {
   const durationNum = parseInt(item.duration, 10) || 60;
   const amountVal = item.totalAmount !== undefined && item.totalAmount !== '' ? item.totalAmount : '—';
@@ -57,47 +168,13 @@ export const mapApiBookingToBooking = (item: any): Booking => {
 
   const assignedIds: string[] = item.vendorId ? [item.vendorId] : [];
 
-  const timelineEvents = [];
-  if (item.requestedTime) {
-    timelineEvents.push({
-      time: dateStr + ' ' + timeStr,
-      title: 'Booking Requested',
-      description: `Customer requested ${serviceName} booking in ${item.areaName || 'Neo_Town'}`,
-      completed: true,
-    });
-  }
-  if (item.startedTime) {
-    try {
-      timelineEvents.push({
-        time: new Date(item.startedTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
-        title: 'Service Started',
-        description: `Expert ${item.vendorName || item.vendorId || ''} commenced job`,
-        completed: true,
-      });
-    } catch {
-      // ignore
-    }
-  }
-  if (item.completedTime) {
-    try {
-      timelineEvents.push({
-        time: new Date(item.completedTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
-        title: 'Service Completed',
-        description: 'Order fulfillment completed successfully',
-        completed: true,
-      });
-    } catch {
-      // ignore
-    }
-  }
-  if (timelineEvents.length === 0) {
-    timelineEvents.push({
-      time: 'Just now',
-      title: 'Booking Active',
-      description: 'Order status monitored by dispatch engine',
-      completed: true,
-    });
-  }
+  const dynamicTimeline = getBookingTimelineStages({ ...item, service: serviceName });
+  const timelineEvents = dynamicTimeline.map((s) => ({
+    time: s.timeDisplay,
+    title: s.title,
+    description: s.description,
+    completed: s.isCompleted,
+  }));
 
   return {
     id: item.bookingId || item.tableId,
@@ -133,7 +210,9 @@ export const mapApiBookingToBooking = (item: any): Booking => {
     vendorName: item.vendorName || '',
     vendorId: item.vendorId || '',
     vendorPhoto: item.vendorPhoto || '',
+    createdTime: item.createdTime || item.createdAt || '',
     requestedTime: item.requestedTime || '',
+    assignedTime: item.assignedTime || '',
     startedTime: item.startedTime || '',
     completedTime: item.completedTime || '',
     slaTimer: item.slaTimer || '—',
@@ -142,11 +221,12 @@ export const mapApiBookingToBooking = (item: any): Booking => {
     customerPhone: item.customerPhone || '—',
     customerEmail: item.customerEmail || '',
     timeline: timelineEvents,
+    rawMessage: typeof item === 'object' && item !== null ? item : {},
   };
 };
 
 export const bookingService = {
-  async getBookings(filtersOrArea: string | any = 'Pulikari', page = 1, limit = 50): Promise<Booking[]> {
+  async getBookings(filtersOrArea: string | any = 'Haatza_corp', page = 1, limit = 20): Promise<Booking[]> {
     try {
       const res = await getBookings(filtersOrArea, page, limit);
       if (res.success && Array.isArray(res.data) && res.data.length > 0) {

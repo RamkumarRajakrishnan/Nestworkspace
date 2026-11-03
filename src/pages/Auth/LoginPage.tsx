@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+﻿import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { NestRoleItem, NestLoginData } from '../../types';
@@ -290,7 +290,7 @@ export const LoginPage: React.FC = () => {
 
             {/* Tagline — centered */}
             <div className="mt-5 text-center w-full">
-              <h2 className="text-base sm:text-xl font-black text-[#3B1E7A] leading-snug tracking-tight">
+              <h2 className="text-base sm:text-xl font-black text-[#13225C] leading-snug tracking-tight">
                 Manage Your Operations, Effortlessly
               </h2>
             </div>
@@ -321,7 +321,7 @@ export const LoginPage: React.FC = () => {
               <form onSubmit={handleCredentialsSubmit} className="space-y-4" noValidate>
                 <div>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#4A2E80]">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1B2E79]">
                       <User className="h-4 w-4" />
                     </div>
                     <input
@@ -334,10 +334,10 @@ export const LoginPage: React.FC = () => {
                       placeholder="Email ID / Username"
                       disabled={isLoading}
                       required
-                      className={`w-full pl-11 pr-4 py-3.5 text-sm bg-white border rounded-xl text-[#1F1F1F] placeholder:text-[#9CA3AF] focus:border-[#4A2E80] focus:ring-2 focus:ring-[#4A2E80]/15 outline-none transition-all disabled:opacity-50 ${
+                      className={`w-full pl-11 pr-4 py-3.5 text-sm bg-white border rounded-xl text-[#1F1F1F] placeholder:text-[#9CA3AF] focus:border-[#1B2E79] focus:ring-2 focus:ring-[#1B2E79]/15 outline-none transition-all disabled:opacity-50 ${
                         showEmailError
                           ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20'
-                          : 'border-[#E5E7EB] focus:border-[#4A2E80]'
+                          : 'border-[#E5E7EB] focus:border-[#1B2E79]'
                       }`}
                     />
                   </div>
@@ -350,7 +350,7 @@ export const LoginPage: React.FC = () => {
 
                 <div>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#4A2E80]">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1B2E79]">
                       <Lock className="h-4 w-4" />
                     </div>
                     <input
@@ -362,12 +362,12 @@ export const LoginPage: React.FC = () => {
                       placeholder="Password"
                       disabled={isLoading}
                       required
-                      className="w-full pl-11 pr-11 py-3.5 text-sm bg-white border border-[#E5E7EB] rounded-xl text-[#1F1F1F] placeholder:text-[#9CA3AF] focus:border-[#4A2E80] focus:ring-2 focus:ring-[#4A2E80]/15 outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-11 pr-11 py-3.5 text-sm bg-white border border-[#E5E7EB] rounded-xl text-[#1F1F1F] placeholder:text-[#9CA3AF] focus:border-[#1B2E79] focus:ring-2 focus:ring-[#1B2E79]/15 outline-none transition-all disabled:opacity-50"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#9CA3AF] hover:text-[#4A2E80] transition-colors cursor-pointer"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#9CA3AF] hover:text-[#1B2E79] transition-colors cursor-pointer"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                       tabIndex={-1}
                     >
@@ -380,7 +380,7 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!canSubmitCredentials}
-                  className="w-full mt-2 py-3.5 px-6 rounded-xl bg-[#4A2E80] hover:bg-[#3B1E7A] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full mt-2 py-3.5 px-6 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -423,7 +423,7 @@ export const LoginPage: React.FC = () => {
               <form onSubmit={handleRoleAreaSubmit} className="space-y-4" noValidate>
                 {/* 1. Role Dropdown */}
                 <div ref={roleDropdownRef} className="relative">
-                  <label id="roleLabel" className="block text-xs font-semibold text-[#4A2E80] uppercase tracking-wider mb-1.5 pl-0.5">
+                  <label id="roleLabel" className="block text-xs font-semibold text-[#1B2E79] uppercase tracking-wider mb-1.5 pl-0.5">
                     Role
                   </label>
                   <div className="relative">
@@ -443,14 +443,14 @@ export const LoginPage: React.FC = () => {
                         roleTouched && !selectedRoleName
                           ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
                           : isRoleDropdownOpen
-                          ? 'border-[#4A2E80] bg-white ring-2 ring-[#4A2E80]/15 text-[#4A2E80]'
-                          : 'border-[#E5E7EB] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                          ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1B2E79]'
+                          : 'border-[#E5E7EB] bg-[#FAF9FC] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         <Briefcase
                           className={`h-4 w-4 shrink-0 transition-colors ${
-                            isRoleDropdownOpen || selectedRoleName ? 'text-[#4A2E80]' : 'text-[#9CA3AF]'
+                            isRoleDropdownOpen || selectedRoleName ? 'text-[#1B2E79]' : 'text-[#9CA3AF]'
                           }`}
                         />
                         <span
@@ -464,7 +464,7 @@ export const LoginPage: React.FC = () => {
                       </div>
                       <ChevronDown
                         className={`h-4 w-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 ${
-                          isRoleDropdownOpen ? 'rotate-180 text-[#4A2E80]' : ''
+                          isRoleDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                         }`}
                       />
                     </button>
@@ -474,7 +474,7 @@ export const LoginPage: React.FC = () => {
                       <div
                         role="listbox"
                         aria-labelledby="roleLabel"
-                        className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-60 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-xl shadow-purple-950/10 animate-in fade-in zoom-in-95 duration-150"
+                        className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-60 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-xl shadow-blue-950/10 animate-in fade-in zoom-in-95 duration-150"
                       >
                         {uniqueRoles.length > 5 && (
                           <div className="p-1.5 mb-1 border-b border-[#EEEEF2] bg-[#FAF9FC] rounded-lg">
@@ -485,7 +485,7 @@ export const LoginPage: React.FC = () => {
                                 value={roleSearch}
                                 onChange={(e) => setRoleSearch(e.target.value)}
                                 placeholder="Search role..."
-                                className="w-full pl-8 pr-2.5 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#4A2E80]"
+                                className="w-full pl-8 pr-2.5 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79]"
                                 onClick={(e) => e.stopPropagation()}
                                 autoFocus
                               />
@@ -516,14 +516,14 @@ export const LoginPage: React.FC = () => {
                                   }}
                                   className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer text-left ${
                                     isSelected
-                                      ? 'bg-[#EDE9FE] text-[#4A2E80] font-bold shadow-soft-xs'
-                                      : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#4A2E80]'
+                                      ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold shadow-soft-xs'
+                                      : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                                   }`}
                                   title={roleName}
                                 >
                                   <span className="truncate flex-1 min-w-0">{roleName}</span>
                                   {isSelected && (
-                                    <Check className="h-4 w-4 text-[#4A2E80] shrink-0" />
+                                    <Check className="h-4 w-4 text-[#1B2E79] shrink-0" />
                                   )}
                                 </button>
                               );
@@ -542,7 +542,7 @@ export const LoginPage: React.FC = () => {
 
                 {/* 2. Area Dropdown */}
                 <div ref={areaDropdownRef} className="relative">
-                  <label id="areaLabel" className="block text-xs font-semibold text-[#4A2E80] uppercase tracking-wider mb-1.5 pl-0.5">
+                  <label id="areaLabel" className="block text-xs font-semibold text-[#1B2E79] uppercase tracking-wider mb-1.5 pl-0.5">
                     Area
                   </label>
                   <div className="relative">
@@ -563,14 +563,14 @@ export const LoginPage: React.FC = () => {
                         areaTouched && !selectedAreaName
                           ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
                           : isAreaDropdownOpen
-                          ? 'border-[#4A2E80] bg-white ring-2 ring-[#4A2E80]/15 text-[#4A2E80]'
-                          : 'border-[#E5E7EB] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                          ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1B2E79]'
+                          : 'border-[#E5E7EB] bg-[#FAF9FC] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                       } disabled:bg-[#FAF9FC] disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         <MapPin
                           className={`h-4 w-4 shrink-0 transition-colors ${
-                            isAreaDropdownOpen || selectedAreaName ? 'text-[#4A2E80]' : 'text-[#9CA3AF]'
+                            isAreaDropdownOpen || selectedAreaName ? 'text-[#1B2E79]' : 'text-[#9CA3AF]'
                           }`}
                         />
                         <span
@@ -584,7 +584,7 @@ export const LoginPage: React.FC = () => {
                       </div>
                       <ChevronDown
                         className={`h-4 w-4 shrink-0 text-[#9CA3AF] transition-transform duration-200 ${
-                          isAreaDropdownOpen ? 'rotate-180 text-[#4A2E80]' : ''
+                          isAreaDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                         }`}
                       />
                     </button>
@@ -594,7 +594,7 @@ export const LoginPage: React.FC = () => {
                       <div
                         role="listbox"
                         aria-labelledby="areaLabel"
-                        className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-60 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-xl shadow-purple-950/10 animate-in fade-in zoom-in-95 duration-150"
+                        className="absolute left-0 right-0 top-full mt-1.5 z-40 max-h-60 overflow-y-auto rounded-xl border border-[#EEEEF2] bg-white p-1.5 shadow-xl shadow-blue-950/10 animate-in fade-in zoom-in-95 duration-150"
                       >
                         {availableAreas.length > 5 && (
                           <div className="p-1.5 mb-1 border-b border-[#EEEEF2] bg-[#FAF9FC] rounded-lg">
@@ -605,7 +605,7 @@ export const LoginPage: React.FC = () => {
                                 value={areaSearch}
                                 onChange={(e) => setAreaSearch(e.target.value)}
                                 placeholder="Search area..."
-                                className="w-full pl-8 pr-2.5 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#4A2E80]"
+                                className="w-full pl-8 pr-2.5 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79]"
                                 onClick={(e) => e.stopPropagation()}
                                 autoFocus
                               />
@@ -635,14 +635,14 @@ export const LoginPage: React.FC = () => {
                                   }}
                                   className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer text-left ${
                                     isSelected
-                                      ? 'bg-[#EDE9FE] text-[#4A2E80] font-bold shadow-soft-xs'
-                                      : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#4A2E80]'
+                                      ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold shadow-soft-xs'
+                                      : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                                   }`}
                                   title={areaName}
                                 >
                                   <span className="truncate flex-1 min-w-0">{areaName}</span>
                                   {isSelected && (
-                                    <Check className="h-4 w-4 text-[#4A2E80] shrink-0" />
+                                    <Check className="h-4 w-4 text-[#1B2E79] shrink-0" />
                                   )}
                                 </button>
                               );
@@ -663,7 +663,7 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading || !selectedRoleName || !selectedAreaName}
-                  className="w-full mt-2 py-3.5 px-6 rounded-xl bg-[#4A2E80] hover:bg-[#3B1E7A] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full mt-2 py-3.5 px-6 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -687,7 +687,7 @@ export const LoginPage: React.FC = () => {
                     setCredentialsError(null);
                   }}
                   disabled={isLoading}
-                  className="w-full text-center text-xs font-semibold text-[#6B6B6B] hover:text-[#4A2E80] transition-colors pt-2 pb-1 cursor-pointer disabled:opacity-50"
+                  className="w-full text-center text-xs font-semibold text-[#6B6B6B] hover:text-[#1B2E79] transition-colors pt-2 pb-1 cursor-pointer disabled:opacity-50"
                 >
                   ← Sign in with a different account
                 </button>

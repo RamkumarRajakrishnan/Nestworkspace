@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
 import { Worker, APPROVED_SERVICE_TYPES } from '../../../types';
 import { mockEmployees } from '../../../data/mock/mockEmployees';
 import { DataTable, Column } from '../../../components/common/DataTable';
+import { Pagination } from '../../../components/common/Pagination';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { SearchInput } from '../../../components/common/SearchInput';
 import { WorkerDetailDrawer } from '../../../components/operations/WorkerDetailDrawer';
@@ -23,6 +24,10 @@ export const EmployeesPage: React.FC = () => {
 
   // Employees data (duplicated from Experts mock data)
   const [employees, setEmployees] = useState<Worker[]>(mockEmployees);
+
+  // Pagination state
+  const [page, setPage] = useState<number>(1);
+  const PAGE_SIZE = 15;
 
   // Add Employee Modal state
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
@@ -81,6 +86,7 @@ export const EmployeesPage: React.FC = () => {
     setSelectedSkills([...draftSkills]);
     setSelectedMarkets([...draftMarkets]);
     setSelectedCompliances([...draftCompliances]);
+    setPage(1);
     setIsFilterOpen(false);
   };
 
@@ -103,6 +109,7 @@ export const EmployeesPage: React.FC = () => {
     setDraftMarkets([]);
     setDraftCompliances([]);
     setSearch('');
+    setPage(1);
     setIsFilterOpen(false);
   };
 
@@ -121,8 +128,8 @@ export const EmployeesPage: React.FC = () => {
   // Status options
   const statusOptions = [
     { id: 'Available', label: 'Available', color: '#10B981' },
-    { id: 'Assigned', label: 'Assigned', color: '#5B21B6' },
-    { id: 'Busy', label: 'Busy', color: '#7C3AED' },
+    { id: 'Assigned', label: 'Assigned', color: '#1B2E79' },
+    { id: 'Busy', label: 'Busy', color: '#162766' },
     { id: 'GPS Stale', label: 'GPS Stale', color: '#F59E0B' },
     { id: 'Offline', label: 'Offline', color: '#6B6B6B' },
   ];
@@ -182,6 +189,14 @@ export const EmployeesPage: React.FC = () => {
     selectedCompliances,
   ]);
 
+  const totalPages = Math.ceil(filteredEmployees.length / PAGE_SIZE) || 1;
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
+  const paginatedEmployees = useMemo(() => {
+    const startIndex = (safePage - 1) * PAGE_SIZE;
+    return filteredEmployees.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredEmployees, safePage]);
+
   // Desktop Table Columns
   const columns: Column<Worker>[] = [
     {
@@ -194,7 +209,7 @@ export const EmployeesPage: React.FC = () => {
             className="h-9 w-9 rounded-full object-cover border border-[#EEEEF2]"
           />
           <div>
-            <div className="font-semibold text-[#1F1F1F] hover:text-[#5B21B6] transition-colors">{e.name}</div>
+            <div className="font-semibold text-[#1F1F1F] hover:text-[#1B2E79] transition-colors">{e.name}</div>
             <div className="font-mono text-[11px] text-[#6B6B6B]">{e.phone}</div>
           </div>
         </div>
@@ -209,8 +224,8 @@ export const EmployeesPage: React.FC = () => {
       header: 'Zone / Location',
       accessor: 'areaId',
       render: (e) => (
-        <span className="inline-flex items-center gap-1 font-mono text-[#5B21B6] font-semibold text-xs bg-[#EDE9FE] px-2 py-0.5 rounded-lg">
-          <MapPin className="h-3 w-3 text-[#5B21B6]" />
+        <span className="inline-flex items-center gap-1 font-mono text-[#1B2E79] font-semibold text-xs bg-[#EEF3FF] px-2 py-0.5 rounded-lg">
+          <MapPin className="h-3 w-3 text-[#1B2E79]" />
           {e.areaId}
         </span>
       ),
@@ -222,7 +237,7 @@ export const EmployeesPage: React.FC = () => {
     {
       header: 'Current Task',
       render: (e) => (
-        <span className="font-mono text-xs text-[#5B21B6] font-semibold">
+        <span className="font-mono text-xs text-[#1B2E79] font-semibold">
           {e.currentJobId ? `#${e.currentJobId}` : <span className="text-[#6B6B6B] font-normal">Idle</span>}
         </span>
       ),
@@ -253,7 +268,7 @@ export const EmployeesPage: React.FC = () => {
         <div className="flex items-center justify-end gap-1.5" onClick={(ev) => ev.stopPropagation()}>
           <button
             onClick={() => setInspectEmployee(e)}
-            className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors shadow-soft-sm cursor-pointer"
+            className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-1.5 text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors shadow-soft-sm cursor-pointer"
             title="Inspect Employee (Quick Drawer)"
           >
             <Eye className="h-3.5 w-3.5" />
@@ -280,7 +295,7 @@ export const EmployeesPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAddEmployeeModalOpen(true)}
-          className="flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer shrink-0"
+          className="flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer shrink-0"
         >
           <Plus className="h-4 w-4" />
           <span>New Employee</span>
@@ -294,7 +309,10 @@ export const EmployeesPage: React.FC = () => {
           <div className="w-full sm:max-w-md">
             <SearchInput
               value={search}
-              onChange={setSearch}
+              onChange={(val) => {
+                setSearch(val);
+                setPage(1);
+              }}
               placeholder="Search employee by name, ID, phone..."
               className="w-full"
             />
@@ -324,16 +342,16 @@ export const EmployeesPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -351,11 +369,11 @@ export const EmployeesPage: React.FC = () => {
             {/* Filter Popover Panel */}
             {isFilterOpen && (
               <div 
-                className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-80 md:w-96 rounded-2xl border border-[#EEEEF2] bg-white p-4 shadow-2xl shadow-purple-950/15 animate-in fade-in zoom-in-95 max-h-[85vh] overflow-y-auto"
+                className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-80 md:w-96 rounded-2xl border border-[#EEEEF2] bg-white p-4 shadow-2xl shadow-blue-950/15 animate-in fade-in zoom-in-95 max-h-[85vh] overflow-y-auto"
               >
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
                       Filter Employees
                     </h3>
@@ -390,7 +408,7 @@ export const EmployeesPage: React.FC = () => {
                               onClick={() => setDraftStatuses(toggleArrayItem(draftStatuses, st.id))}
                               className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold border transition-all ${
                                 isSelected
-                                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6] shadow-soft-xs'
+                                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79] shadow-soft-xs'
                                   : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B] hover:bg-[#F3F2F7]'
                               }`}
                             >
@@ -424,7 +442,7 @@ export const EmployeesPage: React.FC = () => {
                               onClick={() => setDraftSkills(toggleArrayItem(draftSkills, srv))}
                               className={`rounded-xl px-2.5 py-1 text-xs font-semibold border transition-all ${
                                 isSelected
-                                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6] shadow-soft-xs'
+                                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79] shadow-soft-xs'
                                   : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B] hover:bg-[#F3F2F7]'
                               }`}
                             >
@@ -457,7 +475,7 @@ export const EmployeesPage: React.FC = () => {
                               onClick={() => setDraftMarkets(toggleArrayItem(draftMarkets, m.id))}
                               className={`rounded-xl px-2.5 py-1 text-xs font-semibold border font-mono transition-all ${
                                 isSelected
-                                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6] shadow-soft-xs'
+                                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79] shadow-soft-xs'
                                   : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B] hover:bg-[#F3F2F7]'
                               }`}
                             >
@@ -490,7 +508,7 @@ export const EmployeesPage: React.FC = () => {
                               onClick={() => setDraftCompliances(toggleArrayItem(draftCompliances, c.id))}
                               className={`rounded-xl px-2.5 py-1 text-xs font-semibold border transition-all ${
                                 isSelected
-                                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6] shadow-soft-xs'
+                                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79] shadow-soft-xs'
                                   : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#6B6B6B] hover:bg-[#F3F2F7]'
                               }`}
                             >
@@ -515,7 +533,7 @@ export const EmployeesPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilters}
-                    className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-1.5 text-xs font-bold shadow-soft-sm transition-all active:scale-95"
+                    className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-1.5 text-xs font-bold shadow-soft-sm transition-all active:scale-95"
                   >
                     Apply Filters
                   </button>
@@ -532,11 +550,16 @@ export const EmployeesPage: React.FC = () => {
 
             {/* Status chips */}
             {selectedStatuses.map((st) => (
-              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {st}
                 <button 
-                  onClick={() => setSelectedStatuses(selectedStatuses.filter((x) => x !== st))} 
-                  className="hover:text-rose-600 transition-colors"
+                  onClick={() => {
+                    setSelectedStatuses(selectedStatuses.filter((x) => x !== st));
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Status filter"
+                  aria-label="Remove Status filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -545,11 +568,16 @@ export const EmployeesPage: React.FC = () => {
 
             {/* Skills chips */}
             {selectedSkills.map((sk) => (
-              <span key={sk} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={sk} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Skill: {sk}
                 <button 
-                  onClick={() => setSelectedSkills(selectedSkills.filter((x) => x !== sk))} 
-                  className="hover:text-rose-600 transition-colors"
+                  onClick={() => {
+                    setSelectedSkills(selectedSkills.filter((x) => x !== sk));
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Skill filter"
+                  aria-label="Remove Skill filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -558,11 +586,16 @@ export const EmployeesPage: React.FC = () => {
 
             {/* Market chips */}
             {selectedMarkets.map((mk) => (
-              <span key={mk} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={mk} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Market: {mk}
                 <button 
-                  onClick={() => setSelectedMarkets(selectedMarkets.filter((x) => x !== mk))} 
-                  className="hover:text-rose-600 transition-colors"
+                  onClick={() => {
+                    setSelectedMarkets(selectedMarkets.filter((x) => x !== mk));
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Market filter"
+                  aria-label="Remove Market filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -571,11 +604,16 @@ export const EmployeesPage: React.FC = () => {
 
             {/* Compliance chips */}
             {selectedCompliances.map((cp) => (
-              <span key={cp} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={cp} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Compliance: {cp}
                 <button 
-                  onClick={() => setSelectedCompliances(selectedCompliances.filter((x) => x !== cp))} 
-                  className="hover:text-rose-600 transition-colors"
+                  onClick={() => {
+                    setSelectedCompliances(selectedCompliances.filter((x) => x !== cp));
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Compliance filter"
+                  aria-label="Remove Compliance filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -589,7 +627,7 @@ export const EmployeesPage: React.FC = () => {
       <div className="hidden md:block">
         <DataTable
           columns={columns}
-          data={filteredEmployees}
+          data={paginatedEmployees}
           keyExtractor={(e) => e.id}
           onRowClick={(e) => setInspectEmployee(e)}
           emptyTitle="No employees found"
@@ -605,11 +643,11 @@ export const EmployeesPage: React.FC = () => {
             <p className="text-xs text-[#6B6B6B] mt-1">Try adjusting your filters or search keywords.</p>
           </div>
         ) : (
-          filteredEmployees.map((e) => (
+          paginatedEmployees.map((e) => (
             <div
               key={e.id}
               onClick={() => setInspectEmployee(e)}
-              className="rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-3.5 shadow-soft-sm hover:border-[#5B21B6]/30 transition-all cursor-pointer space-y-2 w-full max-w-full overflow-hidden"
+              className="rounded-2xl border border-[#EEEEF2] bg-white p-3 sm:p-3.5 shadow-soft-sm hover:border-[#1B2E79]/30 transition-all cursor-pointer space-y-2 w-full max-w-full overflow-hidden"
             >
               {/* Card Header: Profile & Status */}
               <div className="flex items-center justify-between gap-2.5 border-b border-[#EEEEF2] pb-1.5">
@@ -623,7 +661,7 @@ export const EmployeesPage: React.FC = () => {
                     <h3 className="text-sm font-bold text-[#1F1F1F] truncate">{e.name}</h3>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       <span className="font-mono text-[11px] text-[#6B6B6B] font-semibold">{e.id}</span>
-                      <span className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-1.5 py-0.5 rounded-md truncate">
+                      <span className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-1.5 py-0.5 rounded-md truncate">
                         <MapPin className="h-2.5 w-2.5 shrink-0" />
                         <span className="truncate">{e.areaId}</span>
                       </span>
@@ -661,7 +699,7 @@ export const EmployeesPage: React.FC = () => {
                   }}
                   title="Inspect Details"
                   aria-label="Inspect Details"
-                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white shadow-soft-sm transition-all cursor-pointer shrink-0"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white shadow-soft-sm transition-all cursor-pointer shrink-0"
                 >
                   <Eye className="h-4 w-4" />
                 </button>
@@ -670,6 +708,21 @@ export const EmployeesPage: React.FC = () => {
           ))
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {filteredEmployees.length > 0 && (
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalRecords={filteredEmployees.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          recordLabel="employees"
+        />
+      )}
 
       {/* Inspect Drawer */}
       <WorkerDetailDrawer

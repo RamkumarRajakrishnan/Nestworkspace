@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   X, 
   Ticket, 
@@ -317,7 +317,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#EEEEF2] px-4 sm:px-6 py-4 bg-[#FAF9FC] shrink-0 gap-2">
           <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-2">
-            <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6] shrink-0">
+            <div className="h-8 w-8 rounded-xl bg-[#EEF3FF] flex items-center justify-center text-[#1B2E79] shrink-0">
               <Ticket className="h-4 w-4" />
             </div>
             <div className="min-w-0 truncate">
@@ -345,7 +345,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
 
           {/* Section 1: Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-[#5B21B6] uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#1B2E79] uppercase tracking-wider">
               1. Basic Package Information
             </h3>
 
@@ -367,8 +367,8 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                       validationErrors.areaName
                         ? 'border-rose-400 bg-rose-50/40 text-[#1F1F1F] focus:ring-2 focus:ring-rose-500/20'
                         : isAreaDropdownOpen
-                        ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#5B21B6]'
-                        : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#DDD6FE] text-[#1F1F1F]'
+                        ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1B2E79]'
+                        : 'border-[#EEEEF2] bg-[#FAF9FC] hover:bg-white hover:border-[#C4D9FD] text-[#1F1F1F]'
                     }`}
                     aria-haspopup="listbox"
                     aria-expanded={isAreaDropdownOpen}
@@ -376,7 +376,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       <MapPin
                         className={`h-4 w-4 shrink-0 transition-colors ${
-                          isAreaDropdownOpen ? 'text-[#5B21B6]' : 'text-[#7C3AED]'
+                          isAreaDropdownOpen ? 'text-[#1B2E79]' : 'text-[#162766]'
                         }`}
                       />
                       <span className={`truncate text-left ${areaName ? 'font-bold text-[#1F1F1F]' : 'text-[#9E9E9E]'}`}>
@@ -390,7 +390,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
 
                     <ChevronDown
                       className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${
-                        isAreaDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''
+                        isAreaDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''
                       }`}
                     />
                   </button>
@@ -407,7 +407,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                               value={areaSearch}
                               onChange={(e) => setAreaSearch(e.target.value)}
                               placeholder="Search area..."
-                              className="w-full pl-8 pr-2 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#5B21B6]"
+                              className="w-full pl-8 pr-2 py-1 text-xs rounded-md bg-white border border-[#EEEEF2] text-[#1F1F1F] placeholder:text-[#9E9E9E] focus:outline-none focus:border-[#1B2E79]"
                               onClick={(e) => e.stopPropagation()}
                               autoFocus
                             />
@@ -439,21 +439,21 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                                 }}
                                 className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-left ${
                                   isSelected
-                                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold shadow-soft-xs'
-                                    : 'text-[#1F1F1F] hover:bg-[#F5F3FF] hover:text-[#5B21B6]'
+                                    ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold shadow-soft-xs'
+                                    : 'text-[#1F1F1F] hover:bg-[#F5F8FF] hover:text-[#1B2E79]'
                                 }`}
                                 title={a}
                               >
                                 <div className="flex items-center gap-2 min-w-0 flex-1">
                                   <MapPin
                                     className={`h-3.5 w-3.5 shrink-0 ${
-                                      isSelected ? 'text-[#5B21B6]' : 'text-[#6B6B6B]'
+                                      isSelected ? 'text-[#1B2E79]' : 'text-[#6B6B6B]'
                                     }`}
                                   />
                                   <span className="truncate">{a}</span>
                                 </div>
                                 {isSelected && (
-                                  <Check className="h-3.5 w-3.5 text-[#5B21B6] shrink-0 stroke-[2.5]" />
+                                  <Check className="h-3.5 w-3.5 text-[#1B2E79] shrink-0 stroke-[2.5]" />
                                 )}
                               </button>
                             );
@@ -480,7 +480,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                     value={packType}
                     onChange={(e) => setPackType(e.target.value)}
                     placeholder="Enter pack type"
-                    className={`w-full rounded-xl border pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden ${
+                    className={`w-full rounded-xl border pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-[#162766] focus:outline-hidden ${
                       validationErrors.packType ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2] bg-white'
                     }`}
                   />
@@ -504,7 +504,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                   value={visits}
                   onChange={(e) => setVisits(e.target.value)}
                   placeholder="Enter number of visits"
-                  className={`w-full rounded-xl border px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden ${
+                  className={`w-full rounded-xl border px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#162766] focus:outline-hidden ${
                     validationErrors.visits ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2] bg-white'
                   }`}
                 />
@@ -527,7 +527,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="Enter price"
-                    className={`w-full rounded-xl border pl-7 pr-3 py-2 text-xs font-mono font-bold text-[#1F1F1F] focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden ${
+                    className={`w-full rounded-xl border pl-7 pr-3 py-2 text-xs font-mono font-bold text-[#1F1F1F] focus:ring-2 focus:ring-[#162766] focus:outline-hidden ${
                       validationErrors.price ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2] bg-white'
                     }`}
                   />
@@ -549,7 +549,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
                     placeholder="Enter duration in minutes"
-                    className={`w-full rounded-xl border pl-9 pr-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden ${
+                    className={`w-full rounded-xl border pl-9 pr-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#162766] focus:outline-hidden ${
                       validationErrors.duration ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2] bg-white'
                     }`}
                   />
@@ -563,7 +563,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
 
           {/* Section 2: Validity & Status */}
           <div className="space-y-4 pt-2 border-t border-[#EEEEF2]">
-            <h3 className="text-xs font-bold text-[#5B21B6] uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#1B2E79] uppercase tracking-wider">
               2. Validity & Activation
             </h3>
 
@@ -580,7 +580,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                   value={validityDays}
                   onChange={(e) => setValidityDays(e.target.value)}
                   placeholder="Enter validity days"
-                  className={`w-full rounded-xl border px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden ${
+                  className={`w-full rounded-xl border px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#162766] focus:outline-hidden ${
                     validationErrors.validityDays ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2] bg-white'
                   }`}
                 />
@@ -600,7 +600,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                     type="date"
                     value={offerexpire}
                     onChange={(e) => setOfferexpire(e.target.value)}
-                    className={`w-full rounded-xl border pl-9 pr-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#7C3AED] focus:outline-hidden ${
+                    className={`w-full rounded-xl border pl-9 pr-3 py-2 text-xs font-mono focus:ring-2 focus:ring-[#162766] focus:outline-hidden ${
                       validationErrors.offerexpire ? 'border-rose-400 bg-rose-50' : 'border-[#EEEEF2] bg-white'
                     }`}
                   />
@@ -635,7 +635,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
 
           {/* Section 3: Promotional Banners (Image Uploads) */}
           <div className="space-y-4 pt-2 border-t border-[#EEEEF2]">
-            <h3 className="text-xs font-bold text-[#5B21B6] uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#1B2E79] uppercase tracking-wider">
               3. Promotional Banners
             </h3>
 
@@ -653,16 +653,16 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
               />
 
               {dashboardBannerFile ? (
-                <div className="flex items-center justify-between rounded-xl border border-[#DDD6FE] bg-[#F5F3FF] p-3">
+                <div className="flex items-center justify-between rounded-xl border border-[#C4D9FD] bg-[#F5F8FF] p-3">
                   <div className="flex items-center gap-3 min-w-0">
                     {dashboardBannerPreview ? (
                       <img
                         src={dashboardBannerPreview}
                         alt="Dashboard Banner Preview"
-                        className="h-12 w-20 rounded-lg object-cover border border-[#DDD6FE] bg-white shrink-0"
+                        className="h-12 w-20 rounded-lg object-cover border border-[#C4D9FD] bg-white shrink-0"
                       />
                     ) : (
-                      <ImageIcon className="h-8 w-8 text-[#5B21B6] shrink-0" />
+                      <ImageIcon className="h-8 w-8 text-[#1B2E79] shrink-0" />
                     )}
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-[#1F1F1F] truncate max-w-[180px] sm:max-w-xs">
@@ -678,7 +678,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                       type="button"
                       onClick={() => dashboardBannerInputRef.current?.click()}
                       disabled={isSubmitting}
-                      className="rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B21B6] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
+                      className="rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1B2E79] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       Change
                     </button>
@@ -702,13 +702,13 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                 <button
                   type="button"
                   onClick={() => dashboardBannerInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-2.5 rounded-xl border-2 border-dashed border-[#DDD6FE] bg-[#FAF9FC] hover:bg-[#F5F3FF] hover:border-[#5B21B6] py-3.5 px-3 text-center cursor-pointer transition-all group"
+                  className="w-full flex items-center justify-center gap-2.5 rounded-xl border-2 border-dashed border-[#C4D9FD] bg-[#FAF9FC] hover:bg-[#F5F8FF] hover:border-[#1B2E79] py-3.5 px-3 text-center cursor-pointer transition-all group"
                 >
-                  <div className="h-8 w-8 rounded-lg bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6] group-hover:scale-105 transition-transform shrink-0">
+                  <div className="h-8 w-8 rounded-lg bg-[#EEF3FF] flex items-center justify-center text-[#1B2E79] group-hover:scale-105 transition-transform shrink-0">
                     <Upload className="h-4 w-4" />
                   </div>
                   <div className="text-left">
-                    <span className="text-xs font-bold text-[#5B21B6] block">Upload Dashboard Banner</span>
+                    <span className="text-xs font-bold text-[#1B2E79] block">Upload Dashboard Banner</span>
                     <span className="text-[11px] text-[#6B6B6B]">JPG, PNG, or WebP</span>
                   </div>
                 </button>
@@ -732,16 +732,16 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
               />
 
               {popupBannerFile ? (
-                <div className="flex items-center justify-between rounded-xl border border-[#DDD6FE] bg-[#F5F3FF] p-3">
+                <div className="flex items-center justify-between rounded-xl border border-[#C4D9FD] bg-[#F5F8FF] p-3">
                   <div className="flex items-center gap-3 min-w-0">
                     {popupBannerPreview ? (
                       <img
                         src={popupBannerPreview}
                         alt="Popup Banner Preview"
-                        className="h-12 w-16 rounded-lg object-cover border border-[#DDD6FE] bg-white shrink-0"
+                        className="h-12 w-16 rounded-lg object-cover border border-[#C4D9FD] bg-white shrink-0"
                       />
                     ) : (
-                      <ImageIcon className="h-8 w-8 text-[#5B21B6] shrink-0" />
+                      <ImageIcon className="h-8 w-8 text-[#1B2E79] shrink-0" />
                     )}
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-[#1F1F1F] truncate max-w-[180px] sm:max-w-xs">
@@ -757,7 +757,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                       type="button"
                       onClick={() => popupBannerInputRef.current?.click()}
                       disabled={isSubmitting}
-                      className="rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5B21B6] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
+                      className="rounded-lg border border-[#EEEEF2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1B2E79] hover:bg-[#FAF9FC] transition-colors cursor-pointer"
                     >
                       Change
                     </button>
@@ -781,13 +781,13 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
                 <button
                   type="button"
                   onClick={() => popupBannerInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-2.5 rounded-xl border-2 border-dashed border-[#DDD6FE] bg-[#FAF9FC] hover:bg-[#F5F3FF] hover:border-[#5B21B6] py-3.5 px-3 text-center cursor-pointer transition-all group"
+                  className="w-full flex items-center justify-center gap-2.5 rounded-xl border-2 border-dashed border-[#C4D9FD] bg-[#FAF9FC] hover:bg-[#F5F8FF] hover:border-[#1B2E79] py-3.5 px-3 text-center cursor-pointer transition-all group"
                 >
-                  <div className="h-8 w-8 rounded-lg bg-[#EDE9FE] flex items-center justify-center text-[#5B21B6] group-hover:scale-105 transition-transform shrink-0">
+                  <div className="h-8 w-8 rounded-lg bg-[#EEF3FF] flex items-center justify-center text-[#1B2E79] group-hover:scale-105 transition-transform shrink-0">
                     <Upload className="h-4 w-4" />
                   </div>
                   <div className="text-left">
-                    <span className="text-xs font-bold text-[#5B21B6] block">Upload Popup Banner</span>
+                    <span className="text-xs font-bold text-[#1B2E79] block">Upload Popup Banner</span>
                     <span className="text-[11px] text-[#6B6B6B]">JPG, PNG, or WebP</span>
                   </div>
                 </button>
@@ -811,7 +811,7 @@ export const CreateNestPassModal: React.FC<CreateNestPassModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useOperations } from '../../../context/OperationsContext';
 import { Market, MarketStatus } from '../../../types';
 import { StatusBadge } from '../../../components/common/StatusBadge';
@@ -127,7 +127,7 @@ export const MarketsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsCreateMarketModalOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Create New Market</span>
@@ -161,7 +161,7 @@ export const MarketsPage: React.FC = () => {
           <p className="text-xs text-[#6B6B6B] max-w-sm mx-auto">{error}</p>
           <button
             onClick={loadMarketsList}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all cursor-pointer"
           >
             <RotateCw className="h-3.5 w-3.5" />
             <span>Retry</span>
@@ -205,7 +205,7 @@ export const MarketsPage: React.FC = () => {
       {/* Empty State */}
       {!isLoading && !error && displayMarkets.length === 0 && (
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-12 text-center shadow-soft-sm space-y-3">
-          <Store className="h-10 w-10 text-[#5B21B6] mx-auto" />
+          <Store className="h-10 w-10 text-[#1B2E79] mx-auto" />
           <h3 className="text-base font-bold text-[#1F1F1F]">No Markets Available</h3>
           <p className="text-xs text-[#6B6B6B] max-w-sm mx-auto">
             No active nano-markets found in the database. Create a new market using the button above to begin operations.
@@ -246,7 +246,7 @@ export const MarketsPage: React.FC = () => {
                       <span className="font-mono text-xs font-semibold text-[#6B6B6B]">({m.rawArea?.areaName || m.id})</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-[#6B6B6B] mt-1">
-                      <MapPin className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                      <MapPin className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                       <span>{m.area}</span>
                     </div>
                   </div>
@@ -271,10 +271,10 @@ export const MarketsPage: React.FC = () => {
                   {/* Dynamic Experts */}
                   <div className="rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-1.5 sm:p-2.5">
                     <div className="flex items-center justify-center gap-1 text-[10px] font-mono uppercase font-bold text-[#6B6B6B]">
-                      <Users className="h-3 w-3 text-[#5B21B6]" />
+                      <Users className="h-3 w-3 text-[#1B2E79]" />
                       <span>Experts</span>
                     </div>
-                    <div className="text-base sm:text-lg font-bold font-mono text-[#5B21B6] mt-0.5">
+                    <div className="text-base sm:text-lg font-bold font-mono text-[#1B2E79] mt-0.5">
                       {expertsCount}
                     </div>
                     <span className="text-[9px] sm:text-[10px] text-[#6B6B6B] font-medium">Assigned</span>
@@ -323,7 +323,7 @@ export const MarketsPage: React.FC = () => {
                 {/* Dynamic Working Hours & Operational Status */}
                 <div className="mt-3 flex items-center justify-between rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] px-3 py-2 text-xs">
                   <div className="flex items-center gap-1.5 text-[#6B6B6B] truncate mr-2">
-                    <Clock className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                    <Clock className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                     <span className="text-[11px] font-medium">Hours:</span>
                     <span className="font-mono font-bold text-[#1F1F1F] text-xs truncate">
                       {workingHours}
@@ -350,7 +350,7 @@ export const MarketsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleMarketClick(m)}
-                    className="text-[#5B21B6] hover:text-[#4C1D95] font-semibold flex items-center gap-1 hover:underline cursor-pointer transition-colors"
+                    className="text-[#1B2E79] hover:text-[#13225C] font-semibold flex items-center gap-1 hover:underline cursor-pointer transition-colors"
                   >
                     <span>Manage Market</span>
                     <ChevronRight className="h-3.5 w-3.5" />

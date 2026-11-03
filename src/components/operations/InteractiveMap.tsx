@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { Worker, Booking, Market, WorkerStatus, BookingStatus } from '../../types';
 import { 
   ZoomIn, 
@@ -106,22 +106,22 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const getWorkerColor = (status: WorkerStatus) => {
     switch (status) {
       case 'Available': return '#10B981'; // Green
-      case 'Assigned': return '#7C3AED'; // Secondary Purple
-      case 'Busy': return '#5B21B6'; // Primary Purple
+      case 'Assigned': return '#162766'; // Secondary Purple
+      case 'Busy': return '#1B2E79'; // Primary Purple
       case 'Traveling': return '#F59E0B'; // Orange
       case 'Offline': return '#9CA3AF'; // Gray
       case 'GPS Stale': return '#EA580C'; // Amber
       case 'Suspended': return '#E11D48'; // Red
-      default: return '#7C3AED';
+      default: return '#162766';
     }
   };
 
   const getBookingColor = (status: BookingStatus | string) => {
     switch (status) {
       case 'SLA Risk': return '#E11D48'; // Red
-      case 'Searching': return '#5B21B6'; // Purple
+      case 'Searching': return '#1B2E79'; // Purple
       case 'Queued': return '#F59E0B'; // Amber
-      case 'In Progress': return '#7C3AED'; // Secondary Purple
+      case 'In Progress': return '#162766'; // Secondary Purple
       case 'En Route': return '#D97706'; // Amber
       case 'Completed': return '#10B981'; // Green
       default: return '#6B7280';
@@ -137,7 +137,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           value={selectedAreaFilter}
           onChange={(e) => setSelectedAreaFilter(e.target.value)}
           aria-label="Filter Map by Area"
-          className="rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] focus:outline-none focus:border-[#7C3AED]"
+          className="rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] focus:outline-none focus:border-[#162766]"
         >
           <option value="ALL">All Nano-Markets</option>
           {markets.map((m) => (
@@ -152,7 +152,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           value={workerStatusFilter}
           onChange={(e) => setWorkerStatusFilter(e.target.value)}
           aria-label="Filter Map by Expert Status"
-          className="rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] focus:outline-none focus:border-[#7C3AED]"
+          className="rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] focus:outline-none focus:border-[#162766]"
         >
           <option value="ALL">All Expert Statuses</option>
           <option value="Available">🟢 Available Only</option>
@@ -167,7 +167,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           value={bookingStatusFilter}
           onChange={(e) => setBookingStatusFilter(e.target.value)}
           aria-label="Filter Map by Booking Status"
-          className="rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] focus:outline-none focus:border-[#7C3AED]"
+          className="rounded-xl border border-[#EEEEF2] bg-[#F7F5FA] px-3 py-1.5 text-xs font-semibold text-[#1F1F1F] focus:outline-none focus:border-[#162766]"
         >
           <option value="ALL">All Bookings</option>
           <option value="SLA Risk">⚠️ SLA Risk Only</option>
@@ -182,7 +182,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             onClick={() => setShowWorkers(!showWorkers)}
             className={`rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all flex items-center gap-1 ${
               showWorkers
-                ? 'bg-[#EDE9FE] text-[#5B21B6] shadow-soft-sm'
+                ? 'bg-[#EEF3FF] text-[#1B2E79] shadow-soft-sm'
                 : 'bg-[#F7F5FA] text-[#6B6B6B]'
             }`}
             title="Toggle Experts Layer"
@@ -195,7 +195,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             onClick={() => setShowBookings(!showBookings)}
             className={`rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all flex items-center gap-1 ${
               showBookings
-                ? 'bg-[#EDE9FE] text-[#5B21B6] shadow-soft-sm'
+                ? 'bg-[#EEF3FF] text-[#1B2E79] shadow-soft-sm'
                 : 'bg-[#F7F5FA] text-[#6B6B6B]'
             }`}
             title="Toggle Bookings Layer"
@@ -208,7 +208,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             onClick={() => setShowMarkets(!showMarkets)}
             className={`rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all flex items-center gap-1 ${
               showMarkets
-                ? 'bg-[#EDE9FE] text-[#5B21B6] shadow-soft-sm'
+                ? 'bg-[#EEF3FF] text-[#1B2E79] shadow-soft-sm'
                 : 'bg-[#F7F5FA] text-[#6B6B6B]'
             }`}
             title="Toggle Nano-Markets Layer"
@@ -223,21 +223,21 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-1.5 rounded-2xl border border-[#EEEEF2] bg-white/95 p-1.5 shadow-soft-md backdrop-blur-md">
         <button
           onClick={() => handleZoom(0.25)}
-          className="rounded-xl p-2 text-[#6B6B6B] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors"
+          className="rounded-xl p-2 text-[#6B6B6B] hover:bg-[#F5F8FF] hover:text-[#1B2E79] transition-colors"
           title="Zoom In"
         >
           <ZoomIn className="h-4 w-4" />
         </button>
         <button
           onClick={() => handleZoom(-0.25)}
-          className="rounded-xl p-2 text-[#6B6B6B] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors"
+          className="rounded-xl p-2 text-[#6B6B6B] hover:bg-[#F5F8FF] hover:text-[#1B2E79] transition-colors"
           title="Zoom Out"
         >
           <ZoomOut className="h-4 w-4" />
         </button>
         <button
           onClick={resetViewport}
-          className="rounded-xl p-2 text-[#6B6B6B] hover:bg-[#F5F3FF] hover:text-[#5B21B6] transition-colors"
+          className="rounded-xl p-2 text-[#6B6B6B] hover:bg-[#F5F8FF] hover:text-[#1B2E79] transition-colors"
           title="Reset Center"
         >
           <RotateCcw className="h-4 w-4" />
@@ -250,12 +250,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           <span className="h-2.5 w-2.5 rounded-full bg-[#10B981] ring-2 ring-[#A6F4C5]" />
           <span>Available</span>
         </div>
-        <div className="flex items-center gap-1.5 font-bold text-[#5B21B6]">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#5B21B6] ring-2 ring-[#EDE9FE]" />
+        <div className="flex items-center gap-1.5 font-bold text-[#1B2E79]">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#1B2E79] ring-2 ring-[#EEF3FF]" />
           <span>Assigned</span>
         </div>
-        <div className="flex items-center gap-1.5 font-bold text-[#7C3AED]">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#7C3AED] ring-2 ring-[#EDE9FE]" />
+        <div className="flex items-center gap-1.5 font-bold text-[#162766]">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#162766] ring-2 ring-[#EEF3FF]" />
           <span>Busy</span>
         </div>
         <div className="flex items-center gap-1.5 font-bold text-[#C2410C]">
@@ -315,7 +315,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   switch (m.status) {
                     case 'Critical': return '#FEF2F2';
                     case 'Tight': return '#FFF7ED';
-                    default: return '#F5F3FF';
+                    default: return '#F5F8FF';
                   }
                 };
 
@@ -323,7 +323,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   switch (m.status) {
                     case 'Critical': return '#E11D48';
                     case 'Tight': return '#F59E0B';
-                    default: return '#7C3AED';
+                    default: return '#162766';
                   }
                 };
 
@@ -359,7 +359,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     <text
                       x={center.x}
                       y={topLeft.y + 20}
-                      fill="#5B21B6"
+                      fill="#1B2E79"
                       fontSize="11"
                       fontWeight="bold"
                       fontFamily="JetBrains Mono, monospace"

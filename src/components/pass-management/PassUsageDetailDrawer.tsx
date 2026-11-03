@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Drawer } from '../common/Drawer';
 import { StatusBadge } from '../common/StatusBadge';
 import { RawUserNestPassRecord } from '../../types';
@@ -93,8 +93,8 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
       <div className="space-y-4 w-full max-w-full overflow-hidden">
         {/* Top Header Card */}
         <div className="flex items-center gap-3.5 sm:gap-4 rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-4.5 w-full overflow-hidden">
-          <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EDE9FE] flex items-center justify-center relative">
-            <Ticket className="h-7 w-7 text-[#5B21B6]" />
+          <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EEF3FF] flex items-center justify-center relative">
+            <Ticket className="h-7 w-7 text-[#1B2E79]" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -104,13 +104,13 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
               <StatusBadge status={status} size="sm" pulse={status === 'Active'} />
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-[#6B6B6B] flex-wrap">
-              <span className="font-mono text-[11px] font-semibold text-[#5B21B6] truncate max-w-[240px]">
+              <span className="font-mono text-[11px] font-semibold text-[#1B2E79] truncate max-w-[240px]">
                 {userId}
               </span>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#5B21B6] font-semibold truncate max-w-[220px]">
-                <Hash className="h-3 w-3 text-[#5B21B6] shrink-0" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#1B2E79] font-semibold truncate max-w-[220px]">
+                <Hash className="h-3 w-3 text-[#1B2E79] shrink-0" />
                 <span className="truncate">{bookingId}</span>
               </span>
             </div>
@@ -120,7 +120,7 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
         {/* 1. Customer & Pass Information */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <User className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Customer & Pass Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -132,7 +132,7 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">PASS PACKAGE ID</span>
-              <div className="font-mono text-[#5B21B6] font-bold mt-0.5 truncate">{packId}</div>
+              <div className="font-mono text-[#1B2E79] font-bold mt-0.5 truncate">{packId}</div>
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">STATUS</span>
@@ -150,7 +150,7 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
         {/* 2. Visit & Usage Metrics */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <Activity className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Activity className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Visits & Session Metrics
           </h4>
 
@@ -158,11 +158,11 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
           <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-[10px] text-[#6B6B6B] font-mono font-semibold uppercase">Visits Consumed</span>
-              <span className="font-bold text-[#5B21B6] font-mono">{completedVisits} of {totalVisits} visits ({usagePercent}%)</span>
+              <span className="font-bold text-[#1B2E79] font-mono">{completedVisits} of {totalVisits} visits ({usagePercent}%)</span>
             </div>
             <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden">
               <div
-                className="h-full bg-[#5B21B6] rounded-full transition-all duration-300"
+                className="h-full bg-[#1B2E79] rounded-full transition-all duration-300"
                 style={{ width: `${usagePercent}%` }}
               />
             </div>
@@ -181,7 +181,7 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0 text-center">
               <span className="text-[10px] text-[#6B6B6B] font-mono block">REMAINING</span>
-              <div className="font-mono text-base font-bold text-[#5B21B6] mt-0.5">{remainingVisits}</div>
+              <div className="font-mono text-base font-bold text-[#1B2E79] mt-0.5">{remainingVisits}</div>
               <span className="text-[10px] text-[#8C8C8C]">Available</span>
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0 text-center">
@@ -195,7 +195,7 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
         {/* 3. Payment & Transaction Details */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <CreditCard className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <CreditCard className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Payment & Transaction Details
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -209,7 +209,7 @@ export const PassUsageDetailDrawer: React.FC<PassUsageDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0 sm:col-span-2">
               <span className="text-[10px] text-[#6B6B6B] font-mono">BOOKING REFERENCE ID</span>
-              <div className="font-mono text-[#5B21B6] font-semibold mt-0.5 truncate select-all">{bookingId}</div>
+              <div className="font-mono text-[#1B2E79] font-semibold mt-0.5 truncate select-all">{bookingId}</div>
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0 sm:col-span-2">
               <span className="text-[10px] text-[#6B6B6B] font-mono">RAZORPAY ORDER / PAYMENT ID</span>

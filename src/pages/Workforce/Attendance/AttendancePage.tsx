@@ -3,6 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { getWorkerAttendance, getActiveAreas, ActiveAreaItem } from '../../../services/api';
 import { RawWorkerAttendanceRecord } from '../../../types';
 import { DataTable, Column } from '../../../components/common/DataTable';
+import { Pagination } from '../../../components/common/Pagination';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { SearchInput } from '../../../components/common/SearchInput';
 import { AttendanceDetailDrawer } from '../../../components/workforce/AttendanceDetailDrawer';
@@ -273,21 +274,22 @@ export const AttendancePage: React.FC = () => {
         if (res.success && Array.isArray(res.data)) {
           setAttendanceRecords(res.data);
           if (res.pagination) {
+            const rawPag: any = res.pagination;
             setPagination({
-              currentPage: res.pagination.currentPage || res.pagination.page || page,
-              limit: res.pagination.limit || limit,
-              totalRecords: typeof res.pagination.totalRecords === 'number'
-                ? res.pagination.totalRecords
-                : (typeof res.pagination.totalCount === 'number'
-                    ? res.pagination.totalCount
+              currentPage: rawPag.currentPage || rawPag.page || page,
+              limit: rawPag.limit || limit,
+              totalRecords: typeof rawPag.totalRecords === 'number'
+                ? rawPag.totalRecords
+                : (typeof rawPag.totalCount === 'number'
+                    ? rawPag.totalCount
                     : (typeof res.count === 'number' ? res.count : res.data.length)),
-              totalPages: res.pagination.totalPages || Math.max(1, Math.ceil((res.pagination.totalRecords || res.count || res.data.length) / limit)),
-              hasNextPage: typeof res.pagination.hasNextPage === 'boolean'
-                ? res.pagination.hasNextPage
-                : ((res.pagination.currentPage || page) < (res.pagination.totalPages || Math.ceil((res.pagination.totalRecords || res.count || res.data.length) / limit))),
-              hasPreviousPage: typeof res.pagination.hasPreviousPage === 'boolean'
-                ? res.pagination.hasPreviousPage
-                : ((res.pagination.currentPage || page) > 1),
+              totalPages: rawPag.totalPages || Math.max(1, Math.ceil((rawPag.totalRecords || res.count || res.data.length) / limit)),
+              hasNextPage: typeof rawPag.hasNextPage === 'boolean'
+                ? rawPag.hasNextPage
+                : ((rawPag.currentPage || page) < (rawPag.totalPages || Math.ceil((rawPag.totalRecords || res.count || res.data.length) / limit))),
+              hasPreviousPage: typeof rawPag.hasPreviousPage === 'boolean'
+                ? rawPag.hasPreviousPage
+                : ((rawPag.currentPage || page) > 1),
             });
           } else {
             const total = typeof res.count === 'number' ? res.count : res.data.length;
@@ -486,8 +488,13 @@ export const AttendancePage: React.FC = () => {
     setIsFilterOpen(false);
   };
 
-  // Calendar Date Click Handler
+  // Calendar Date Click Handler (strictly disables future dates)
   const handleCalendarDayClick = (isoStr: string) => {
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 4);
+    const maxDateIso = getIsoDateString(maxDate);
+    if (isoStr > maxDateIso) return; // Future dates beyond 4 days disabled
+
     setActivePreset('custom');
     if (calendarStep === 'start') {
       setDraftFromDate(isoStr);
@@ -590,72 +597,22 @@ export const AttendancePage: React.FC = () => {
   const startRecord = totalRecords > 0 ? (currentPage - 1) * pageSize + 1 : 0;
   const endRecord = Math.min(currentPage * pageSize, totalRecords);
 
-  // Windowed pagination calculation:
-  // When totalPages <= 5: display all pages [1, ..., totalPages]
-  // When totalPages > 5: display a small window of 3 pages [windowStart, windowStart+1, windowStart+2]
-  //   Initial state: 1 2 3 ...
-  //   Click Next: 4 5 6 ...
-  //   Click Next again: 7 8 9 ...
-  const WINDOW_SIZE = 3;
-  const isWindowed = totalPages > 5;
-  const windowStart = isWindowed
-    ? Math.floor((currentPage - 1) / WINDOW_SIZE) * WINDOW_SIZE + 1
-    : 1;
-  const windowEnd = isWindowed
-    ? Math.min(windowStart + WINDOW_SIZE - 1, totalPages)
-    : totalPages;
-
-  const visiblePages = useMemo(() => {
-    const pages: number[] = [];
-    for (let p = windowStart; p <= windowEnd; p++) {
-      pages.push(p);
-    }
-    return pages;
-  }, [windowStart, windowEnd]);
-
-  const hasMoreAfter = isWindowed && windowEnd < totalPages;
-
-  const handleNext = () => {
-    if (isLoading) return;
-    if (isWindowed) {
-      const nextWindowStart = windowStart + WINDOW_SIZE;
-      if (nextWindowStart <= totalPages) {
-        setCurrentPage(nextWindowStart);
-      } else {
-        setCurrentPage((p) => Math.min(totalPages, p + 1));
-      }
-    } else {
-      setCurrentPage((p) => Math.min(totalPages, p + 1));
-    }
-  };
-
-  const handlePrevious = () => {
-    if (isLoading) return;
-    if (isWindowed) {
-      if (windowStart > 1) {
-        const prevWindowStart = Math.max(1, windowStart - WINDOW_SIZE);
-        setCurrentPage(prevWindowStart);
-      } else {
-        setCurrentPage((p) => Math.max(1, p - 1));
-      }
-    } else {
-      setCurrentPage((p) => Math.max(1, p - 1));
-    }
-  };
-
   // Handle open drawer
   const handleViewRecord = (record: RawWorkerAttendanceRecord) => {
     setSelectedRecord(record);
     setIsDrawerOpen(true);
   };
 
-  // Render Calendar Month Days
+  // Render Calendar Month Days with future dates disabled
   const renderCalendarDays = () => {
     const year = calendarMonth.getFullYear();
     const month = calendarMonth.getMonth();
 
     const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sun
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 4);
+    const maxDateIso = getIsoDateString(maxDate);
 
     const days = [];
 
@@ -668,31 +625,37 @@ export const AttendancePage: React.FC = () => {
     for (let day = 1; day <= daysInMonth; day++) {
       const dayDate = new Date(year, month, day);
       const isoStr = getIsoDateString(dayDate);
+      const isFuture = isoStr > maxDateIso;
       const isStart = isoStr === draftFromDate;
       const isEnd = isoStr === draftToDate;
       const isInRange = draftFromDate && draftToDate && isoStr > draftFromDate && isoStr < draftToDate;
       const isSingleDay = isStart && isEnd;
 
-      let btnClass = 'h-8 w-8 text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ';
+      let btnClass = 'h-8 w-8 text-xs font-semibold flex items-center justify-center transition-all ';
 
-      if (isSingleDay) {
-        btnClass += 'rounded-xl bg-[#5B21B6] text-white font-bold shadow-soft-sm ring-2 ring-[#5B21B6]/30';
+      if (isFuture) {
+        btnClass += 'rounded-xl text-[#B0B0B0] opacity-25 cursor-not-allowed select-none';
+      } else if (isSingleDay) {
+        btnClass += 'rounded-xl bg-[#1B2E79] text-white font-bold shadow-soft-sm ring-2 ring-[#1B2E79]/30 cursor-pointer';
       } else if (isStart) {
-        btnClass += 'rounded-l-xl bg-[#5B21B6] text-white font-bold shadow-soft-sm';
+        btnClass += 'rounded-l-xl bg-[#1B2E79] text-white font-bold shadow-soft-sm cursor-pointer';
       } else if (isEnd) {
-        btnClass += 'rounded-r-xl bg-[#5B21B6] text-white font-bold shadow-soft-sm';
+        btnClass += 'rounded-r-xl bg-[#1B2E79] text-white font-bold shadow-soft-sm cursor-pointer';
       } else if (isInRange) {
-        btnClass += 'bg-[#EDE9FE] text-[#5B21B6] font-semibold rounded-none';
+        btnClass += 'bg-[#EEF3FF] text-[#1B2E79] font-semibold rounded-none cursor-pointer';
       } else {
-        btnClass += 'rounded-xl text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#5B21B6]';
+        btnClass += 'rounded-xl text-[#1F1F1F] hover:bg-[#FAF9FC] hover:text-[#1B2E79] cursor-pointer';
       }
 
       days.push(
         <button
           key={isoStr}
           type="button"
+          disabled={isFuture}
           onClick={() => handleCalendarDayClick(isoStr)}
           className={btnClass}
+          aria-label={isoStr}
+          aria-disabled={isFuture}
         >
           {day}
         </button>
@@ -728,7 +691,7 @@ export const AttendancePage: React.FC = () => {
         const name = safeVal(r.workerName);
         return (
           <div className="flex items-center gap-2 min-w-0">
-            <div className="h-7 w-7 rounded-lg bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="h-7 w-7 rounded-lg bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0 overflow-hidden">
               {r.checkInPhoto ? (
                 <img
                   src={r.checkInPhoto}
@@ -739,8 +702,8 @@ export const AttendancePage: React.FC = () => {
                   }}
                 />
               ) : (
-                <span className="font-bold text-[11px] text-[#5B21B6]">
-                  {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-3.5 w-3.5 text-[#5B21B6]" />}
+                <span className="font-bold text-[11px] text-[#1B2E79]">
+                  {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-3.5 w-3.5 text-[#1B2E79]" />}
                 </span>
               )}
             </div>
@@ -764,7 +727,7 @@ export const AttendancePage: React.FC = () => {
       align: 'center',
       className: 'w-[8%] min-w-[75px]',
       render: (r) => (
-        <span className="font-mono text-[#5B21B6] text-xs font-semibold">
+        <span className="font-mono text-[#1B2E79] text-xs font-semibold">
           {safeVal(r.workerId)}
         </span>
       ),
@@ -798,10 +761,10 @@ export const AttendancePage: React.FC = () => {
       render: (r) => (
         <div className="flex justify-center">
           <span
-            className="inline-flex items-center gap-1 font-mono text-[#5B21B6] font-semibold text-[11px] bg-[#EDE9FE] px-2 py-0.5 rounded-lg max-w-[110px] truncate"
+            className="inline-flex items-center gap-1 font-mono text-[#1B2E79] font-semibold text-[11px] bg-[#EEF3FF] px-2 py-0.5 rounded-lg max-w-[110px] truncate"
             title={safeVal(r.areaName)}
           >
-            <MapPin className="h-2.5 w-2.5 text-[#5B21B6] shrink-0" />
+            <MapPin className="h-2.5 w-2.5 text-[#1B2E79] shrink-0" />
             <span className="truncate">{safeVal(r.areaName)}</span>
           </span>
         </div>
@@ -952,7 +915,7 @@ export const AttendancePage: React.FC = () => {
               e.stopPropagation();
               handleViewRecord(r);
             }}
-            className="p-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
             title="View Details"
             aria-label="View Attendance Details"
           >
@@ -997,10 +960,10 @@ export const AttendancePage: React.FC = () => {
               type="button"
               onClick={handleRefresh}
               disabled={isLoading || isRefreshing}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
+              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-semibold text-[#6B6B6B] hover:text-[#1B2E79] hover:bg-[#EEF3FF] transition-all shadow-soft-sm active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
               title="Refresh attendance records"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#5B21B6]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading || isRefreshing ? 'animate-spin text-[#1B2E79]' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
@@ -1017,16 +980,16 @@ export const AttendancePage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Attendance Filters"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -1046,11 +1009,11 @@ export const AttendancePage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER WITH CUSTOM ATTRACTIVE DROPDOWN & CALENDAR */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[420px] md:w-[440px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[420px] md:w-[440px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Attendance</h3>
                   </div>
                   <button
@@ -1071,10 +1034,10 @@ export const AttendancePage: React.FC = () => {
                   <div className="rounded-xl border border-[#EEEEF2] bg-white p-3.5 shadow-soft-xs space-y-2">
                     <label className="block text-xs font-bold text-[#1F1F1F] flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <MapPin className="h-3.5 w-3.5 text-[#1B2E79]" />
                         Area / Zone
                       </span>
-                      <span className="text-[10px] font-mono text-[#5B21B6] font-semibold bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-mono text-[#1B2E79] font-semibold bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                         {draftArea}
                       </span>
                     </label>
@@ -1086,15 +1049,15 @@ export const AttendancePage: React.FC = () => {
                         onClick={() => setIsAreaDropdownOpen((prev) => !prev)}
                         className={`w-full flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-all shadow-soft-xs cursor-pointer ${
                           isAreaDropdownOpen
-                            ? 'border-[#5B21B6] bg-white ring-2 ring-[#5B21B6]/15 text-[#1F1F1F]'
-                            : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-white hover:border-[#DDD6FE]'
+                            ? 'border-[#1B2E79] bg-white ring-2 ring-[#1B2E79]/15 text-[#1F1F1F]'
+                            : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-white hover:border-[#C4D9FD]'
                         }`}
                       >
                         <div className="flex items-center gap-2 truncate">
-                          <MapPin className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                          <MapPin className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                           <span className="truncate">{draftArea || 'Select Area'}</span>
                         </div>
-                        <ChevronDown className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${isAreaDropdownOpen ? 'rotate-180 text-[#5B21B6]' : ''}`} />
+                        <ChevronDown className={`h-4 w-4 text-[#6B6B6B] shrink-0 transition-transform duration-200 ${isAreaDropdownOpen ? 'rotate-180 text-[#1B2E79]' : ''}`} />
                       </button>
 
                       {/* Custom Dropdown Options Menu */}
@@ -1112,15 +1075,15 @@ export const AttendancePage: React.FC = () => {
                                 }}
                                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
                                   isSelected
-                                    ? 'bg-[#EDE9FE] text-[#5B21B6] font-bold'
+                                    ? 'bg-[#EEF3FF] text-[#1B2E79] font-bold'
                                     : 'text-[#1F1F1F] hover:bg-[#FAF9FC]'
                                 }`}
                               >
                                 <div className="flex items-center gap-2 truncate">
-                                  <MapPin className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-[#5B21B6]' : 'text-[#8C8C8C]'}`} />
+                                  <MapPin className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-[#1B2E79]' : 'text-[#8C8C8C]'}`} />
                                   <span className="truncate">{area}</span>
                                 </div>
-                                {isSelected && <Check className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />}
+                                {isSelected && <Check className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />}
                               </button>
                             );
                           })}
@@ -1133,7 +1096,7 @@ export const AttendancePage: React.FC = () => {
                   <div className="rounded-xl border border-[#EEEEF2] bg-white p-3.5 shadow-soft-xs space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
-                        <Activity className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <Activity className="h-3.5 w-3.5 text-[#1B2E79]" />
                         Attendance Status
                       </label>
                       {draftStatus ? (
@@ -1165,8 +1128,8 @@ export const AttendancePage: React.FC = () => {
                             onClick={() => setDraftStatus(s.id)}
                             className={`rounded-xl py-2 px-2 text-[11px] font-semibold border transition-all text-center cursor-pointer flex items-center justify-center gap-1 active:scale-95 ${
                               isSelected
-                                ? 'bg-[#5B21B6] text-white border-[#5B21B6] shadow-soft-xs ring-2 ring-[#5B21B6]/25 font-bold'
-                                : 'bg-[#FAF9FC] text-[#4B5563] border-[#EEEEF2] hover:bg-[#EDE9FE] hover:text-[#5B21B6] hover:border-[#DDD6FE]'
+                                ? 'bg-[#1B2E79] text-white border-[#1B2E79] shadow-soft-xs ring-2 ring-[#1B2E79]/25 font-bold'
+                                : 'bg-[#FAF9FC] text-[#4B5563] border-[#EEEEF2] hover:bg-[#EEF3FF] hover:text-[#1B2E79] hover:border-[#C4D9FD]'
                             }`}
                           >
                             {isSelected && <Check className="h-3 w-3 text-white shrink-0" />}
@@ -1183,7 +1146,7 @@ export const AttendancePage: React.FC = () => {
                       {/* Worker ID */}
                       <div className="space-y-1">
                         <label className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
-                          <User className="h-3.5 w-3.5 text-[#5B21B6]" />
+                          <User className="h-3.5 w-3.5 text-[#1B2E79]" />
                           Worker ID
                         </label>
                         <div className="relative">
@@ -1192,7 +1155,7 @@ export const AttendancePage: React.FC = () => {
                             value={draftWorkerId}
                             onChange={(e) => setDraftWorkerId(e.target.value)}
                             placeholder="Search by ID"
-                            className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-mono text-[#1F1F1F] placeholder:text-[#8C8C8C] focus:bg-white focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/15 transition-all"
+                            className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs font-mono text-[#1F1F1F] placeholder:text-[#8C8C8C] focus:bg-white focus:border-[#1B2E79] focus:outline-none focus:ring-2 focus:ring-[#1B2E79]/15 transition-all"
                           />
                           {draftWorkerId && (
                             <button
@@ -1210,7 +1173,7 @@ export const AttendancePage: React.FC = () => {
                       {/* Worker Name */}
                       <div className="space-y-1">
                         <label className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
-                          <User className="h-3.5 w-3.5 text-[#5B21B6]" />
+                          <User className="h-3.5 w-3.5 text-[#1B2E79]" />
                           Worker Name
                         </label>
                         <div className="relative">
@@ -1219,7 +1182,7 @@ export const AttendancePage: React.FC = () => {
                             value={draftWorkerName}
                             onChange={(e) => setDraftWorkerName(e.target.value)}
                             placeholder="Search by Name"
-                            className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs text-[#1F1F1F] placeholder:text-[#8C8C8C] focus:bg-white focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/15 transition-all"
+                            className="w-full rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3 py-2 text-xs text-[#1F1F1F] placeholder:text-[#8C8C8C] focus:bg-white focus:border-[#1B2E79] focus:outline-none focus:ring-2 focus:ring-[#1B2E79]/15 transition-all"
                           />
                           {draftWorkerName && (
                             <button
@@ -1240,12 +1203,12 @@ export const AttendancePage: React.FC = () => {
                   <div className="rounded-xl border border-[#EEEEF2] bg-white p-3.5 shadow-soft-xs space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-[#1F1F1F] flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-[#5B21B6]" />
+                        <Calendar className="h-3.5 w-3.5 text-[#1B2E79]" />
                         Date Range
                       </label>
                       {draftFromDate && draftToDate ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-[#5B21B6] font-semibold bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-mono text-[#1B2E79] font-semibold bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {getRangeDaysCount(draftFromDate, draftToDate)} days selected
                           </span>
                           <button
@@ -1279,8 +1242,8 @@ export const AttendancePage: React.FC = () => {
                             onClick={() => applyPreset(p.id)}
                             className={`rounded-xl py-2 px-2 text-[11px] font-semibold border transition-all text-center cursor-pointer flex items-center justify-center gap-1 active:scale-95 ${
                               isSelected
-                                ? 'bg-[#5B21B6] text-white border-[#5B21B6] shadow-soft-xs ring-2 ring-[#5B21B6]/25 font-bold'
-                                : 'bg-[#FAF9FC] text-[#4B5563] border-[#EEEEF2] hover:bg-[#EDE9FE] hover:text-[#5B21B6] hover:border-[#DDD6FE]'
+                                ? 'bg-[#1B2E79] text-white border-[#1B2E79] shadow-soft-xs ring-2 ring-[#1B2E79]/25 font-bold'
+                                : 'bg-[#FAF9FC] text-[#4B5563] border-[#EEEEF2] hover:bg-[#EEF3FF] hover:text-[#1B2E79] hover:border-[#C4D9FD]'
                             }`}
                           >
                             {isSelected && <Check className="h-3 w-3 text-white shrink-0" />}
@@ -1298,16 +1261,16 @@ export const AttendancePage: React.FC = () => {
                           <span className="text-[#8C8C8C] font-sans">to</span>
                           <span className="font-bold text-[#1F1F1F]">{formatDisplayDate(draftToDate)}</span>
                         </div>
-                        <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full capitalize">
+                        <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full capitalize">
                           {activePreset && activePreset !== 'custom'
                             ? PRESET_OPTIONS.find((p) => p.id === activePreset)?.label || 'Preset'
                             : `${getRangeDaysCount(draftFromDate, draftToDate)} days selected`}
                         </span>
                       </div>
                     ) : draftFromDate && !draftToDate ? (
-                      <div className="flex items-center justify-between rounded-xl bg-[#EDE9FE]/50 p-2.5 border border-[#DDD6FE] text-xs">
+                      <div className="flex items-center justify-between rounded-xl bg-[#EEF3FF]/50 p-2.5 border border-[#C4D9FD] text-xs">
                         <div className="flex items-center gap-1.5 font-mono text-[11px]">
-                          <span className="font-bold text-[#5B21B6]">{formatDisplayDate(draftFromDate)}</span>
+                          <span className="font-bold text-[#1B2E79]">{formatDisplayDate(draftFromDate)}</span>
                           <span className="text-[#6B6B6B] font-sans">→ Select end date on calendar</span>
                         </div>
                         <button
@@ -1324,9 +1287,9 @@ export const AttendancePage: React.FC = () => {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between rounded-xl bg-[#FAF9FC] p-2.5 border border-dashed border-[#DDD6FE] text-xs text-[#6B6B6B]">
+                      <div className="flex items-center justify-between rounded-xl bg-[#FAF9FC] p-2.5 border border-dashed border-[#C4D9FD] text-xs text-[#6B6B6B]">
                         <span className="text-[11px]">No date range selected (shows all dates)</span>
-                        <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                           Optional
                         </span>
                       </div>
@@ -1349,16 +1312,31 @@ export const AttendancePage: React.FC = () => {
                         <span className="text-xs font-bold text-[#1F1F1F]">
                           {calendarMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1));
-                          }}
-                          className="p-1 rounded-lg hover:bg-[#FAF9FC] text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors cursor-pointer"
-                          title="Next Month"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
+                        {(() => {
+                          const now = new Date();
+                          const isCurrentMonthOrFuture =
+                            calendarMonth.getFullYear() > now.getFullYear() ||
+                            (calendarMonth.getFullYear() === now.getFullYear() && calendarMonth.getMonth() >= now.getMonth());
+                          return (
+                            <button
+                              type="button"
+                              disabled={isCurrentMonthOrFuture}
+                              onClick={() => {
+                                if (!isCurrentMonthOrFuture) {
+                                  setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1));
+                                }
+                              }}
+                              className={`p-1 rounded-lg transition-colors ${
+                                isCurrentMonthOrFuture
+                                  ? 'text-[#C0C0C0] opacity-30 cursor-not-allowed'
+                                  : 'hover:bg-[#FAF9FC] text-[#6B6B6B] hover:text-[#1F1F1F] cursor-pointer'
+                              }`}
+                              title={isCurrentMonthOrFuture ? 'Future dates beyond 4 days are disabled' : 'Next Month'}
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </button>
+                          );
+                        })()}
                       </div>
 
                       {/* Day of week headers */}
@@ -1392,7 +1370,7 @@ export const AttendancePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
+                    className="rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2 text-xs font-bold shadow-soft-sm transition-all active:scale-95 cursor-pointer"
                   >
                     Apply Filters
                   </button>
@@ -1406,14 +1384,14 @@ export const AttendancePage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#EEEEF2]">
           <span className="text-[11px] font-semibold text-[#6B6B6B]">Filters:</span>
 
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
-            <MapPin className="h-3 w-3 text-[#5B21B6]" />
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
+            <MapPin className="h-3 w-3 text-[#1B2E79]" />
             Area: {selectedArea}
           </span>
 
           {fromDate && toDate ? (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
-              <Calendar className="h-3 w-3 text-[#5B21B6]" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
+              <Calendar className="h-3 w-3 text-[#1B2E79]" />
               {formatDisplayDate(fromDate)} → {formatDisplayDate(toDate)}
               <button
                 type="button"
@@ -1436,8 +1414,8 @@ export const AttendancePage: React.FC = () => {
           )}
 
           {attendanceStatus && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
-              <Activity className="h-3 w-3 text-[#5B21B6]" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
+              <Activity className="h-3 w-3 text-[#1B2E79]" />
               Status: {attendanceStatus}
               <button
                 type="button"
@@ -1454,8 +1432,8 @@ export const AttendancePage: React.FC = () => {
           )}
 
           {workerId && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
-              <User className="h-3 w-3 text-[#5B21B6]" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
+              <User className="h-3 w-3 text-[#1B2E79]" />
               ID: {workerId}
               <button
                 type="button"
@@ -1473,8 +1451,8 @@ export const AttendancePage: React.FC = () => {
           )}
 
           {workerName && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
-              <User className="h-3 w-3 text-[#5B21B6]" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
+              <User className="h-3 w-3 text-[#1B2E79]" />
               Name: {workerName}
               <button
                 type="button"
@@ -1497,7 +1475,7 @@ export const AttendancePage: React.FC = () => {
       {isLoading && (
         <div className="space-y-3">
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-6 shadow-soft-sm space-y-4">
-            <div className="h-5 w-48 bg-[#EDE9FE] animate-pulse rounded-lg" />
+            <div className="h-5 w-48 bg-[#EEF3FF] animate-pulse rounded-lg" />
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((idx) => (
                 <div key={idx} className="h-12 w-full bg-[#FAF9FC] animate-pulse rounded-xl" />
@@ -1571,7 +1549,7 @@ export const AttendancePage: React.FC = () => {
                   {/* Card Header: Worker & Status */}
                   <div className="flex items-center justify-between gap-2 border-b border-[#EEEEF2] pb-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-9 w-9 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE] flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="h-9 w-9 rounded-xl bg-[#EEF3FF] border border-[#C4D9FD] flex items-center justify-center shrink-0 overflow-hidden">
                         {r.checkInPhoto ? (
                           <img
                             src={r.checkInPhoto}
@@ -1582,8 +1560,8 @@ export const AttendancePage: React.FC = () => {
                             }}
                           />
                         ) : (
-                          <span className="font-bold text-xs text-[#5B21B6]">
-                            {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#5B21B6]" />}
+                          <span className="font-bold text-xs text-[#1B2E79]">
+                            {name !== '—' ? name.charAt(0).toUpperCase() : <User className="h-4 w-4 text-[#1B2E79]" />}
                           </span>
                         )}
                       </div>
@@ -1591,7 +1569,7 @@ export const AttendancePage: React.FC = () => {
                         <h4 className="font-bold text-xs text-[#1F1F1F] truncate" title={name}>
                           {name}
                         </h4>
-                        <span className="font-mono text-[11px] text-[#5B21B6] font-semibold">
+                        <span className="font-mono text-[11px] text-[#1B2E79] font-semibold">
                           {safeVal(r.workerId)}
                         </span>
                       </div>
@@ -1610,7 +1588,7 @@ export const AttendancePage: React.FC = () => {
 
                     <div className="rounded-xl bg-[#FAF9FC] p-2.5 border border-[#EEEEF2]">
                       <span className="text-[10px] text-[#6B6B6B] font-mono block">AREA</span>
-                      <span className="font-mono text-[11px] font-semibold text-[#5B21B6] truncate block">
+                      <span className="font-mono text-[11px] font-semibold text-[#1B2E79] truncate block">
                         {safeVal(r.areaName)}
                       </span>
                     </div>
@@ -1668,7 +1646,7 @@ export const AttendancePage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleViewRecord(r)}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#EEF3FF] transition-colors cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       <span>View Details</span>
@@ -1683,67 +1661,20 @@ export const AttendancePage: React.FC = () => {
 
       {/* Windowed Pagination Controls */}
       {!isLoading && !apiError && totalRecords > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#EEEEF2] bg-white px-4 py-3 rounded-2xl shadow-soft-sm w-full">
-          <div className="text-xs text-[#6B6B6B]">
-            Showing <strong className="text-[#1F1F1F] font-mono">{startRecord}</strong> to{' '}
-            <strong className="text-[#1F1F1F] font-mono">{endRecord}</strong> of{' '}
-            <strong className="text-[#1F1F1F] font-mono">{totalRecords}</strong> records
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Previous Button */}
-            <button
-              type="button"
-              onClick={handlePrevious}
-              disabled={currentPage <= 1 || isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Previous Page"
-            >
-              <ChevronLeft className="h-3.5 w-3.5 text-[#6B6B6B]" />
-              <span>Previous</span>
-            </button>
-
-            {/* Windowed Page Numbers */}
-            {visiblePages.map((pageNum) => {
-              const isActive = pageNum === currentPage;
-              return (
-                <button
-                  key={pageNum}
-                  type="button"
-                  onClick={() => setCurrentPage(pageNum)}
-                  disabled={isLoading}
-                  className={`h-8 w-8 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
-                    isActive
-                      ? 'bg-[#5B21B6] text-white shadow-soft-xs'
-                      : 'border border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
-                  }`}
-                  title={`Page ${pageNum}`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-
-            {/* Trailing Ellipsis if more pages exist beyond current window */}
-            {hasMoreAfter && (
-              <span className="px-1 text-xs font-bold text-[#6B6B6B] select-none">
-                ...
-              </span>
-            )}
-
-            {/* Next Button */}
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={currentPage >= totalPages || isLoading}
-              className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] px-3.5 py-1.5 text-xs font-semibold text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              title="Next Page"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-3.5 w-3.5 text-[#6B6B6B]" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalRecords={totalRecords}
+          pageSize={pageSize}
+          startRecord={startRecord}
+          endRecord={endRecord}
+          onPageChange={(newPage) => {
+            setCurrentPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isLoading={isLoading}
+          recordLabel="records"
+        />
       )}
 
       {/* Attendance Detail Drawer */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Drawer } from '../common/Drawer';
 import { StatusBadge } from '../common/StatusBadge';
 import { getNestWorkerById, formatImageUrl, RawApiExpertDetail } from '../../services/api';
@@ -93,7 +93,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
       <div className="space-y-4 w-full max-w-full overflow-hidden">
         {/* Loading Indicator banner if fetching detailed data */}
         {isLoading && (
-          <div className="flex items-center gap-2 rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-2.5 text-xs text-[#5B21B6]">
+          <div className="flex items-center gap-2 rounded-xl bg-[#FAF9FC] border border-[#EEEEF2] p-2.5 text-xs text-[#1B2E79]">
             <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
             <span className="font-medium">Fetching complete live profile data...</span>
           </div>
@@ -101,9 +101,9 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
 
         {/* Header Profile Card */}
         <div className="flex items-center gap-3.5 sm:gap-4 rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 sm:p-4.5 w-full overflow-hidden">
-          <div className="h-16 w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EDE9FE] flex items-center justify-center relative">
-            <span className="font-bold text-xl text-[#5B21B6] select-none">
-              {fullName !== '—' ? fullName.charAt(0).toUpperCase() : <User className="h-8 w-8 text-[#5B21B6]" />}
+          <div className="h-16 w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-soft-sm bg-[#EEF3FF] flex items-center justify-center relative">
+            <span className="font-bold text-xl text-[#1B2E79] select-none">
+              {fullName !== '—' ? fullName.charAt(0).toUpperCase() : <User className="h-8 w-8 text-[#1B2E79]" />}
             </span>
             {avatarUrl ? (
               <img
@@ -136,8 +136,8 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
               )}
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#5B21B6] font-semibold truncate max-w-[180px]">
-                <MapPin className="h-3 w-3 text-[#5B21B6] shrink-0" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-white border border-[#EEEEF2] px-2.5 py-0.5 text-[10px] text-[#1B2E79] font-semibold truncate max-w-[180px]">
+                <MapPin className="h-3 w-3 text-[#1B2E79] shrink-0" />
                 <span className="truncate">{areaName}</span>
               </span>
               {data.gender && (
@@ -160,9 +160,9 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
               });
               onClose();
             }}
-            className="flex items-center justify-center gap-2 rounded-xl border border-[#EEEEF2] bg-white hover:bg-[#FAF9FC] hover:border-[#5B21B6]/30 text-[#1F1F1F] hover:text-[#5B21B6] px-4 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl border border-[#EEEEF2] bg-white hover:bg-[#FAF9FC] hover:border-[#1B2E79]/30 text-[#1F1F1F] hover:text-[#1B2E79] px-4 py-2.5 text-xs font-bold transition-all shadow-soft-sm active:scale-95 cursor-pointer"
           >
-            <Pencil className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Pencil className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             <span>Edit</span>
           </button>
 
@@ -175,7 +175,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
               });
               onClose();
             }}
-            className="flex items-center justify-center gap-2 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-4 py-2.5 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-4 py-2.5 text-xs font-bold transition-all shadow-soft-sm hover:shadow-soft-md active:scale-95 cursor-pointer"
           >
             <span>Full Profile</span>
             <ArrowRight className="h-3.5 w-3.5 shrink-0" />
@@ -185,7 +185,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
         {/* Location & Shift Details */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-3 shadow-soft-sm w-full overflow-hidden">
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] flex items-center gap-1.5">
-            <Radio className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Radio className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Location & Operations Telemetry
           </h4>
 
@@ -198,7 +198,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">BASE AREA</span>
-              <div className="font-mono text-[#5B21B6] font-bold mt-0.5 truncate">{areaName}</div>
+              <div className="font-mono text-[#1B2E79] font-bold mt-0.5 truncate">{areaName}</div>
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">SHIFT TIMING</span>
@@ -208,7 +208,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
             </div>
             <div className="rounded-xl bg-[#FAF9FC] p-3 border border-[#EEEEF2] min-w-0">
               <span className="text-[10px] text-[#6B6B6B] font-mono">REFERRED BY</span>
-              <div className="font-mono text-[#7C3AED] font-bold mt-0.5 truncate">{safeVal(data.referredBy)}</div>
+              <div className="font-mono text-[#162766] font-bold mt-0.5 truncate">{safeVal(data.referredBy)}</div>
             </div>
           </div>
         </div>
@@ -217,7 +217,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
         <div className="grid grid-cols-3 gap-2 w-full overflow-hidden">
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-3 text-center shadow-soft-sm min-w-0">
             <div className="text-[10px] text-[#6B6B6B] uppercase font-mono font-medium truncate">Salary</div>
-            <div className="text-sm sm:text-base font-bold font-mono text-[#5B21B6] mt-1 truncate">
+            <div className="text-sm sm:text-base font-bold font-mono text-[#1B2E79] mt-1 truncate">
               {monthlySalary ? `₹${Number(monthlySalary).toLocaleString('en-IN')}` : '—'}
             </div>
           </div>
@@ -238,7 +238,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
         {/* Identity & Verification Documents */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-2 text-xs shadow-soft-sm w-full overflow-hidden">
           <h4 className="font-bold text-[#1F1F1F] flex items-center gap-1.5 uppercase text-[11px] tracking-wider text-[#6B6B6B]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <ShieldCheck className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Identity & KYC Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
@@ -260,7 +260,7 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
         {/* Banking Information */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 space-y-2 text-xs shadow-soft-sm w-full overflow-hidden">
           <h4 className="font-bold text-[#1F1F1F] flex items-center gap-1.5 uppercase text-[11px] tracking-wider text-[#6B6B6B]">
-            <CreditCard className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <CreditCard className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             Bank Account Details
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
@@ -287,12 +287,12 @@ export const ExpertDetailDrawer: React.FC<ExpertDetailDrawerProps> = ({
         <div className="rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-2 text-xs w-full overflow-hidden">
           <h4 className="font-bold text-[#1F1F1F]">Direct Contact Information</h4>
           <div className="flex items-center gap-2 text-[#6B6B6B] min-w-0">
-            <Phone className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+            <Phone className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
             <span className="font-mono text-[#1F1F1F] font-medium truncate">{mobileNumber}</span>
           </div>
           {data.address && (
             <div className="flex items-start gap-2 text-[#6B6B6B] pt-1 min-w-0">
-              <MapPin className="h-3.5 w-3.5 text-[#5B21B6] shrink-0 mt-0.5" />
+              <MapPin className="h-3.5 w-3.5 text-[#1B2E79] shrink-0 mt-0.5" />
               <span className="text-[#1F1F1F] break-words">{safeVal(data.address)}</span>
             </div>
           )}

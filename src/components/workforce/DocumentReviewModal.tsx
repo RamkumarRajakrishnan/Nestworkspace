@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { WorkerDocument } from '../../types';
 import { useOperations } from '../../context/OperationsContext';
@@ -80,7 +80,7 @@ export const DocumentReviewModal: React.FC<DocumentReviewModalProps> = ({
               </button>
               <button
                 onClick={handleApprove}
-                className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-bold text-white hover:bg-[#4C1D95] flex items-center gap-1.5 shadow-soft-sm active:scale-95 transition-all"
+                className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-bold text-white hover:bg-[#13225C] flex items-center gap-1.5 shadow-soft-sm active:scale-95 transition-all"
               >
                 <Check className="h-3.5 w-3.5" /> Approve & Verify
               </button>
@@ -96,7 +96,7 @@ export const DocumentReviewModal: React.FC<DocumentReviewModalProps> = ({
             <div>
               <div className="text-xs text-[#6B6B6B]">Expert Name & ID</div>
               <div className="text-sm font-bold text-[#1F1F1F] mt-0.5">{document.workerName}</div>
-              <div className="text-xs font-mono text-[#5B21B6] font-semibold">{document.workerId}</div>
+              <div className="text-xs font-mono text-[#1B2E79] font-semibold">{document.workerId}</div>
             </div>
             <StatusBadge status={document.status} size="md" />
           </div>
@@ -108,7 +108,7 @@ export const DocumentReviewModal: React.FC<DocumentReviewModalProps> = ({
             </div>
             <div>
               <span className="text-[#6B6B6B] font-mono text-[10px]">POLICY / REGISTRATION ID</span>
-              <div className="font-mono text-[#5B21B6] font-bold mt-0.5">{document.documentNumber}</div>
+              <div className="font-mono text-[#1B2E79] font-bold mt-0.5">{document.documentNumber}</div>
             </div>
             <div className="pt-1">
               <span className="text-[#6B6B6B] font-mono text-[10px]">SUBMISSION DATE</span>
@@ -123,7 +123,7 @@ export const DocumentReviewModal: React.FC<DocumentReviewModalProps> = ({
 
         {/* Simulated Document Preview Area */}
         <div className="rounded-2xl border border-[#EEEEF2] bg-white p-6 text-center space-y-2 shadow-soft-sm">
-          <FileText className="mx-auto h-10 w-10 text-[#5B21B6]" />
+          <FileText className="mx-auto h-10 w-10 text-[#1B2E79]" />
           <div className="text-xs font-bold text-[#1F1F1F]">
             {document.type} — {document.documentNumber}.pdf
           </div>

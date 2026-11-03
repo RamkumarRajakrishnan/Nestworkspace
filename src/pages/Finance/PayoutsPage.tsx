@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useOperations } from '../../context/OperationsContext';
 import { WorkerPayout, PayoutStatus } from '../../types';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable, Column } from '../../components/common/DataTable';
+import { Pagination } from '../../components/common/Pagination';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { PayoutLedgerDrawer } from '../../components/finance/PayoutLedgerDrawer';
 import { SearchInput } from '../../components/common/SearchInput';
@@ -12,20 +13,22 @@ import {
   TrendingUp, 
   CheckCircle2, 
   Clock, 
-  FileText,
-  Eye,
-  Receipt,
-  AlertCircle,
-  Filter,
-  X,
-  ChevronDown,
-  ChevronUp
+  FileText, 
+  Eye, 
+  Receipt, 
+  AlertCircle, 
+  Filter, 
+  X, 
+  ChevronDown, 
+  ChevronUp 
 } from 'lucide-react';
 
 export const PayoutsPage: React.FC = () => {
   const { payouts, markets, approvePayout, addToast } = useOperations();
 
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState<number>(1);
+  const PAGE_SIZE = 15;
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
 
@@ -66,6 +69,7 @@ export const PayoutsPage: React.FC = () => {
   const handleApplyFilter = () => {
     setSelectedStatuses([...draftStatuses]);
     setSelectedMarkets([...draftMarkets]);
+    setPage(1);
     setIsFilterOpen(false);
   };
 
@@ -75,6 +79,7 @@ export const PayoutsPage: React.FC = () => {
     setDraftStatuses([]);
     setDraftMarkets([]);
     setSearch('');
+    setPage(1);
   };
 
   const activeFilterCount = useMemo(() => {
@@ -108,6 +113,14 @@ export const PayoutsPage: React.FC = () => {
       return true;
     });
   }, [payouts, search, selectedStatuses, selectedMarkets]);
+
+  const totalPages = Math.ceil(filteredPayouts.length / PAGE_SIZE) || 1;
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
+  const paginatedPayouts = useMemo(() => {
+    const startIndex = (safePage - 1) * PAGE_SIZE;
+    return filteredPayouts.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredPayouts, safePage]);
 
   const toggleItem = (list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     if (list.includes(item)) {
@@ -167,7 +180,7 @@ export const PayoutsPage: React.FC = () => {
     {
       header: 'Net Payable',
       render: (p) => (
-        <span className="font-mono font-bold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-lg">
+        <span className="font-mono font-bold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-lg">
           ₹{p.netPayable}
         </span>
       ),
@@ -185,7 +198,7 @@ export const PayoutsPage: React.FC = () => {
             e.stopPropagation();
             setSelectedPayout(p);
           }}
-          className="rounded-xl bg-[#5B21B6] text-white px-3 py-1.5 text-xs font-semibold hover:bg-[#4C1D95] shadow-soft-sm transition-all flex items-center gap-1.5 ml-auto active:scale-95"
+          className="rounded-xl bg-[#1B2E79] text-white px-3 py-1.5 text-xs font-semibold hover:bg-[#13225C] shadow-soft-sm transition-all flex items-center gap-1.5 ml-auto active:scale-95"
         >
           <Receipt className="h-3.5 w-3.5" /> Ledger Details
         </button>
@@ -209,7 +222,7 @@ export const PayoutsPage: React.FC = () => {
         {pendingApprovalsCount > 0 && (
           <button
             onClick={handleBatchApprove}
-            className="rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all active:scale-95 flex items-center gap-1.5"
+            className="rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all active:scale-95 flex items-center gap-1.5"
           >
             <CheckCircle2 className="h-4 w-4" />
             Approve All Pending ({pendingApprovalsCount})
@@ -262,7 +275,10 @@ export const PayoutsPage: React.FC = () => {
           <div className="w-full sm:max-w-md">
             <SearchInput
               value={search}
-              onChange={setSearch}
+              onChange={(val) => {
+                setSearch(val);
+                setPage(1);
+              }}
               placeholder="Search partner name or ID..."
               className="w-full"
             />
@@ -293,16 +309,16 @@ export const PayoutsPage: React.FC = () => {
               }}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-soft-sm active:scale-95 cursor-pointer ${
                 isFilterOpen || activeFilterCount > 0
-                  ? 'border-[#5B21B6] bg-[#EDE9FE] text-[#5B21B6]'
-                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EDE9FE] hover:text-[#5B21B6]'
+                  ? 'border-[#1B2E79] bg-[#EEF3FF] text-[#1B2E79]'
+                  : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] hover:bg-[#EEF3FF] hover:text-[#1B2E79]'
               }`}
               aria-expanded={isFilterOpen}
               aria-label="Toggle Filter Options"
             >
-              <Filter className="h-4 w-4 text-[#5B21B6]" />
+              <Filter className="h-4 w-4 text-[#1B2E79]" />
               <span>Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B21B6] text-[10px] font-bold text-white shadow-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B2E79] text-[10px] font-bold text-white shadow-xs">
                   {activeFilterCount}
                 </span>
               )}
@@ -319,11 +335,11 @@ export const PayoutsPage: React.FC = () => {
 
             {/* FLOATING FILTER POPOVER */}
             {isFilterOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-purple-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-3 sm:right-0 top-20 sm:top-full mt-2 z-50 w-auto sm:w-[380px] md:w-[420px] h-auto max-h-[85vh] flex flex-col rounded-2xl border border-[#EEEEF2] bg-white shadow-2xl shadow-blue-950/15 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Popover Header */}
                 <div className="flex items-center justify-between border-b border-[#EEEEF2] p-4 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#5B21B6]" />
+                    <Filter className="h-4 w-4 text-[#1B2E79]" />
                     <h3 className="text-sm font-bold text-[#1F1F1F]">Filter Payouts</h3>
                   </div>
                   <button
@@ -346,13 +362,13 @@ export const PayoutsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Settlement Status</span>
                         {draftStatuses.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftStatuses.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.status ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -370,7 +386,7 @@ export const PayoutsPage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftStatuses.includes(st)}
                                 onChange={() => toggleItem(draftStatuses, setDraftStatuses, st)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {st}
@@ -395,13 +411,13 @@ export const PayoutsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Nano-Market Zone</span>
                         {draftMarkets.length > 0 && (
-                          <span className="text-[10px] font-semibold text-[#5B21B6] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-[#1B2E79] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
                             {draftMarkets.length}
                           </span>
                         )}
                       </div>
                       {expandedSections.market ? (
-                        <ChevronUp className="h-4 w-4 text-[#5B21B6]" />
+                        <ChevronUp className="h-4 w-4 text-[#1B2E79]" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-[#6B6B6B]" />
                       )}
@@ -419,7 +435,7 @@ export const PayoutsPage: React.FC = () => {
                                 type="checkbox"
                                 checked={draftMarkets.includes(m.id)}
                                 onChange={() => toggleItem(draftMarkets, setDraftMarkets, m.id)}
-                                className="h-4 w-4 rounded border-[#DDD6FE] text-[#5B21B6] focus:ring-[#7C3AED] cursor-pointer accent-[#5B21B6]"
+                                className="h-4 w-4 rounded border-[#C4D9FD] text-[#1B2E79] focus:ring-[#162766] cursor-pointer accent-[#1B2E79]"
                               />
                               <span className="text-xs font-medium text-[#1F1F1F] select-none">
                                 {m.id} — {m.name}
@@ -450,7 +466,7 @@ export const PayoutsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleApplyFilter}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-5 py-2.5 text-xs font-bold shadow-soft-sm hover:shadow-soft-md active:scale-95 transition-all"
                   >
                     Apply ({draftMatchingCount} records)
                   </button>
@@ -467,11 +483,16 @@ export const PayoutsPage: React.FC = () => {
 
             {/* Status chips */}
             {selectedStatuses.map((st) => (
-              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={st} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Status: {st}
                 <button 
-                  onClick={() => setSelectedStatuses(selectedStatuses.filter((x) => x !== st))} 
-                  className="hover:text-rose-600 transition-colors"
+                  onClick={() => {
+                    setSelectedStatuses(selectedStatuses.filter((x) => x !== st));
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Status filter"
+                  aria-label="Remove Status filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -480,11 +501,16 @@ export const PayoutsPage: React.FC = () => {
 
             {/* Market chips */}
             {selectedMarkets.map((mId) => (
-              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#5B21B6]">
+              <span key={mId} className="inline-flex items-center gap-1.5 rounded-lg bg-[#FAF9FC] border border-[#C4D9FD] px-2.5 py-0.5 text-[11px] font-semibold text-[#1B2E79]">
                 Market: {mId}
                 <button 
-                  onClick={() => setSelectedMarkets(selectedMarkets.filter((x) => x !== mId))} 
-                  className="hover:text-rose-600 transition-colors"
+                  onClick={() => {
+                    setSelectedMarkets(selectedMarkets.filter((x) => x !== mId));
+                    setPage(1);
+                  }}
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
+                  title="Remove Market filter"
+                  aria-label="Remove Market filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -497,12 +523,27 @@ export const PayoutsPage: React.FC = () => {
       {/* Payouts Table */}
       <DataTable
         columns={columns}
-        data={filteredPayouts}
+        data={paginatedPayouts}
         keyExtractor={(p) => p.id}
         onRowClick={(p) => setSelectedPayout(p)}
         emptyTitle="No payouts found"
         emptyDescription="All expert financial ledgers have been disbursed or no records match filters."
       />
+
+      {/* Pagination Controls */}
+      {filteredPayouts.length > 0 && (
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalRecords={filteredPayouts.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          recordLabel="payouts"
+        />
+      )}
 
       {/* Ledger Drawer */}
       <PayoutLedgerDrawer

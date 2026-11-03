@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   X, 
   MapPin, 
@@ -119,7 +119,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
                   },
                 });
               }}
-              className="flex items-center gap-1.5 rounded-xl bg-[#5B21B6] hover:bg-[#4C1D95] text-white px-3.5 py-1.5 text-xs font-semibold shadow-soft-sm transition-all cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-[#1B2E79] hover:bg-[#13225C] text-white px-3.5 py-1.5 text-xs font-semibold shadow-soft-sm transition-all cursor-pointer"
             >
               <span>Full Market Console</span>
               <ChevronRight className="h-3.5 w-3.5" />
@@ -131,7 +131,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
       {/* Loading State */}
       {isLoading && (
         <div className="py-16 text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-[#5B21B6] mx-auto" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#1B2E79] mx-auto" />
           <div className="text-xs font-semibold text-[#1F1F1F]">Loading Market Details...</div>
           <p className="text-[11px] text-[#6B6B6B]">
             Fetching geographic telemetry and duration tiers from the network.
@@ -151,7 +151,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
           </p>
           <button
             onClick={handleRetry}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1B2E79] px-4 py-2 text-xs font-semibold text-white shadow-soft-sm hover:bg-[#13225C] transition-all cursor-pointer"
           >
             <RotateCw className="h-3.5 w-3.5" />
             <span>Retry</span>
@@ -165,7 +165,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
           {/* Header Status Badges */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-[#EEEEF2] bg-[#FAF9FC]">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-[#5B21B6] bg-[#EDE9FE] px-2.5 py-1 rounded-lg">
+              <span className="font-mono text-xs font-bold text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-1 rounded-lg">
                 {areaDetail.areaName}
               </span>
             </div>
@@ -186,7 +186,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
 
           {/* Section 1: Geographic Telemetry Grid */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#5B21B6]">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1B2E79]">
               <MapPin className="h-3.5 w-3.5" />
               <span>Geographic & Operational Telemetry</span>
             </div>
@@ -234,7 +234,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
               <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3">
                 <span className="text-[10px] font-mono uppercase text-[#6B6B6B]">Working Hours</span>
                 <div className="text-xs font-bold text-[#1F1F1F] mt-1 flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-[#5B21B6] shrink-0" />
+                  <Clock className="h-3.5 w-3.5 text-[#1B2E79] shrink-0" />
                   <span className="truncate">{areaDetail.workingHours || '—'}</span>
                 </div>
               </div>
@@ -260,8 +260,8 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
           {/* Section 2: Durations & Pricing Configuration */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#5B21B6]">
-                <span className="font-bold text-sm text-[#5B21B6] font-mono">₹</span>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1B2E79]">
+                <span className="font-bold text-sm text-[#1B2E79] font-mono">₹</span>
                 <span>Duration Tiers & Pricing ({durations.length})</span>
               </div>
             </div>
@@ -286,7 +286,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
                     </thead>
                     <tbody className="divide-y divide-[#EEEEF2]">
                       {durations.map((d, idx) => (
-                        <tr key={d.tableId || idx} className="hover:bg-[#F5F3FF]/40 transition-colors">
+                        <tr key={d.tableId || idx} className="hover:bg-[#F5F8FF]/40 transition-colors">
                           <td className="px-3.5 py-3 font-semibold text-[#1F1F1F]">
                             <div className="flex items-center gap-1.5">
                               <span className="font-mono text-[10px] text-[#6B6B6B]">#{d.sequence ?? idx + 1}</span>
@@ -302,7 +302,7 @@ export const MarketDetailDrawer: React.FC<MarketDetailDrawerProps> = ({
                           <td className="px-3.5 py-3 font-mono text-emerald-700 font-semibold">
                             {d.firstTimeUser != null ? `₹${d.firstTimeUser}` : '—'}
                           </td>
-                          <td className="px-3.5 py-3 font-mono text-[#7C3AED] font-semibold">
+                          <td className="px-3.5 py-3 font-mono text-[#162766] font-semibold">
                             {d.secoundtimeuser != null ? `₹${d.secoundtimeuser}` : '—'}
                           </td>
                           <td className="px-3.5 py-3 font-mono text-[#1F1F1F]">

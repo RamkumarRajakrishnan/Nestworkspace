@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Drawer } from '../common/Drawer';
 import { Booking } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
@@ -19,8 +19,8 @@ import {
 import { AssignWorkerModal } from './AssignWorkerModal';
 import { ReassignWorkerModal } from './ReassignWorkerModal';
 import { ConfirmDialog } from '../common/ConfirmDialog';
-import { cancelBooking } from '../../services/api';
-import { formatDurationInHours } from '../../services/bookingService';
+import { cancelBooking, getOrderDetails } from '../../services/api';
+import { formatDurationInHours, getBookingTimelineStages, mapApiBookingToBooking } from '../../services/bookingService';
 
 interface BookingDetailDrawerProps {
   booking: Booking | null;
@@ -41,8 +41,30 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
   const [showReassignModal, setShowReassignModal] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [liveDetails, setLiveDetails] = useState<Booking | null>(null);
+
+  // Dynamically fetch latest booking details including timestamps when drawer is open
+  useEffect(() => {
+    const tableId = booking?.tableId || booking?.id;
+    if (isOpen && tableId) {
+      getOrderDetails(tableId)
+        .then((res) => {
+          if (res.success && res.data) {
+            setLiveDetails(mapApiBookingToBooking(res.data));
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to fetch full order details in drawer:', err);
+        });
+    } else {
+      setLiveDetails(null);
+    }
+  }, [isOpen, booking?.tableId, booking?.id]);
 
   if (!booking) return null;
+
+  const currentBooking = liveDetails || booking;
+  const timelineStages = getBookingTimelineStages(currentBooking);
 
   const bookingIdDisplay = booking.bookingId || booking.id;
   const areaDisplay = booking.areaName || booking.areaId || 'Neo_Town';
@@ -124,7 +146,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
                 onClose();
               }
             }}
-            className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs font-semibold text-[#5B21B6] hover:bg-[#F5F3FF] transition-colors shadow-soft-sm active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl border border-[#EEEEF2] bg-white px-3 py-1.5 text-xs font-semibold text-[#1B2E79] hover:bg-[#F5F8FF] transition-colors shadow-soft-sm active:scale-95"
             title="Open Full Order Details Page"
           >
             <span>Order Details</span>
@@ -151,7 +173,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
               </div>
 
               <div className="text-right shrink-0">
-                <span className="text-base font-bold font-mono text-[#5B21B6]">₹{amountDisplay}</span>
+                <span className="text-base font-bold font-mono text-[#1B2E79]">₹{amountDisplay}</span>
                 <span className="block text-[10px] text-[#6B6B6B]">{durationDisplay} slot</span>
               </div>
             </div>
@@ -173,7 +195,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAssignModal(true)}
-                className="w-full rounded-xl bg-[#5B21B6] px-4 py-2.5 text-xs font-bold text-white shadow-soft-sm hover:bg-[#4C1D95] transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+                className="w-full rounded-xl bg-[#1B2E79] px-4 py-2.5 text-xs font-bold text-white shadow-soft-sm hover:bg-[#13225C] transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
               >
                 <Users className="h-3.5 w-3.5" />
                 Assign Expert
@@ -189,7 +211,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
               <span className="text-[#6B6B6B] font-mono text-xs shrink-0">{customerPhone}</span>
             </div>
             <div className="flex items-start gap-2 text-[#6B6B6B] pt-1 border-t border-[#F3F2F7]">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#5B21B6] mt-0.5" />
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#1B2E79] mt-0.5" />
               <span className="leading-relaxed break-words">{booking.address}</span>
             </div>
           </div>
@@ -198,7 +220,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 sm:p-5 space-y-3 shadow-soft-sm">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-[#1F1F1F] text-xs">Assigned Expert</h4>
-              <span className="font-mono text-xs font-bold text-[#5B21B6]">
+              <span className="font-mono text-xs font-bold text-[#1B2E79]">
                 {hasAssignedVendor || assignedWorkers.length > 0 ? '1 / 1 Expert' : '0 / 1 Expert'}
               </span>
             </div>
@@ -213,7 +235,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
                       className="h-9 w-9 rounded-full object-cover border border-white shadow-soft-sm"
                     />
                   ) : (
-                    <div className="h-9 w-9 rounded-full bg-[#EDE9FE] text-[#5B21B6] font-bold text-xs flex items-center justify-center border border-[#DDD6FE]">
+                    <div className="h-9 w-9 rounded-full bg-[#EEF3FF] text-[#1B2E79] font-bold text-xs flex items-center justify-center border border-[#C4D9FD]">
                       {booking.vendorName ? booking.vendorName.slice(0, 2).toUpperCase() : 'EX'}
                     </div>
                   )}
@@ -247,7 +269,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-[#DDD6FE] bg-[#FAF9FC] p-4 text-center text-xs text-[#B45309] font-medium">
+              <div className="rounded-xl border border-dashed border-[#C4D9FD] bg-[#FAF9FC] p-4 text-center text-xs text-[#B45309] font-medium">
                 No experts currently dispatched. Immediate assignment required.
               </div>
             )}
@@ -259,50 +281,48 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
               Dispatch & Fulfillment Timeline
             </h4>
             <div className="pt-1">
-              {booking.timeline && booking.timeline.length > 0 ? (
-                booking.timeline.map((event, idx) => {
-                  const isLast = idx === (booking.timeline?.length ?? 1) - 1;
-                  return (
-                    <div key={idx} className="flex gap-3 text-xs">
-                      {/* Timeline dot and connecting line */}
-                      <div className="flex flex-col items-center shrink-0">
-                        <div className="h-3 w-3 rounded-full bg-[#5B21B6] ring-4 ring-[#EDE9FE] shrink-0 mt-0.5" />
-                        {!isLast && (
-                          <div className="w-0.5 grow bg-[#EDE9FE] min-h-[26px] my-1" />
-                        )}
-                      </div>
+              {timelineStages.map((stage, idx) => {
+                const isLast = idx === timelineStages.length - 1;
+                const isCompleted = stage.isCompleted;
+                return (
+                  <div key={stage.key} className="flex gap-3 text-xs">
+                    {/* Timeline dot and connecting line */}
+                    <div className="flex flex-col items-center shrink-0">
+                      <div
+                        className={`h-3 w-3 rounded-full shrink-0 mt-0.5 ${
+                          isCompleted
+                            ? 'bg-[#1B2E79] ring-4 ring-[#EEF3FF]'
+                            : 'bg-[#D1D5DB] ring-4 ring-[#F3F4F6]'
+                        }`}
+                      />
+                      {!isLast && (
+                        <div
+                          className={`w-0.5 grow min-h-[26px] my-1 ${
+                            isCompleted ? 'bg-[#1B2E79]' : 'bg-[#E5E7EB]'
+                          }`}
+                        />
+                      )}
+                    </div>
 
-                      {/* Content */}
-                      <div className={`flex-1 ${!isLast ? 'pb-4' : 'pb-0'}`}>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          <span className="font-mono text-[11px] text-[#6B6B6B] shrink-0">{event.time}</span>
-                          <span className="font-bold text-xs text-[#1F1F1F]">{event.title}</span>
-                        </div>
-                        {event.description && (
-                          <p className="mt-1 text-xs text-[#6B6B6B] leading-relaxed break-words">
-                            {event.description}
-                          </p>
-                        )}
+                    {/* Content */}
+                    <div className={`flex-1 ${!isLast ? 'pb-4' : 'pb-0'}`}>
+                      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
+                        <span className="font-bold text-xs text-[#1F1F1F]">{stage.title}</span>
+                        <span
+                          className={`font-mono text-[11px] ${
+                            isCompleted ? 'text-[#1B2E79] font-semibold' : 'text-[#9CA3AF] italic'
+                          }`}
+                        >
+                          {stage.timeDisplay}
+                        </span>
                       </div>
+                      <p className="mt-1 text-xs text-[#6B6B6B] leading-relaxed break-words">
+                        {stage.description}
+                      </p>
                     </div>
-                  );
-                })
-              ) : (
-                <div className="flex gap-3 text-xs">
-                  <div className="flex flex-col items-center shrink-0">
-                    <div className="h-3 w-3 rounded-full bg-[#5B21B6] ring-4 ring-[#EDE9FE] shrink-0 mt-0.5" />
                   </div>
-                  <div className="flex-1 pb-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] text-[#6B6B6B]">Live Status</span>
-                      <span className="font-bold text-xs text-[#1F1F1F]">{booking.bookingStatus || 'Active'}</span>
-                    </div>
-                    <p className="mt-1 text-xs text-[#6B6B6B] leading-relaxed">
-                      SLA Status: {booking.slaTimer} ({booking.slaAlert})
-                    </p>
-                  </div>
-                </div>
-              )}
+                );
+              })}
             </div>
           </div>
         </div>
