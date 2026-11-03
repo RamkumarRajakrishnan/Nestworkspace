@@ -24,16 +24,19 @@ export interface DynamicTimelineStage {
   timeDisplay: string;
   isCompleted: boolean;
   description: string;
+  date?: Date;
 }
 
-export const formatTimelineTimestamp = (rawTime?: string | number | null): { formatted: string; isValid: boolean } => {
+export const formatTimelineTimestamp = (rawTime?: string | number | Date | null): { formatted: string; isValid: boolean; date?: Date } => {
   if (!rawTime || rawTime === 'null' || rawTime === 'undefined') {
     return { formatted: 'Pending', isValid: false };
   }
 
   try {
     let d: Date;
-    if (typeof rawTime === 'number') {
+    if (rawTime instanceof Date) {
+      d = rawTime;
+    } else if (typeof rawTime === 'number') {
       d = new Date(rawTime);
     } else {
       const trimmed = String(rawTime).trim();
@@ -60,7 +63,7 @@ export const formatTimelineTimestamp = (rawTime?: string | number | null): { for
       hour12: true,
     });
 
-    return { formatted: `${datePart}, ${timePart}`, isValid: true };
+    return { formatted: `${datePart}, ${timePart}`, isValid: true, date: d };
   } catch {
     return { formatted: 'Pending', isValid: false };
   }
@@ -68,6 +71,13 @@ export const formatTimelineTimestamp = (rawTime?: string | number | null): { for
 
 export const getBookingTimelineStages = (booking: Partial<Booking> | any): DynamicTimelineStage[] => {
   if (!booking) return [];
+
+  const rawStatus = String(booking.bookingStatus || booking.status || '').trim().toLowerCase();
+  const isCompletedStatus = rawStatus === 'completed';
+  const isCancelledStatus = rawStatus === 'cancelled';
+  const isOngoingOrStarted = rawStatus === 'ongoing' || rawStatus === 'in progress' || rawStatus === 'started';
+  const isAssignedStatus = rawStatus === 'assigned';
+  const hasAssignedVendor = Boolean(booking.vendorName || booking.vendorId);
 
   const createdTime = booking.createdTime || booking.createdAt || null;
   const requestedTime = booking.requestedTime || null;
@@ -84,46 +94,103 @@ export const getBookingTimelineStages = (booking: Partial<Booking> | any): Dynam
   const vendorDisplay = booking.vendorName || booking.vendorId ? `Expert ${booking.vendorName || booking.vendorId}` : 'Expert';
   const serviceDisplay = booking.service || 'Service';
 
+  // 1. Created stage
+  const isCreatedCompleted = createdInfo.isValid;
+
+  // 2. Requested stage
+  const isRequestedCompleted = requestedInfo.isValid;
+
+  // 3. Assigned stage
+  const isAssignedCompleted = assignedInfo.isValid || hasAssignedVendor || isAssignedStatus || isOngoingOrStarted || isCompletedStatus;
+
+  // 4. Started stage
+  const isStartedCompleted = (isOngoingOrStarted || isCompletedStatus) && startedInfo.isValid;
+
+  // 5. Completed stage:
+  // Strictly requires bookingStatus to be 'completed' (and valid completion timestamp).
+  // If the booking is ongoing, completedTime represents the estimated completion time (e.g. 5:16 pm), NOT a finished stage.
+  const isCompletedCompleted = isCompletedStatus && completedInfo.isValid;
+
+  // Dynamic descriptions
+  const createdDescription = isCreatedCompleted
+    ? 'Booking successfully created in system'
+    : 'Pending creation';
+
+  const requestedDescription = isRequestedCompleted
+    ? `Customer requested ${serviceDisplay} booking`
+    : 'Pending request confirmation';
+
+  const assignedDescription = isAssignedCompleted
+    ? `${vendorDisplay} assigned to booking`
+    : 'Awaiting expert assignment';
+
+  let startedDescription = 'Service not yet started';
+  if (isStartedCompleted) {
+    startedDescription = `Service job commenced by ${vendorDisplay}`;
+  } else if (startedInfo.isValid) {
+    const timeOnly = startedInfo.date
+      ? startedInfo.date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
+      : startedInfo.formatted;
+    startedDescription = `Scheduled start at ${timeOnly}`;
+  }
+
+  let completedDescription = 'Pending completion';
+  if (isCompletedCompleted) {
+    completedDescription = 'Order fulfillment completed successfully';
+  } else if (isCancelledStatus) {
+    completedDescription = 'Booking cancelled';
+  } else if (completedInfo.isValid) {
+    const timeOnly = completedInfo.date
+      ? completedInfo.date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
+      : completedInfo.formatted;
+    completedDescription = `Expected completion by ${timeOnly}`;
+  }
+
   return [
     {
       key: 'created',
       title: 'Created',
       rawTime: createdTime,
       timeDisplay: createdInfo.formatted,
-      isCompleted: createdInfo.isValid,
-      description: createdInfo.isValid ? 'Booking successfully created in system' : 'Pending creation',
+      isCompleted: isCreatedCompleted,
+      description: createdDescription,
+      date: createdInfo.date,
     },
     {
       key: 'requested',
       title: 'Requested',
       rawTime: requestedTime,
       timeDisplay: requestedInfo.formatted,
-      isCompleted: requestedInfo.isValid,
-      description: requestedInfo.isValid ? `Customer requested ${serviceDisplay} booking` : 'Pending request confirmation',
+      isCompleted: isRequestedCompleted,
+      description: requestedDescription,
+      date: requestedInfo.date,
     },
     {
       key: 'assigned',
       title: 'Assigned',
       rawTime: assignedTime,
       timeDisplay: assignedInfo.formatted,
-      isCompleted: assignedInfo.isValid,
-      description: assignedInfo.isValid ? `${vendorDisplay} assigned to booking` : 'Awaiting expert assignment',
+      isCompleted: isAssignedCompleted,
+      description: assignedDescription,
+      date: assignedInfo.date,
     },
     {
       key: 'started',
       title: 'Started',
       rawTime: startedTime,
       timeDisplay: startedInfo.formatted,
-      isCompleted: startedInfo.isValid,
-      description: startedInfo.isValid ? `Service job commenced by ${vendorDisplay}` : 'Service not yet started',
+      isCompleted: isStartedCompleted,
+      description: startedDescription,
+      date: startedInfo.date,
     },
     {
       key: 'completed',
       title: 'Completed',
       rawTime: completedTime,
       timeDisplay: completedInfo.formatted,
-      isCompleted: completedInfo.isValid,
-      description: completedInfo.isValid ? 'Order fulfillment completed successfully' : 'Pending completion',
+      isCompleted: isCompletedCompleted,
+      description: completedDescription,
+      date: completedInfo.date,
     },
   ];
 };
@@ -131,7 +198,7 @@ export const getBookingTimelineStages = (booking: Partial<Booking> | any): Dynam
 export const mapApiBookingToBooking = (item: any): Booking => {
   const durationNum = parseInt(item.duration, 10) || 60;
   const amountVal = item.totalAmount !== undefined && item.totalAmount !== '' ? item.totalAmount : '—';
-  
+
   let dateStr = 'Today';
   let timeStr = '09:00 AM';
   if (item.requestedTime) {
@@ -168,6 +235,12 @@ export const mapApiBookingToBooking = (item: any): Booking => {
 
   const assignedIds: string[] = item.vendorId ? [item.vendorId] : [];
 
+  const rawCustomerRating = item.customeRating ?? item.customerRating ?? item.rating;
+  const parsedCustomerRating =
+    rawCustomerRating !== undefined && rawCustomerRating !== '' && rawCustomerRating !== null && !isNaN(Number(rawCustomerRating))
+      ? Number(rawCustomerRating)
+      : undefined;
+
   const dynamicTimeline = getBookingTimelineStages({ ...item, service: serviceName });
   const timelineEvents = dynamicTimeline.map((s) => ({
     time: s.timeDisplay,
@@ -184,8 +257,11 @@ export const mapApiBookingToBooking = (item: any): Booking => {
       name: item.customerName || item.vendorName || '—',
       phone: item.customerPhone || '—',
       email: item.customerEmail || '',
-      rating: 4.9,
+      rating: parsedCustomerRating,
     },
+    customerRating: parsedCustomerRating,
+    customeRating: rawCustomerRating !== undefined ? rawCustomerRating : '',
+    rating: parsedCustomerRating,
     service: serviceName,
     address: item.address || '—',
     areaId: item.areaName || 'Neo_Town',
@@ -201,8 +277,8 @@ export const mapApiBookingToBooking = (item: any): Booking => {
     priority: item.slaAlert === 'SLA Risk' ? 'High' : 'Normal',
     slaSecondsRemaining: slaSec,
     slaTargetMinutes: 30,
-    lat: 12.8452,
-    lng: 77.6602,
+    lat: item.latitude !== undefined && item.latitude !== '' && !isNaN(Number(item.latitude)) ? Number(item.latitude) : 0,
+    lng: item.longitude !== undefined && item.longitude !== '' && !isNaN(Number(item.longitude)) ? Number(item.longitude) : 0,
     amount: amountVal,
     totalAmount: amountVal,
     paymentStatus: item.paymentStatus || 'Success',
@@ -220,6 +296,8 @@ export const mapApiBookingToBooking = (item: any): Booking => {
     customerName: item.customerName || item.vendorName || '—',
     customerPhone: item.customerPhone || '—',
     customerEmail: item.customerEmail || '',
+    passbooking: item.passbooking ?? item.passBooking,
+    passId: item.passId ?? item.passid,
     timeline: timelineEvents,
     rawMessage: typeof item === 'object' && item !== null ? item : {},
   };

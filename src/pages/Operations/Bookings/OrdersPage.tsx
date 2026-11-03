@@ -23,7 +23,8 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Calendar
+  Calendar,
+  Star
 } from 'lucide-react';
 
 const REFRESH_INTERVAL_MS = 1 * 60 * 1000; // 1 minute (auto-refresh every 60s)
@@ -864,7 +865,12 @@ export const OrdersPage: React.FC = () => {
   // Table Columns Definition: Headings and content alignment strictly match
   const columns: Column<Booking>[] = [
     {
-      header: 'Booking ID',
+      header: (
+        <div className="leading-tight">
+          <div>Booking</div>
+          <div>ID</div>
+        </div>
+      ),
       accessor: 'id',
       align: 'left',
       render: (b) => (
@@ -874,7 +880,11 @@ export const OrdersPage: React.FC = () => {
       ),
     },
     {
-      header: 'Customer',
+      header: (
+        <div className="leading-tight">
+          <div>Customer</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => {
         const name = b.customerName || b.customer?.name || b.vendorName || '—';
@@ -891,7 +901,12 @@ export const OrdersPage: React.FC = () => {
     },
     {
       // Requirement: service type as instant or schedule fetch from api
-      header: 'Service Type',
+      header: (
+        <div className="leading-tight">
+          <div>Service</div>
+          <div>Type</div>
+        </div>
+      ),
       accessor: 'service',
       align: 'left',
       render: (b) => {
@@ -914,7 +929,12 @@ export const OrdersPage: React.FC = () => {
       },
     },
     {
-      header: 'Area / Nano-Market',
+      header: (
+        <div className="leading-tight">
+          <div>Area /</div>
+          <div>Nano-Market</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => (
         <div className="text-left">
@@ -927,7 +947,12 @@ export const OrdersPage: React.FC = () => {
     },
     {
       // Requirement: in schedule time we have duration also remove it, and put time below date
-      header: 'Scheduled Time',
+      header: (
+        <div className="leading-tight">
+          <div>Scheduled</div>
+          <div>Time</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => {
         const { dateStr, timeStr } = formatScheduledDateTime(b.requestedTime, b.date, b.startTime);
@@ -945,7 +970,11 @@ export const OrdersPage: React.FC = () => {
     },
     {
       // Requirement: for duration colum convert it into hours
-      header: 'Duration',
+      header: (
+        <div className="leading-tight">
+          <div>Duration</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => {
         const durationHours = formatDurationInHours(b.duration || b.durationMinutes);
@@ -957,7 +986,35 @@ export const OrdersPage: React.FC = () => {
       },
     },
     {
-      header: 'Payment',
+      header: (
+        <div className="leading-tight">
+          <div>Customer</div>
+          <div>Rating</div>
+        </div>
+      ),
+      align: 'left',
+      render: (b) => {
+        const raw = b.customerRating ?? b.customeRating ?? b.customer?.rating ?? b.rating;
+        const ratingNum = raw !== undefined && raw !== '' && raw !== null && !isNaN(Number(raw)) ? Number(raw) : null;
+        if (ratingNum === null) {
+          return <span className="font-mono text-xs text-[#9CA3AF] select-none">—</span>;
+        }
+        return (
+          <div className="text-left font-mono text-xs font-semibold">
+            <span className="inline-flex items-center gap-0.5 bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg text-xs font-bold font-mono shadow-soft-xs">
+              <span>{ratingNum}</span>
+              <Star className="h-3 w-3 fill-amber-400 text-amber-500 shrink-0" />
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      header: (
+        <div className="leading-tight">
+          <div>Payment</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => {
         const amt = b.totalAmount !== undefined && b.totalAmount !== '' ? b.totalAmount : b.amount;
@@ -975,7 +1032,11 @@ export const OrdersPage: React.FC = () => {
       },
     },
     {
-      header: 'Status',
+      header: (
+        <div className="leading-tight">
+          <div>Status</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => {
         let statusValue = b.bookingStatus || b.status;
@@ -991,7 +1052,11 @@ export const OrdersPage: React.FC = () => {
       },
     },
     {
-      header: 'SLA',
+      header: (
+        <div className="leading-tight">
+          <div>SLA</div>
+        </div>
+      ),
       align: 'left',
       render: (b) => {
         const timer = b.slaTimer;
@@ -1019,7 +1084,11 @@ export const OrdersPage: React.FC = () => {
       },
     },
     {
-      header: 'Actions',
+      header: (
+        <div className="leading-tight text-right">
+          <div>Actions</div>
+        </div>
+      ),
       align: 'right',
       render: (b) => {
         const showAssign = canAssignExpert(b);
@@ -1928,8 +1997,8 @@ export const OrdersPage: React.FC = () => {
                     <p className="text-[11px] text-[#6B6B6B] truncate">{b.address}</p>
                   </div>
 
-                  {/* Key Metrics Row: Slot, Duration, SLA */}
-                  <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-white/70 p-2 text-center text-xs">
+                  {/* Key Metrics Row: Slot, Duration, Customer Rating, SLA */}
+                  <div className="grid grid-cols-4 gap-1.5 rounded-xl bg-white/70 p-2 text-center text-xs">
                     <div>
                       <span className="text-[10px] text-[#6B6B6B] block">Slot</span>
                       <span className="font-mono font-semibold text-[#1F1F1F] text-[11px] block truncate">
@@ -1943,6 +2012,22 @@ export const OrdersPage: React.FC = () => {
                       <span className="text-[10px] text-[#6B6B6B] block">Duration</span>
                       <span className="font-mono font-bold text-[11px] text-[#1F1F1F] block">
                         {durationHours}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-[#6B6B6B] block">Rating</span>
+                      <span className="font-mono font-bold text-[11px] block">
+                        {(() => {
+                          const rawR = b.customerRating ?? b.customeRating ?? b.customer?.rating ?? b.rating;
+                          const rNum = rawR !== undefined && rawR !== '' && rawR !== null && !isNaN(Number(rawR)) ? Number(rawR) : null;
+                          if (rNum === null) return <span className="text-[#9CA3AF] font-normal">—</span>;
+                          return (
+                            <span className="inline-flex items-center gap-0.5 text-amber-700">
+                              <span>{rNum}</span>
+                              <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500 shrink-0" />
+                            </span>
+                          );
+                        })()}
                       </span>
                     </div>
                     <div>

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatDurationInHours } from '../../services/bookingService';
+import { CoordinatesMiniMap } from './CoordinatesMiniMap';
 
 interface DynamicKeyValueRendererProps {
   data: Record<string, any>;
@@ -30,6 +31,8 @@ interface DynamicKeyValueRendererProps {
  * Default list of keys that are already displayed in the top Booking Overview,
  * Assigned Expert card, and Dispatch & Fulfillment Timeline cards.
  * We normalize and filter these out so only new/additional API fields are shown.
+ * Note: 'otp' is explicitly excluded per user request.
+ * 'totalamount' and 'duration' are kept to display dynamically in their respective cards.
  */
 const DEFAULT_ALREADY_DISPLAYED_KEYS = new Set([
   'tableid',
@@ -51,10 +54,6 @@ const DEFAULT_ALREADY_DISPLAYED_KEYS = new Set([
   'customernotes',
   'date',
   'starttime',
-  'duration',
-  'durationminutes',
-  'totalamount',
-  'amount',
   'paymentstatus',
   'slatimer',
   'slaalert',
@@ -70,22 +69,7 @@ const DEFAULT_ALREADY_DISPLAYED_KEYS = new Set([
   'updatedat',
   'timeline',
   'rawmessage',
-  // Excluded per user request: dont show these fields (Payment breakdown, Service buffer, Customer additional)
-  'paymentmethod',
-  'surgeamount',
-  'platformfee',
-  'baseprice',
-  'tips',
-  'extendedamount',
-  'refundstatus',
-  'coupon',
-  'walletusage',
-  'paymentid',
-  'extendedpaymentid',
-  'extendedduration',
-  'bufferminutes',
-  'customeremail',
-  'email',
+  'otp', // explicitly excluded per user requirement ("in Verification, Quality & Codes dont show otp option")
 ]);
 
 /**
@@ -96,22 +80,8 @@ export const formatFieldLabel = (key: string): string => {
   if (!key) return '';
 
   const knownMap: Record<string, string> = {
-    paymentid: 'Payment ID',
-    paymentId: 'Payment ID',
-    extendedpaymentid: 'Extended Payment ID',
-    extendedpaymentId: 'Extended Payment ID',
-    extendedPaymentId: 'Extended Payment ID',
-    passid: 'Pass ID',
-    passId: 'Pass ID',
-    passbooking: 'Pass Booking',
-    passBooking: 'Pass Booking',
-    otp: 'OTP',
-    jobcompletedby: 'Job Completed By',
-    jobCompletedBy: 'Job Completed By',
-    visitphoto: 'Visit Photo',
-    visitPhoto: 'Visit Photo',
-    workeravailableafter: 'Worker Available After',
-    workerAvailableAfter: 'Worker Available After',
+    totalamount: 'Total Amount',
+    totalAmount: 'Total Amount',
     baseprice: 'Base Price',
     basePrice: 'Base Price',
     surgeamount: 'Surge Amount',
@@ -128,12 +98,33 @@ export const formatFieldLabel = (key: string): string => {
     bufferMinutes: 'Buffer Minutes',
     refundstatus: 'Refund Status',
     refundStatus: 'Refund Status',
+    paymentmethod: 'Payment Method',
+    paymentMethod: 'Payment Method',
+    paymentid: 'Payment ID',
+    paymentId: 'Payment ID',
+    extendedpaymentid: 'Extended Payment ID',
+    extendedpaymentId: 'Extended Payment ID',
+    extendedPaymentId: 'Extended Payment ID',
+    passid: 'Pass ID',
+    passId: 'Pass ID',
+    passbooking: 'Pass Booking',
+    passBooking: 'Pass Booking',
     customeremail: 'Customer Email',
     customerEmail: 'Customer Email',
     assignmentstatus: 'Assignment Status',
     assignmentStatus: 'Assignment Status',
     assignmenttype: 'Assignment Type',
     assignmentType: 'Assignment Type',
+    jobcompletedby: 'Job Completed By',
+    jobCompletedBy: 'Job Completed By',
+    visitphoto: 'Visit Photo',
+    visitPhoto: 'Visit Photo',
+    workeravailableafter: 'Worker Available After',
+    workerAvailableAfter: 'Worker Available After',
+    vendorlatitude: 'Vendor Latitude',
+    vendorLatitude: 'Vendor Latitude',
+    vendorlongitude: 'Vendor Longitude',
+    vendorLongitude: 'Vendor Longitude',
   };
 
   if (knownMap[key]) {
@@ -244,25 +235,25 @@ const CATEGORIES: CategoryDef[] = [
     id: 'payment',
     title: 'Payment & Billing Breakdown',
     icon: <CreditCard className="h-4 w-4 text-[#1B2E79]" />,
-    matcher: (k) => /payment|basePrice|surgeAmount|platformFee|tips|walletUsage|refundStatus|coupon|amount|price|fee|cost/i.test(k),
+    matcher: (k) => /payment|amount|price|surge|platformfee|tips|wallet|refund|coupon/i.test(k),
   },
   {
     id: 'service',
     title: 'Service & Buffer Specifications',
     icon: <Clock className="h-4 w-4 text-[#1B2E79]" />,
-    matcher: (k) => /duration|bufferMinutes|extendedDuration|extendedAmount|slot/i.test(k),
+    matcher: (k) => /duration|buffer/i.test(k),
   },
   {
     id: 'vendor',
     title: 'Dispatch & Assignment Details',
     icon: <UserCheck className="h-4 w-4 text-[#1B2E79]" />,
-    matcher: (k) => /vendor|worker|expert|assignmentStatus|assignmentType|jobCompletedBy|workerAvailableAfter/i.test(k),
+    matcher: (k) => /assignment|jobcompletedby|workeravailable|vendorlat|vendorlong/i.test(k),
   },
   {
     id: 'quality',
     title: 'Verification, Quality & Codes',
     icon: <ShieldCheck className="h-4 w-4 text-[#1B2E79]" />,
-    matcher: (k) => /rating|review|otp|visitPhoto|slaTimer|slaAlert|sla/i.test(k),
+    matcher: (k) => /rating|review|visitphoto/i.test(k),
   },
   {
     id: 'pass',
@@ -274,13 +265,13 @@ const CATEGORIES: CategoryDef[] = [
     id: 'customer',
     title: 'Customer Details (Additional)',
     icon: <User className="h-4 w-4 text-[#1B2E79]" />,
-    matcher: (k) => /customer|email/i.test(k),
+    matcher: (k) => /email/i.test(k),
   },
   {
     id: 'location',
     title: 'Location Coordinates',
     icon: <MapPin className="h-4 w-4 text-[#1B2E79]" />,
-    matcher: (k) => /latitude|longitude|lat|lng|pincode|postalCode|landmark/i.test(k),
+    matcher: (k) => /^(latitude|longitude|lat|lng)$/i.test(k),
   },
 ];
 
@@ -313,6 +304,9 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
       DEFAULT_ALREADY_DISPLAYED_KEYS.forEach((k) => excluded.add(k));
     }
     customExcludeKeys.forEach((k) => excluded.add(k.toLowerCase().trim()));
+
+    // Never show OTP
+    excluded.add('otp');
 
     return Object.keys(data).filter((k) => !excluded.has(k.toLowerCase().trim()));
   }, [data, excludeAlreadyDisplayed, customExcludeKeys]);
@@ -357,6 +351,11 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
   }, [displayableKeys]);
 
   const renderFieldValue = (key: string, value: any) => {
+    // 0. Explicitly suppress OTP per user request
+    if (key.toLowerCase() === 'otp') {
+      return null;
+    }
+
     // 1. Null / Empty
     if (value === null || value === undefined || value === '' || value === 'null' || value === 'undefined') {
       return <span className="text-[#9CA3AF] font-mono select-none">—</span>;
@@ -439,7 +438,7 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
     }
 
     // 6. Coordinates (Lat / Lng)
-    if (/^(latitude|lat)$/i.test(key)) {
+    if (/^(latitude|lat|vendorlatitude)$/i.test(key)) {
       return (
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs font-semibold text-[#1F1F1F]">{value}°</span>
@@ -447,7 +446,7 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
         </div>
       );
     }
-    if (/^(longitude|lng)$/i.test(key)) {
+    if (/^(longitude|lng|vendorlongitude)$/i.test(key)) {
       return (
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs font-semibold text-[#1F1F1F]">{value}°</span>
@@ -477,16 +476,7 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
       );
     }
 
-    // 9. OTP
-    if (/^otp$/i.test(key)) {
-      return (
-        <span className="font-mono font-bold tracking-widest text-xs text-[#1B2E79] bg-[#EEF3FF] px-2.5 py-1 rounded-lg border border-[#C4D9FD] inline-block shadow-soft-sm">
-          {value}
-        </span>
-      );
-    }
-
-    // 10. Rating
+    // 9. Rating
     if (/^rating$/i.test(key) && !isNaN(Number(value))) {
       return (
         <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
@@ -495,12 +485,12 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
       );
     }
 
-    // 11. Status fields
+    // 10. Status fields
     if (/status$/i.test(key) && typeof value === 'string') {
       return <StatusBadge status={value} size="sm" />;
     }
 
-    // 12. IDs and Long Tokens (with copy button)
+    // 11. IDs and Long Tokens (with copy button)
     if (/id$/i.test(key) && typeof value === 'string' && value.length > 5) {
       const isCopied = copiedKey === key;
       return (
@@ -519,7 +509,7 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
       );
     }
 
-    // 13. Nested Object / Array
+    // 12. Nested Object / Array
     if (typeof value === 'object' && value !== null) {
       return (
         <pre className="font-mono text-[11px] bg-[#FAF9FC] p-2 rounded-lg border border-[#EEEEF2] overflow-x-auto text-[#1F1F1F] max-h-32">
@@ -528,7 +518,7 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
       );
     }
 
-    // 14. Plain strings & numbers
+    // 13. Plain strings & numbers
     return (
       <div className="text-xs text-[#1F1F1F] font-medium leading-relaxed break-words">
         {String(value)}
@@ -582,26 +572,48 @@ export const DynamicKeyValueRenderer: React.FC<DynamicKeyValueRendererProps> = (
 
               {/* Section Fields Grid */}
               {!isCollapsed && (
-                <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {section.keys.map((key) => {
-                    const label = formatFieldLabel(key);
-                    const val = data[key];
-                    return (
-                      <div
-                        key={key}
-                        className="rounded-xl border border-[#F3F3F6] bg-[#FAF9FC]/60 p-3 space-y-1 hover:border-[#C4D9FD] hover:bg-white transition-all"
-                      >
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="font-mono text-[10px] uppercase tracking-wider text-[#6B6B6B] truncate">
-                            {label}
-                          </span>
+                <div className="p-5 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {section.keys.map((key) => {
+                      const label = formatFieldLabel(key);
+                      const val = data[key];
+                      return (
+                        <div
+                          key={key}
+                          className="rounded-xl border border-[#F3F3F6] bg-[#FAF9FC]/60 p-3 space-y-1 hover:border-[#C4D9FD] hover:bg-white transition-all"
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-mono text-[10px] uppercase tracking-wider text-[#6B6B6B] truncate" title={key}>
+                              {label}
+                            </span>
+                            <span className="font-mono text-[9px] text-[#9CA3AF] opacity-60">
+                              {key}
+                            </span>
+                          </div>
+                          <div className="pt-0.5">
+                            {renderFieldValue(key, val)}
+                          </div>
                         </div>
-                        <div className="pt-0.5">
-                          {renderFieldValue(key, val)}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  {/* Option below the coordinates to show map with that latlongs */}
+                  {section.id === 'location' && (() => {
+                    const lat = parseFloat(data.latitude ?? data.lat);
+                    const lng = parseFloat(data.longitude ?? data.lng);
+                    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                      return (
+                        <CoordinatesMiniMap
+                          latitude={lat}
+                          longitude={lng}
+                          address={typeof data.address === 'string' ? data.address : undefined}
+                          defaultExpanded={true}
+                        />
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               )}
             </div>

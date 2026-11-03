@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Drawer } from '../common/Drawer';
 import { Booking } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
+import { RoyalPassBadge } from '../common/RoyalPassBadge';
 import { useOperations } from '../../context/OperationsContext';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -14,6 +15,7 @@ import {
   ArrowRight,
   UserCheck,
   Ban,
+  Ticket,
   RefreshCw
 } from 'lucide-react';
 import { AssignWorkerModal } from './AssignWorkerModal';
@@ -86,6 +88,26 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
   const activeAssignment = assignments.find((a) => a.bookingId === booking.id || a.bookingId === booking.bookingId);
   const hasAssignedVendor = Boolean(booking.vendorName || booking.vendorId);
 
+  const isPassBooking = Boolean(
+    (currentBooking as any)?.passbooking === true ||
+    (currentBooking as any)?.passbooking === 'true' ||
+    (currentBooking as any)?.passbooking === 1 ||
+    String((currentBooking as any)?.passbooking || '').trim().toLowerCase() === 'yes' ||
+    String((currentBooking as any)?.passBooking || '').trim().toLowerCase() === 'yes' ||
+    (currentBooking as any)?.rawMessage?.passbooking === true ||
+    (currentBooking as any)?.rawMessage?.passbooking === 'true' ||
+    (currentBooking as any)?.rawMessage?.passbooking === 1 ||
+    String((currentBooking as any)?.rawMessage?.passbooking || '').trim().toLowerCase() === 'yes' ||
+    String((currentBooking as any)?.rawMessage?.passBooking || '').trim().toLowerCase() === 'yes' ||
+    String((currentBooking as any)?.paymentMethod || '').trim().toLowerCase() === 'pass'
+  );
+
+  const passId =
+    (currentBooking as any)?.passId ||
+    (currentBooking as any)?.passid ||
+    (currentBooking as any)?.rawMessage?.passId ||
+    (currentBooking as any)?.rawMessage?.passid;
+
   // Requirement: for cancel button use this api https://haatza.com/_functions/cancelNestBooking
   // Pass table id dynamically from orders page api like nestBookings api
   const handleConfirmCancel = async () => {
@@ -141,8 +163,10 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
         actions={
           <button
             onClick={() => {
-              if (booking.tableId) {
-                navigate(`/orders/${booking.tableId}`, { state: { booking } });
+              const b = liveDetails || booking;
+              const tId = b?.tableId || b?.id || b?.bookingId;
+              if (tId) {
+                navigate(`/orders/${tId}`, { state: { booking: b } });
                 onClose();
               }
             }}
@@ -205,7 +229,12 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
 
           {/* Customer & Location */}
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-4 sm:p-5 space-y-2.5 text-xs shadow-soft-sm">
-            <h4 className="font-bold text-[#6B6B6B] uppercase font-mono text-[10px] tracking-wider">Customer Details</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-[#6B6B6B] uppercase font-mono text-[10px] tracking-wider">Customer Details</h4>
+              {isPassBooking && (
+                <RoyalPassBadge size="sm" className="-my-1" />
+              )}
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-2 text-[#1F1F1F]">
               <span className="font-bold text-sm truncate max-w-[220px]" title={customerName}>{customerName}</span>
               <span className="text-[#6B6B6B] font-mono text-xs shrink-0">{customerPhone}</span>
@@ -221,7 +250,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-[#1F1F1F] text-xs">Assigned Expert</h4>
               <span className="font-mono text-xs font-bold text-[#1B2E79]">
-                {hasAssignedVendor || assignedWorkers.length > 0 ? '1 / 1 Expert' : '0 / 1 Expert'}
+                {hasAssignedVendor ? '1 / 1 Expert' : '0 / 1 Expert'}
               </span>
             </div>
 
@@ -246,28 +275,6 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
                 </div>
                 <StatusBadge status={booking.bookingStatus || 'Assigned'} size="sm" />
               </div>
-            ) : assignedWorkers.length > 0 ? (
-              <div className="space-y-2">
-                {assignedWorkers.map((w) => (
-                  <div
-                    key={w.id}
-                    className="flex items-center justify-between rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={w.avatar}
-                        alt={w.name}
-                        className="h-8 w-8 rounded-full object-cover border border-white shadow-soft-sm"
-                      />
-                      <div>
-                        <div className="text-xs font-bold text-[#1F1F1F]">{w.name}</div>
-                        <div className="text-[10px] text-[#6B6B6B] font-mono">{w.phone}</div>
-                      </div>
-                    </div>
-                    <StatusBadge status={w.status} size="sm" />
-                  </div>
-                ))}
-              </div>
             ) : (
               <div className="rounded-xl border border-dashed border-[#C4D9FD] bg-[#FAF9FC] p-4 text-center text-xs text-[#B45309] font-medium">
                 No experts currently dispatched. Immediate assignment required.
@@ -284,6 +291,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
               {timelineStages.map((stage, idx) => {
                 const isLast = idx === timelineStages.length - 1;
                 const isCompleted = stage.isCompleted;
+                const isNextCompleted = Boolean(timelineStages[idx + 1]?.isCompleted);
                 return (
                   <div key={stage.key} className="flex gap-3 text-xs">
                     {/* Timeline dot and connecting line */}
@@ -298,7 +306,7 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
                       {!isLast && (
                         <div
                           className={`w-0.5 grow min-h-[26px] my-1 ${
-                            isCompleted ? 'bg-[#1B2E79]' : 'bg-[#E5E7EB]'
+                            isNextCompleted ? 'bg-[#1B2E79]' : 'bg-[#E5E7EB]'
                           }`}
                         />
                       )}
@@ -310,7 +318,11 @@ export const BookingDetailDrawer: React.FC<BookingDetailDrawerProps> = ({
                         <span className="font-bold text-xs text-[#1F1F1F]">{stage.title}</span>
                         <span
                           className={`font-mono text-[11px] ${
-                            isCompleted ? 'text-[#1B2E79] font-semibold' : 'text-[#9CA3AF] italic'
+                            isCompleted
+                              ? 'text-[#1B2E79] font-semibold'
+                              : stage.timeDisplay !== 'Pending'
+                              ? 'text-[#475467] font-medium'
+                              : 'text-[#9CA3AF] italic'
                           }`}
                         >
                           {stage.timeDisplay}

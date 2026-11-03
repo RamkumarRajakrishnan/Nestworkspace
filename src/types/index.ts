@@ -126,6 +126,11 @@ export interface Booking {
   bookingStatus?: string;
   slaTimer?: string;
   slaAlert?: string;
+  customerRating?: number;
+  customeRating?: string | number;
+  rating?: number;
+  passbooking?: boolean | string;
+  passId?: string;
   rawMessage?: Record<string, any>;
   [key: string]: any;
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useOperations } from '../../../context/OperationsContext';
 import { StatusBadge } from '../../../components/common/StatusBadge';
+import { RoyalPassBadge } from '../../../components/common/RoyalPassBadge';
 import { AssignWorkerModal } from '../../../components/operations/AssignWorkerModal';
 import { ReassignWorkerModal } from '../../../components/operations/ReassignWorkerModal';
 import { ConfirmDialog } from '../../../components/common/ConfirmDialog';
@@ -23,6 +24,7 @@ import {
   Compass, 
   Eye, 
   Ban, 
+  Ticket,
   Loader2 
 } from 'lucide-react';
 
@@ -46,15 +48,24 @@ export const OrderDetailPage: React.FC = () => {
   const [loadingDirect, setLoadingDirect] = useState<boolean>(!routeBooking && !bookings.some((b) => b.tableId === id));
   const [errorDirect, setErrorDirect] = useState<string | null>(null);
 
-  const contextBooking = bookings.find((b) => b.tableId === id);
+  const contextBooking = bookings.find((b) => b.tableId === id || b.bookingId === id || b.id === id);
   const booking = fetchedBooking || contextBooking;
 
   const fetchOrderData = (showSpinner = false) => {
-    if (!id) return;
+    // Resolve valid tableId (UUID) or fallback to id
+    const tableIdToFetch =
+      (id && id.length > 25 && id.includes('-') && !id.startsWith('HN-') ? id : null) ||
+      booking?.tableId ||
+      routeBooking?.tableId ||
+      contextBooking?.tableId ||
+      bookings.find((b) => b.bookingId === id || b.id === id)?.tableId ||
+      id;
+
+    if (!tableIdToFetch) return;
     if (showSpinner) setLoadingDirect(true);
     setErrorDirect(null);
 
-    getOrderDetails(id)
+    getOrderDetails(tableIdToFetch)
       .then((res) => {
         if (res.success && res.data) {
           const raw = (res as any).rawMessage || res.data;
@@ -228,6 +239,34 @@ export const OrderDetailPage: React.FC = () => {
     slaAlert: booking.slaAlert,
   };
 
+  // Check if pass booking is yes
+  const isPassBooking = Boolean(
+    displayApiData?.passbooking === true ||
+    displayApiData?.passbooking === 'true' ||
+    displayApiData?.passbooking === 1 ||
+    String(displayApiData?.passbooking || '').trim().toLowerCase() === 'yes' ||
+    String(displayApiData?.passBooking || '').trim().toLowerCase() === 'yes' ||
+    rawApiMessage?.passbooking === true ||
+    rawApiMessage?.passbooking === 'true' ||
+    rawApiMessage?.passbooking === 1 ||
+    String(rawApiMessage?.passbooking || '').trim().toLowerCase() === 'yes' ||
+    String(rawApiMessage?.passBooking || '').trim().toLowerCase() === 'yes' ||
+    (booking as any)?.passbooking === true ||
+    (booking as any)?.passbooking === 'true' ||
+    (booking as any)?.passbooking === 1 ||
+    String((booking as any)?.passbooking || '').trim().toLowerCase() === 'yes' ||
+    String((booking as any)?.passBooking || '').trim().toLowerCase() === 'yes' ||
+    String(displayApiData?.paymentMethod || '').trim().toLowerCase() === 'pass'
+  );
+
+  const passId =
+    displayApiData?.passId ||
+    displayApiData?.passid ||
+    rawApiMessage?.passId ||
+    rawApiMessage?.passid ||
+    (booking as any)?.passId ||
+    (booking as any)?.passid;
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Back button & Title */}
@@ -281,9 +320,15 @@ export const OrderDetailPage: React.FC = () => {
         {/* Booking Details (2 Cols) */}
         <div className="md:col-span-2 space-y-6">
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
-            <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider border-b border-[#EEEEF2] pb-3">
-              Booking Overview
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#EEEEF2] pb-3">
+              <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider">
+                Booking Overview
+              </h2>
+
+              {isPassBooking && (
+                <RoyalPassBadge size="md" className="-my-1.5" />
+              )}
+            </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
@@ -338,18 +383,18 @@ export const OrderDetailPage: React.FC = () => {
           <div className="rounded-2xl border border-[#EEEEF2] bg-white p-5 shadow-soft-sm space-y-4">
             <div className="flex items-center justify-between border-b border-[#EEEEF2] pb-3">
               <h2 className="text-sm font-bold text-[#1F1F1F] uppercase tracking-wider">
-                Assigned Expert ({hasAssignedVendor || assignedWorkers.length > 0 ? 1 : 0} / 1)
+                Assigned Expert ({hasAssignedVendor ? 1 : 0} / 1)
               </h2>
               <span className="text-xs font-mono text-emerald-700 font-semibold bg-[#ECFDF3] px-2.5 py-0.5 rounded-full">
-                {hasAssignedVendor || assignedWorkers.length > 0 ? '✓ Expert Assigned' : '⚠️ Pending Assignment'}
+                {hasAssignedVendor ? '✓ Expert Assigned' : '⚠️ Pending Assignment'}
               </span>
             </div>
 
-            {!hasAssignedVendor && assignedWorkers.length === 0 ? (
+            {!hasAssignedVendor ? (
               <div className="rounded-xl border border-dashed border-[#EEEEF2] p-8 text-center text-xs text-[#6B6B6B]">
-                No experts currently dispatched. Click &quot;Assign Expert&quot; to dispatch candidate.
+                No experts currently dispatched.
               </div>
-            ) : hasAssignedVendor ? (
+            ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-3">
                   <div className="flex items-start justify-between">
@@ -385,48 +430,6 @@ export const OrderDetailPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {assignedWorkers.map((w) => (
-                  <div
-                    key={w.id}
-                    className="rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] p-4 space-y-3"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={w.avatar}
-                          alt={w.name}
-                          className="h-10 w-10 rounded-full object-cover border border-[#EEEEF2]"
-                        />
-                        <div>
-                          <div className="text-xs font-bold text-[#1F1F1F]">{w.name}</div>
-                          <div className="text-[10px] font-mono text-[#6B6B6B]">Expert ID: {w.id}</div>
-                        </div>
-                      </div>
-                      <StatusBadge status={w.status} size="sm" />
-                    </div>
-
-                    <div className="text-xs text-[#6B6B6B] space-y-1 border-t border-[#EEEEF2] pt-2">
-                      <div className="flex justify-between">
-                        <span>Rating:</span>
-                        <span className="text-amber-600 font-semibold">⭐ {w.rating}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Direct Phone:</span>
-                        <span className="font-mono text-[#1F1F1F]">{w.phone}</span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => navigate(`/workers/${w.id}`)}
-                      className="w-full rounded-xl border border-[#EEEEF2] bg-white py-1.5 text-[11px] font-semibold text-[#1F1F1F] hover:text-[#1B2E79] hover:bg-[#EEF3FF] shadow-soft-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <Eye className="h-3.5 w-3.5 text-[#1B2E79]" /> View Profile
-                    </button>
-                  </div>
-                ))}
-              </div>
             )}
           </div>
         </div>
@@ -441,6 +444,7 @@ export const OrderDetailPage: React.FC = () => {
             {timelineStages.map((stage, idx) => {
               const isLast = idx === timelineStages.length - 1;
               const isStageCompleted = stage.isCompleted;
+              const isNextCompleted = Boolean(timelineStages[idx + 1]?.isCompleted);
               return (
                 <div key={stage.key} className="flex gap-3 text-xs">
                   {/* Timeline dot and connecting line */}
@@ -455,7 +459,7 @@ export const OrderDetailPage: React.FC = () => {
                     {!isLast && (
                       <div
                         className={`w-0.5 grow min-h-[30px] my-1 ${
-                          isStageCompleted ? 'bg-[#1B2E79]' : 'bg-[#E5E7EB]'
+                          isNextCompleted ? 'bg-[#1B2E79]' : 'bg-[#E5E7EB]'
                         }`}
                       />
                     )}
@@ -467,7 +471,11 @@ export const OrderDetailPage: React.FC = () => {
                       <span className="font-bold text-xs text-[#1F1F1F]">{stage.title}</span>
                       <span
                         className={`font-mono text-[11px] ${
-                          isStageCompleted ? 'text-[#1B2E79] font-semibold' : 'text-[#9CA3AF] italic'
+                          isStageCompleted
+                            ? 'text-[#1B2E79] font-semibold'
+                            : stage.timeDisplay !== 'Pending'
+                            ? 'text-[#475467] font-medium'
+                            : 'text-[#9CA3AF] italic'
                         }`}
                       >
                         {stage.timeDisplay}
