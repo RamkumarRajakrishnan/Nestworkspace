@@ -326,7 +326,7 @@ export const OrderDetailPage: React.FC = () => {
               </h2>
 
               {isPassBooking && (
-                <RoyalPassBadge size="md" className="-my-1.5" />
+                <RoyalPassBadge size="md" className="-my-2 sm:-my-2.5" />
               )}
             </div>
 

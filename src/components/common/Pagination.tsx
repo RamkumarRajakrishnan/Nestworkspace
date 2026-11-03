@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface PaginationProps {
@@ -86,6 +86,21 @@ export const Pagination: React.FC<PaginationProps> = ({
     onPageChange(safeCurrentPage + 1);
   };
 
+  const [pageInput, setPageInput] = useState<string>('');
+
+  const trimmedInput = pageInput.trim();
+  const parsedPage = parseInt(trimmedInput, 10);
+  const isInputNumber = !isNaN(parsedPage);
+  const isPageExceeded = isInputNumber && parsedPage > safeTotalPages;
+  const isPageInvalid = !trimmedInput || !isInputNumber || parsedPage < 1 || isPageExceeded;
+  const isGoDisabled = isLoading || isPageInvalid;
+
+  const handleJumpToPage = () => {
+    if (isGoDisabled) return;
+    onPageChange(parsedPage);
+    setPageInput('');
+  };
+
   return (
     <div
       className={`flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#EEEEF2] bg-white px-4 py-3 rounded-2xl shadow-soft-sm w-full ${className}`}
@@ -170,6 +185,42 @@ export const Pagination: React.FC<PaginationProps> = ({
           <span>Next</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </button>
+
+        {/* Go To Page Input Box */}
+        <div className="flex items-center gap-1.5 pl-2 border-l border-[#EEEEF2] ml-1">
+          <span className="text-[11px] font-medium text-[#6B6B6B] hidden sm:inline select-none">Go to:</span>
+          <input
+            type="number"
+            min={1}
+            max={safeTotalPages}
+            value={pageInput}
+            onChange={(e) => setPageInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleJumpToPage();
+              }
+            }}
+            placeholder="Page"
+            disabled={isLoading}
+            className={`h-8 w-14 rounded-xl border px-1.5 text-center text-xs font-bold font-mono transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+              isPageExceeded
+                ? 'border-rose-400 bg-rose-50 text-rose-700 focus:border-rose-500 focus:outline-none'
+                : 'border-[#EEEEF2] bg-[#FAF9FC] text-[#1F1F1F] placeholder:text-[#9CA3AF] placeholder:font-normal focus:border-[#1B2E79] focus:bg-white focus:outline-none'
+            }`}
+            aria-label="Go to page number"
+            title={isPageExceeded ? `Page number cannot exceed ${safeTotalPages}` : undefined}
+          />
+          <button
+            type="button"
+            onClick={handleJumpToPage}
+            disabled={isGoDisabled}
+            className="h-8 px-2.5 rounded-xl border border-[#EEEEF2] bg-[#FAF9FC] text-xs font-bold text-[#1B2E79] hover:bg-[#EEF3FF] hover:border-[#C4D9FD] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-soft-xs active:scale-95"
+            title={isPageExceeded ? `Page cannot exceed ${safeTotalPages}` : 'Go to entered page'}
+          >
+            Go
+          </button>
+        </div>
       </div>
     </div>
   );
